@@ -1,1 +1,53 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap");
 @import "tailwindcss";
+@config "../tailwind.config.ts";
+
+body {
+  font-family: "Manrope", sans-serif !important;
+}
+
+@layer utilities {
+  .input {
+    @apply rounded-lg bg-neutral-100 focus:border outline-none focus:border-primary-200;
+  }
+
+  /* Form Controls */
+  label {
+    @apply block mb-2 text-sm font-bold;
+  }
+
+  input[type="number"].appearance-none::-webkit-inner-spin-button,
+  input[type="number"].appearance-none::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"].appearance-none {
+    -moz-appearance: textfield;
+  }
+
+  .form-control {
+    @apply relative;
+  }
+
+  .form-control input,
+  .form-control textarea {
+    @apply font-semibold text-[15px] px-5 py-4 bg-neutral-100 rounded-lg border border-neutral-50 focus:border-primary-200 outline-0 focus:ring-0;
+  }
+
+  .form-control textarea {
+    @apply w-full text-[15px] py-2.5 placeholder:font-medium placeholder:text-sm placeholder:text-gray-300;
+  }
+
+  .form-control input:not([type="checkbox"]) {
+    @apply w-full  placeholder:font-medium placeholder:text-sm placeholder:text-gray-400;
+  }
+
+  .form-control input.input-condensed {
+    @apply px-3 h-9 sm:text-[15px];
+  }
+
+  .form-control input:disabled {
+    @apply bg-gray-100 cursor-not-allowed;
+  }
+}
