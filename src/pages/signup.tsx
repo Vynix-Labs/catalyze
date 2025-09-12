@@ -1,0 +1,41 @@
+import Button from "../common/ui/button";
+import AuthHeader from "../components/auth/header";
+import SignUpForm from "../components/auth/signup/form";
+import { RoutePath } from "../routes/routePath";
+const link = {
+  url: RoutePath.SIGNIN,
+  text: "Log In",
+};
+function SignUp() {
+  return (
+    <div className="py-6 px-5 flex flex-col justify-between h-svh">
+      <div className="space-y-10">
+        <AuthHeader
+          title="Create an account easily"
+          description="Already have an account? "
+          isLink
+          link={link}
+        />
+
+        <div>
+          <SignUpForm />
+        </div>
+      </div>
+      <div className="space-y-8">
+        <div className="flex gap-3 items-center">
+          <input type="checkbox" name="" id="" />
+          <p className="text-sm font-semibold leading-6">
+            By registering, you accept our{" "}
+            <span className="text-primary-100 font-black">Terms of Use </span>{" "}
+            and{" "}
+            <span className="text-primary-100 font-black">
+              Privacy Policies
+            </span>
+          </p>
+        </div>
+        <Button text="Proceed" variants="primary" />
+      </div>
+    </div>
+  );
+}
+export default SignUp;
