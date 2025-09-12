@@ -1,3 +1,4 @@
+import ThirdPartyAuth from "../common/auth/ThirdPartyAuth";
 import Button from "../common/ui/button";
 import AuthHeader from "../components/auth/header";
 import SignUpForm from "../components/auth/signup/form";
@@ -17,9 +18,8 @@ function SignUp() {
           link={link}
         />
 
-        <div>
-          <SignUpForm />
-        </div>
+        <SignUpForm />
+        <ThirdPartyAuth />
       </div>
       <div className="space-y-8">
         <div className="flex gap-3 items-center">
@@ -33,7 +33,9 @@ function SignUp() {
             </span>
           </p>
         </div>
-        <Button text="Proceed" variants="primary" />
+        <div className="flex-col flex items-center w-full">
+          <Button text="Proceed" variants="primary" />
+        </div>
       </div>
     </div>
   );
