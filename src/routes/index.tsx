@@ -6,7 +6,7 @@ import VerifyEmail from "../pages/auth/verifyEmail";
 import Onboarding from "../pages/auth/onBoarding";
 import SignUp from "../pages/auth/signup";
 import CreatePin from "../pages/auth/createPin";
-import CryptoTransferFlow from "../components/cryptoTransferFlow";
+import CryptoTransferFlow from "../pages/dashboard/CryptoTransferFlow";
 
 export const routes = createBrowserRouter([
   {

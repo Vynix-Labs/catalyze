@@ -32,6 +32,10 @@ export interface AmountEntryStepProps {
   onBack: () => void;
 }
 
+export interface CurrencyTabProps {
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+}
 export interface BankSelectionStepProps {
   selectedBank: string;
   setSelectedBank: React.Dispatch<React.SetStateAction<string>>;
@@ -59,4 +63,11 @@ export interface NumberPadProps {
   canProceed: boolean;
   onClear: () => void;
   showClear: boolean;
+}
+
+export interface CryptoTransferFlowProps {
+  amount: string;
+  setAmount: React.Dispatch<React.SetStateAction<string>>;
+  onNext: () => void;
+  onBack: () => void;
 }

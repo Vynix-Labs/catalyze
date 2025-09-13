@@ -7,7 +7,7 @@ const Header: React.FC<HeaderProps> = ({
   onBack,
   showBackButton = true,
 }) => (
-  <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-white">
+  <div className="flex items-center justify-between p-4 border-gray-100 bg-white">
     {showBackButton ? (
       <button
         onClick={onBack}

@@ -1,5 +1,4 @@
 import React from "react";
-import Header from "./Header";
 import type { BankSelectionStepProps } from "../../types/types";
 
 const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
@@ -9,12 +8,10 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
   setAccountNumber,
   username,
   onNext,
-  onBack,
 }) => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="bg-white flex-1">
-        <Header title="USDC" onBack={onBack} />
 
         <div className="p-4">
           <div className="mb-4">

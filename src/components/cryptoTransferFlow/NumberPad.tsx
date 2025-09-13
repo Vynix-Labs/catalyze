@@ -9,7 +9,7 @@ const NumberPad: React.FC<NumberPadProps> = ({
   onClear,
   showClear,
 }) => (
-  <div className="grid grid-cols-3 gap-4 w-full mx-auto absolute bottom-10 right-0 left-0">
+  <div className="grid grid-cols-3 gap-4 max-w-[420px] w-full mx-auto absolute bottom-10 right-0 left-0">
     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
       <button
         key={num}

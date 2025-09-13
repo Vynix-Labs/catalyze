@@ -1,5 +1,4 @@
 import React from "react";
-import Header from "./Header";
 import NumberPad from "./NumberPad";
 import type { PinEntryStepProps } from "../../types/types";
 
@@ -7,7 +6,6 @@ const PinEntryStep: React.FC<PinEntryStepProps> = ({
   pin,
   setPin,
   onNext,
-  onBack,
 }) => {
   const handleNumberPress = (num: string) => {
     if (pin.length < 4) {
@@ -27,7 +25,6 @@ const PinEntryStep: React.FC<PinEntryStepProps> = ({
 
   return (
     <div className="min-h-screen bg-neutral-100 flex flex-col">
-      <Header title="" onBack={onBack} />
 
       <div className="flex-1 flex flex-col justify- p-4">
         <div className="mb-12">

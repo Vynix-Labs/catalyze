@@ -3,7 +3,7 @@ import AmountEntryStep from "../../components/cryptoTransferFlow/AmountEntryStep
 import BankSelectionStep from "../../components/cryptoTransferFlow/BankSelectionStep";
 import PinEntryStep from "../../components/cryptoTransferFlow/PinEntryStep";
 import SuccessStep from "../../components/cryptoTransferFlow/SuccessStep";
-
+import Header from "../../components/cryptoTransferFlow/Header";
 
 const CryptoTransferFlow: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -76,7 +76,10 @@ const CryptoTransferFlow: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-white">
+    <div className="max-w-[420px] mx-auto min-h-screen">
+      <div className="bg-white">
+        <Header title="USDC" onBack={goToPrevStep} />
+      </div>
       {renderCurrentStep()}
     </div>
   );
