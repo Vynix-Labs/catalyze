@@ -1,14 +1,27 @@
 import { createBrowserRouter } from "react-router-dom";
 import { RoutePath } from "./routePath";
+import Home from "../pages/home";
+import NotFound from "../pages/notFound";
+import VerifyEmail from "../pages/auth/verifyEmail";
 import Onboarding from "../pages/auth/onBoarding";
 import SignUp from "../pages/auth/signup";
-import VerifyEmail from "../pages/auth/verifyEmail";
+import CreatePin from "../pages/auth/createPin";
 
 export const routes = createBrowserRouter([
   {
-    path: RoutePath.ROOT,
+    path: "/home",
+    element: <Home />,
+    errorElement: <NotFound />, // handles errors on this route
+  },
+  {
+    path: "/",
     element: <Onboarding />,
   },
+  {
+    path: "*", // catch-all
+    element: <NotFound />,
+  },
+
   {
     path: "/auth",
     children: [
@@ -19,6 +32,10 @@ export const routes = createBrowserRouter([
       {
         path: RoutePath.RESET_OTP,
         element: <VerifyEmail />,
+      },
+      {
+        path: RoutePath.CREATE_TRANSACTION_PIN,
+        element: <CreatePin />,
       },
     ],
   },
