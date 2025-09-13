@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
 
 export interface buttonProps {
-  variants: "primary" | "secondary"; // add more if need and button ;
+  variants: "primary" | "secondary";
   classes?: string;
   children?: ReactNode;
   text?: string;
   handleClick?: () => void;
+  disabled?: boolean; // <-- add type here
 }
 
 export interface AuthHeaderProps {

@@ -91,6 +91,7 @@ const config: Config = {
         secondary: {
           base: "#A42600",
           100: "#F59E0B",
+          200: "#FDECCE33",
         },
 
         success: {
