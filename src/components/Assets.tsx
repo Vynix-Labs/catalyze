@@ -14,10 +14,10 @@ interface AssetsProps {
   title?: string;
 }
 
-const Assets: React.FC<AssetsProps> = ({ assets, title = "Assets" }) => {
+const Assets: React.FC<AssetsProps> = ({ assets }) => {
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-800 mb-4">{title}</h2>
+      {/* <h2 className="text-xl font-bold text-gray-800 mb-4">{title}</h2> */}
 
       <div className="space-y-4">
         {assets.map((asset) => (

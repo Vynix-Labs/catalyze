@@ -73,6 +73,7 @@ const config: Config = {
         neutral: {
           50: "#FAFAFA",
           100: "#F5F5F5",
+          150: "#F2F2F2",
         },
         primary: {
           50: "#1B1737",
