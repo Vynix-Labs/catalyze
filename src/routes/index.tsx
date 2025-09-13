@@ -7,6 +7,7 @@ import Onboarding from "../pages/auth/onBoarding";
 import SignUp from "../pages/auth/signup";
 import CreatePin from "../pages/auth/createPin";
 
+
 export const routes = createBrowserRouter([
   {
     path: "/home",
