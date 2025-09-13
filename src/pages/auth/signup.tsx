@@ -1,8 +1,8 @@
-import ThirdPartyAuth from "../common/auth/ThirdPartyAuth";
-import Button from "../common/ui/button";
-import AuthHeader from "../components/auth/header";
-import SignUpForm from "../components/auth/signup/form";
-import { RoutePath } from "../routes/routePath";
+import ThirdPartyAuth from "../../common/auth/ThirdPartyAuth";
+import Button from "../../common/ui/button";
+import AuthHeader from "../../components/auth/header";
+import SignUpForm from "../../components/auth/signup/form";
+import { RoutePath } from "../../routes/routePath";
 const link = {
   url: RoutePath.SIGNIN,
   text: "Log In",
@@ -19,6 +19,11 @@ function SignUp() {
         />
 
         <SignUpForm />
+        <div className="flex gap-2 items-center">
+          <hr className="flex-1 border border-gray-200 border-collapse" />
+          <p className="font-semibold text-sm text-gray-600">or</p>
+          <hr className="flex-1 border border-gray-200 border-collapse" />
+        </div>
         <ThirdPartyAuth />
       </div>
       <div className="space-y-8">
