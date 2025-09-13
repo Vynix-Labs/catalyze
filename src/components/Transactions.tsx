@@ -1,5 +1,4 @@
 import React from "react";
-// import { ArrowUpRight } from "lucide-react";
 
 export interface Transaction {
   id: string;
@@ -17,6 +16,7 @@ interface TransactionsProps {
   showDivider?: boolean;
   maxDisplayItems?: number;
   onViewAll?: () => void;
+  onTransactionClick?: (transaction: Transaction) => void;
 }
 
 // Currency icon mapping - using proper image paths
@@ -39,6 +39,7 @@ const Transactions: React.FC<TransactionsProps> = ({
   showDivider = true,
   maxDisplayItems = 2,
   onViewAll,
+  onTransactionClick,
 }) => {
   // Function to detect currency type from title
   const detectCurrencyType = (title: string): string => {
@@ -65,16 +66,25 @@ const Transactions: React.FC<TransactionsProps> = ({
           </button>
         )}
       </div>
+
       <div className="space-y-4">
         {displayTransactions.map((transaction) => {
           const currencyType =
             transaction.currencyType || detectCurrencyType(transaction.title);
           const iconPath =
             currencyIcons[currencyType as keyof typeof currencyIcons];
+
           return (
             <div
               key={transaction.id}
-              className="flex justify-between items-start py-2"
+              className={`flex justify-between items-start py-2 ${
+                onTransactionClick
+                  ? "cursor-pointer hover:bg-gray-50 rounded-lg p-2"
+                  : ""
+              }`}
+              onClick={() =>
+                onTransactionClick && onTransactionClick(transaction)
+              }
             >
               {/* Left side with icon and text */}
               <div className="flex items-start space-x-3 flex-1">
@@ -83,7 +93,7 @@ const Transactions: React.FC<TransactionsProps> = ({
                     <img
                       src={iconPath}
                       alt={`${currencyType} logo`}
-                      className=" object-contain"
+                      className="object-contain w-5 h-5"
                     />
                   ) : (
                     <FallbackIcon currencyType={currencyType} />
@@ -98,6 +108,7 @@ const Transactions: React.FC<TransactionsProps> = ({
                   </p>
                 </div>
               </div>
+
               {/* Right side with amount */}
               <div className="text-right">
                 <span
@@ -110,7 +121,7 @@ const Transactions: React.FC<TransactionsProps> = ({
                   }`}
                 >
                   {transaction.type === "deposit" ? "+" : "-"}
-                  {transaction.currency || "N"}
+                  {transaction.currency || "₦"}
                   {transaction.amount}
                 </span>
               </div>

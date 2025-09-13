@@ -13,7 +13,7 @@ interface AssetsProps {
   assets: Asset[];
   title?: string;
   maxDisplayItems?: number;
-  onViewAll?: () => void;
+  onAssetClick?: (asset: Asset) => void;
 }
 
 // Currency icon mapping - using proper image paths (same as transactions)
@@ -25,7 +25,7 @@ const currencyIcons = {
 
 // Fallback component for unknown currencies
 const FallbackIcon = ({ symbol }: { symbol: string }) => (
-  <div className=" bg-gray-200 rounded-full flex items-center justify-center">
+  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
     <span className="text-xs font-bold">{symbol.charAt(0)}</span>
   </div>
 );
@@ -33,9 +33,11 @@ const FallbackIcon = ({ symbol }: { symbol: string }) => (
 const Assets: React.FC<AssetsProps> = ({
   assets,
   maxDisplayItems = assets.length,
+  onAssetClick,
 }) => {
   // Show only limited items if maxDisplayItems is provided
   const displayAssets = assets.slice(0, maxDisplayItems);
+
   return (
     <div className="mb-6 rounded-lg bg-white p-3">
       <div className="space-y-4">
@@ -46,7 +48,12 @@ const Assets: React.FC<AssetsProps> = ({
           return (
             <div
               key={asset.id}
-              className="flex justify-between items-center py-2"
+              className={`flex justify-between items-center py-2 ${
+                onAssetClick
+                  ? "cursor-pointer hover:bg-gray-50 rounded-lg p-2"
+                  : ""
+              }`}
+              onClick={() => onAssetClick && onAssetClick(asset)}
             >
               {/* Left side with icon and text */}
               <div className="flex items-center space-x-3">
@@ -55,7 +62,7 @@ const Assets: React.FC<AssetsProps> = ({
                     <img
                       src={iconPath}
                       alt={`${asset.symbol} logo`}
-                      className="object-contain"
+                      className="object-contain w-5 h-5"
                     />
                   ) : (
                     <FallbackIcon symbol={asset.symbol} />

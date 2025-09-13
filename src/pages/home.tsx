@@ -1,20 +1,27 @@
 import React, { useState } from "react";
 import BottomNav from "../components/BottomNav";
-import Assets from "../components/Assets";
-import type { Transaction } from "../components/Transactions";
+import Transactions, { type Transaction } from "../components/Transactions";
+import Assets, { type Asset } from "../components/Assets";
+import CurrencyDetailPage from "./CurrencyDetailPage";
 import TransactionDetailsPage from "./transactionDetails";
-import Transactions from "../components/Transactions";
 import { ArrowDownRight, ArrowUpRight, Eye, EyeOff } from "lucide-react";
 import { FaBell } from "react-icons/fa";
 
 const Home: React.FC = () => {
   const [activeTab, setActiveTab] = useState("home");
   const [showTransactionDetails, setShowTransactionDetails] = useState(false);
+  const [showCurrencyDetail, setShowCurrencyDetail] = useState(false);
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
 
   const toggleBalanceVisibility = () => {
     setIsBalanceVisible(!isBalanceVisible);
   };
+
+  const [selectedCurrency, setSelectedCurrency] = useState<{
+    type: string;
+    balance: string;
+    nairaValue: string;
+  } | null>(null);
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
@@ -28,12 +35,51 @@ const Home: React.FC = () => {
     setShowTransactionDetails(false);
   };
 
+  // In your Home component
+  const handleAssetClick = (asset: Asset) => {
+    setSelectedCurrency({
+      type: asset.symbol,
+      balance: asset.balance,
+      nairaValue: asset.value,
+    });
+    setShowCurrencyDetail(true);
+  };
+
+  const handleTransactionClick = (transaction: Transaction) => {
+    const currencyType =
+      transaction.currencyType || detectCurrencyType(transaction.title);
+
+    // Find the asset data for this currency
+    const asset = assetsData.find((a) => a.symbol === currencyType);
+
+    setSelectedCurrency({
+      type: currencyType,
+      balance: asset?.balance || "0.00",
+      nairaValue: asset?.value || "0.00",
+    });
+    setShowCurrencyDetail(true);
+  };
+
+  const handleBackFromCurrencyDetail = () => {
+    setShowCurrencyDetail(false);
+    setSelectedCurrency(null);
+  };
+
+  // Helper function to detect currency type from title
+  const detectCurrencyType = (title: string): string => {
+    if (title.includes("USDT")) return "USDT";
+    if (title.includes("USDC")) return "USDC";
+    if (title.includes("STRK")) return "STRK";
+    return "UNKNOWN";
+  };
+
   const transactionsData: Transaction[] = [
     {
       id: "1",
       title: "Deposit to USDT wallet",
       date: "9th June, 2024",
       amount: "10,000",
+      currency: "₦",
       type: "deposit",
       currencyType: "USDT",
     },
@@ -42,6 +88,7 @@ const Home: React.FC = () => {
       title: "Deposit to USDC wallet",
       date: "9th June, 2024",
       amount: "20,000",
+      currency: "₦",
       type: "deposit",
       currencyType: "USDC",
     },
@@ -50,6 +97,7 @@ const Home: React.FC = () => {
       title: "Deposit to STRK wallet",
       date: "9th June, 2024",
       amount: "20,000",
+      currency: "₦",
       type: "deposit",
       currencyType: "STRK",
     },
@@ -58,6 +106,7 @@ const Home: React.FC = () => {
       title: "Withdrawal from USDT wallet",
       date: "8th June, 2024",
       amount: "5,000",
+      currency: "₦",
       type: "withdrawal",
       currencyType: "USDT",
     },
@@ -66,6 +115,7 @@ const Home: React.FC = () => {
       title: "Transfer to USDC wallet",
       date: "7th June, 2024",
       amount: "15,000",
+      currency: "₦",
       type: "transfer",
       currencyType: "USDC",
     },
@@ -74,25 +124,28 @@ const Home: React.FC = () => {
       title: "Deposit to STRK wallet",
       date: "6th June, 2024",
       amount: "30,000",
+      currency: "₦",
       type: "deposit",
       currencyType: "STRK",
     },
   ];
 
-  const assetsData = [
+  const assetsData: Asset[] = [
     {
       id: "1",
       symbol: "USDT",
       name: "Tether",
       balance: "10,000",
       value: "100,000",
+      currency: "₦",
     },
     {
       id: "2",
       symbol: "USDC",
       name: "USD Coin",
-      balance: "10,000",
-      value: "100,000",
+      balance: "5.00023",
+      value: "6,000,000.00",
+      currency: "₦",
     },
     {
       id: "3",
@@ -100,10 +153,24 @@ const Home: React.FC = () => {
       name: "Starknet",
       balance: "10,000",
       value: "100,000",
+      currency: "₦",
     },
   ];
 
-  // If showing transaction details, render that page
+  // Render currency detail page
+  if (showCurrencyDetail && selectedCurrency) {
+    return (
+      <CurrencyDetailPage
+        currencyType={selectedCurrency.type}
+        balance={selectedCurrency.balance}
+        nairaValue={selectedCurrency.nairaValue}
+        transactions={transactionsData}
+        onBack={handleBackFromCurrencyDetail}
+      />
+    );
+  }
+
+  // Render transaction details page
   if (showTransactionDetails) {
     return (
       <TransactionDetailsPage
@@ -118,7 +185,7 @@ const Home: React.FC = () => {
       {/* Main content container with proper spacing for bottom nav */}
       <div className="max-w-md mx-auto min-h-screen flex flex-col pb-16">
         {/* Scrollable content area */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto space-y-4">
           {/* Header */}
           <div className="p-5">
             <div className="flex justify-between items-center">
@@ -172,10 +239,10 @@ const Home: React.FC = () => {
 
                 {/* Action Buttons */}
                 <div className="flex space-x-3">
-                  <button className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-xl hover:bg-white/30 transition-all flex-1 flex items-center justify-center space-x-2">
+                  <button className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:bg-white/30 transition-all flex-1 flex items-center justify-center space-x-2">
                     <span>Transfer</span> <ArrowUpRight className="w-4 h-4" />
                   </button>
-                  <button className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-xl hover:bg-white/30 transition-all flex-1 flex items-center justify-center space-x-2">
+                  <button className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:bg-white/30 transition-all flex-1 flex items-center justify-center space-x-2">
                     <span>Deposit</span> <ArrowDownRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -183,15 +250,16 @@ const Home: React.FC = () => {
             </div>
           </div>
 
-          <div className="px-4">
+          <div className="p-5">
             {/* Transactions */}
             <div className="max-w-md mx-auto">
               <Transactions
                 transactions={transactionsData}
-                title="Transactions"
+                title="Recent Transactions"
                 showDivider={false}
                 maxDisplayItems={2}
                 onViewAll={handleViewAllTransactions}
+                onTransactionClick={handleTransactionClick}
               />
             </div>
 
@@ -200,13 +268,13 @@ const Home: React.FC = () => {
 
             {/* Assets */}
             <div className="max-w-md mx-auto overflow-hidden">
-              <Assets assets={assetsData} title="Assets" maxDisplayItems={3} />
+              <Assets assets={assetsData} onAssetClick={handleAssetClick} />
             </div>
           </div>
         </div>
 
         {/* Fixed bottom navigation */}
-        <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto">
+        <div className="fixed bottom-0 left-0 right-0 max-w-[420px] mx-auto">
           <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
         </div>
       </div>
