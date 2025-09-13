@@ -25,7 +25,7 @@ body {
 
   /* Form Controls */
   label {
-    @apply block mb-2 text-sm font-bold;
+    @apply block mb-2 text-sm font-bold capitalize;
   }
 
   input[type="number"].appearance-none::-webkit-inner-spin-button,
@@ -52,7 +52,7 @@ body {
   }
 
   .form-control input:not([type="checkbox"]) {
-    @apply w-full  placeholder:font-medium placeholder:text-sm placeholder:text-gray-400;
+    @apply w-full  placeholder:font-medium placeholder:capitalize placeholder:text-sm placeholder:text-gray-400;
   }
 
   .form-control input.input-condensed {
