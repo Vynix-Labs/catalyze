@@ -7,6 +7,9 @@ import Onboarding from "../pages/auth/onBoarding";
 import SignUp from "../pages/auth/signup";
 import CreatePin from "../pages/auth/createPin";
 import CryptoTransferFlow from "../pages/dashboard/CryptoTransferFlow";
+import Login from "../pages/auth/login";
+import ForgetPassword from "../pages/auth/forget-password";
+import CreatePassword from "../pages/auth/createPassword";
 
 export const routes = createBrowserRouter([
   {
@@ -41,6 +44,18 @@ export const routes = createBrowserRouter([
       {
         path: RoutePath.CREATE_TRANSACTION_PIN,
         element: <CreatePin />,
+      },
+      {
+        path: RoutePath.SIGNIN,
+        element: <Login />,
+      },
+      {
+        path: RoutePath.FORGOT_PASSWORD,
+        element: <ForgetPassword />,
+      },
+      {
+        path: RoutePath.CREATE_PASSWORD,
+        element: <CreatePassword />,
       },
     ],
   },

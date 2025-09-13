@@ -1,5 +1,6 @@
+import AuthFooter from "../../common/auth/AuthFooter";
+import Divider from "../../common/auth/Divider";
 import ThirdPartyAuth from "../../common/auth/ThirdPartyAuth";
-import Button from "../../common/ui/button";
 import AuthHeader from "../../components/auth/header";
 import SignUpForm from "../../components/auth/signup/form";
 import { RoutePath } from "../../routes/routePath";
@@ -19,11 +20,7 @@ function SignUp() {
         />
 
         <SignUpForm />
-        <div className="flex gap-2 items-center">
-          <hr className="flex-1 border border-gray-200 border-collapse" />
-          <p className="font-semibold text-sm text-gray-600">or</p>
-          <hr className="flex-1 border border-gray-200 border-collapse" />
-        </div>
+        <Divider />
         <ThirdPartyAuth />
       </div>
       <div className="space-y-8">
@@ -38,9 +35,7 @@ function SignUp() {
             </span>
           </p>
         </div>
-        <div className="flex-col flex items-center w-full">
-          <Button text="Proceed" variants="primary" />
-        </div>
+        <AuthFooter text="Proceed" />
       </div>
     </div>
   );
