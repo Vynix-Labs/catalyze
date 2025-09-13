@@ -431,3 +431,18 @@ export const EyeDropCloseIcon = () => (
     />
   </svg>
 );
+export const PinIcon = () => (
+  <svg
+    width={13}
+    height={12}
+    viewBox="0 0 13 12"
+    fill="none"
+    xmlns="http://
+www.w3.org/2000/svg"
+  >
+    <path
+      d="M4.2768 12L6.762 7.68862L9.38922 12L11.3774 10.5269L8.43064 6.53892L12.833 5.49701L12.0519 3.08982L7.8981 4.81437L8.14662 0H5.5549L5.80342 4.81437L1.61407 3.08982L0.833008 5.49701L5.19987 6.53892L2.25313 10.5269L4.2768 12Z"
+      fill="currentColor"
+    />
+  </svg>
+);

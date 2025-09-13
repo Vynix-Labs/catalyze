@@ -1,8 +1,8 @@
-import ThirdPartyAuth from "../common/auth/ThirdPartyAuth";
-import Button from "../common/ui/button";
-import AuthHeader from "../components/auth/header";
-import SignUpForm from "../components/auth/signup/form";
-import { RoutePath } from "../routes/routePath";
+import ThirdPartyAuth from "../../common/auth/ThirdPartyAuth";
+import Button from "../../common/ui/button";
+import AuthHeader from "../../components/auth/header";
+import SignUpForm from "../../components/auth/signup/form";
+import { RoutePath } from "../../routes/routePath";
 const link = {
   url: RoutePath.SIGNIN,
   text: "Log In",
