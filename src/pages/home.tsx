@@ -27,7 +27,6 @@ const Home: React.FC = () => {
       title: "Deposit to USDT wallet",
       date: "9th June, 2024",
       amount: "10,000",
-      currency: "¥",
       type: "deposit",
       currencyType: "USDT",
     },
@@ -36,7 +35,6 @@ const Home: React.FC = () => {
       title: "Deposit to USDC wallet",
       date: "9th June, 2024",
       amount: "20,000",
-      currency: "¥",
       type: "deposit",
       currencyType: "USDC",
     },
@@ -45,7 +43,6 @@ const Home: React.FC = () => {
       title: "Deposit to STRK wallet",
       date: "9th June, 2024",
       amount: "20,000",
-      currency: "¥",
       type: "deposit",
       currencyType: "STRK",
     },
@@ -54,7 +51,6 @@ const Home: React.FC = () => {
       title: "Withdrawal from USDT wallet",
       date: "8th June, 2024",
       amount: "5,000",
-      currency: "¥",
       type: "withdrawal",
       currencyType: "USDT",
     },
@@ -63,7 +59,6 @@ const Home: React.FC = () => {
       title: "Transfer to USDC wallet",
       date: "7th June, 2024",
       amount: "15,000",
-      currency: "¥",
       type: "transfer",
       currencyType: "USDC",
     },
@@ -72,7 +67,6 @@ const Home: React.FC = () => {
       title: "Deposit to STRK wallet",
       date: "6th June, 2024",
       amount: "30,000",
-      currency: "¥",
       type: "deposit",
       currencyType: "STRK",
     },
@@ -128,7 +122,7 @@ const Home: React.FC = () => {
             <h2 className="text-sm font-semibold text-gray-500 uppercase">
               Total Balance
             </h2>
-            <p className="text-3xl font-bold text-gray-800 mt-1">¥40,000</p>
+            <p className="text-3xl font-bold text-gray-800 mt-1">40,000</p>
           </div>
 
           {/* Transfer Section */}
@@ -163,7 +157,7 @@ const Home: React.FC = () => {
 
             {/* Assets */}
             <div className="max-w-md mx-auto overflow-hidden">
-              <Assets assets={assetsData} />
+              <Assets assets={assetsData} title="Assets" maxDisplayItems={3} />
             </div>
           </div>
         </div>

@@ -33,7 +33,7 @@ const CurrencyIcon = ({ currencyType }: { currencyType: string }) => {
         <img
           src={iconPath}
           alt={`${currencyType} logo`}
-          className="object-contain"
+          className="object-contain "
         />
       </div>
     );
@@ -129,9 +129,9 @@ const TransactionDetailsPage: React.FC<TransactionDetailsPageProps> = ({
                       {/* Right side with amount */}
                       <div className="text-right">
                         <span
-                          className={`font-semibold text-base ${
+                          className={`font-bold text-base ${
                             transaction.type === "deposit"
-                              ? "text-green-600"
+                              ? "text-black"
                               : transaction.type === "withdrawal"
                               ? "text-red-600"
                               : "text-blue-600"
@@ -142,7 +142,7 @@ const TransactionDetailsPage: React.FC<TransactionDetailsPageProps> = ({
                             : transaction.type === "withdrawal"
                             ? "-"
                             : ""}
-                          {transaction.currency || "¥"}
+                          {transaction.currency || "N"}
                           {transaction.amount}
                         </span>
                       </div>

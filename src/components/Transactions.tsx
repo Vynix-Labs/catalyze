@@ -59,7 +59,7 @@ const Transactions: React.FC<TransactionsProps> = ({
         {hasMoreTransactions && onViewAll && (
           <button
             onClick={onViewAll}
-            className="text-primary-100 text-sm font-bold flex items-center space-x-1 hover:text-blue-700 transition-colors"
+            className="text-primary-100 text-sm font-bold flex cursor-pointer items-center space-x-1 hover:text-blue-700 transition-colors"
           >
             <span>See all</span>
           </button>
@@ -83,7 +83,7 @@ const Transactions: React.FC<TransactionsProps> = ({
                     <img
                       src={iconPath}
                       alt={`${currencyType} logo`}
-                      className="w-5 h-5 object-contain"
+                      className=" object-contain"
                     />
                   ) : (
                     <FallbackIcon currencyType={currencyType} />
@@ -101,10 +101,12 @@ const Transactions: React.FC<TransactionsProps> = ({
               {/* Right side with amount */}
               <div className="text-right">
                 <span
-                  className={`font-black text-base ${
+                  className={`font-bold text-base ${
                     transaction.type === "deposit"
-                      ? "text-green-600"
-                      : "text-red-600"
+                      ? "text-black"
+                      : transaction.type === "withdrawal"
+                      ? "text-red-600"
+                      : "text-blue-600"
                   }`}
                 >
                   {transaction.type === "deposit" ? "+" : "-"}
