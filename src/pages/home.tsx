@@ -4,10 +4,17 @@ import Assets from "../components/Assets";
 import type { Transaction } from "../components/Transactions";
 import TransactionDetailsPage from "./transactionDetails";
 import Transactions from "../components/Transactions";
+import { ArrowDownRight, ArrowUpRight, Eye, EyeOff } from "lucide-react";
+import { FaBell } from "react-icons/fa";
 
 const Home: React.FC = () => {
   const [activeTab, setActiveTab] = useState("home");
   const [showTransactionDetails, setShowTransactionDetails] = useState(false);
+  const [isBalanceVisible, setIsBalanceVisible] = useState(true);
+
+  const toggleBalanceVisibility = () => {
+    setIsBalanceVisible(!isBalanceVisible);
+  };
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
@@ -113,30 +120,66 @@ const Home: React.FC = () => {
         {/* Scrollable content area */}
         <div className="flex-1 overflow-y-auto">
           {/* Header */}
-          <div className="p-5 border-b border-gray-200">
-            <h1 className="text-2xl font-bold text-gray-800">AO</h1>
-          </div>
-
-          {/* Total Balance */}
           <div className="p-5">
-            <h2 className="text-sm font-semibold text-gray-500 uppercase">
-              Total Balance
-            </h2>
-            <p className="text-3xl font-bold text-gray-800 mt-1">40,000</p>
+            <div className="flex justify-between items-center">
+              <div className="flex gap-2 items-center">
+                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+                  <span className="text-white font-black">AO</span>
+                </div>
+                <div className="text-sm">
+                  <p className=" text-gray-600 font-semibold">Good Morning</p>
+                  <h1 className=" font-black text-gray-800">Amara</h1>
+                </div>
+              </div>
+              <FaBell className="w-7 h-7 cursor-pointer" />
+            </div>
           </div>
 
-          {/* Transfer Section */}
-          <div className="p-5 bg-gray-50">
-            <h2 className="text-sm font-semibold text-gray-500 uppercase mb-2">
-              Transfer
-            </h2>
-            <div className="flex space-x-3">
-              <button className="bg-primary text-white font-medium py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors flex-1">
-                Transfer
-              </button>
-              <button className="bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors flex-1">
-                Deposit
-              </button>
+          {/* Total Balance Card */}
+          <div className="mx-5 mb-5">
+            <div className="bg-gradient-to-br from-primary-100 to-blue-700 rounded-2xl p-6 text-white relative overflow-hidden">
+              {/* Background decoration */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -translate-y-16 translate-x-16"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-5 rounded-full translate-y-12 -translate-x-12"></div>
+
+              {/* Balance Section */}
+              <div className="relative z-10">
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <p className="text-white text-sm font-semibold">
+                      Total Balance
+                    </p>
+
+                    <div className="flex items-center mt-2">
+                      {isBalanceVisible ? (
+                        <p className="text-4xl font-bold">₦40,000</p>
+                      ) : (
+                        <p className="text-4xl font-bold">••••••</p>
+                      )}
+                      <button
+                        onClick={toggleBalanceVisibility}
+                        className="ml-3 p-2 hover:bg-white/10 rounded-full transition-colors bg-black/40"
+                      >
+                        {isBalanceVisible ? (
+                          <Eye className="w-5 h-5 text-white/80" />
+                        ) : (
+                          <EyeOff className="w-5 h-5 text-white/80" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex space-x-3">
+                  <button className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-xl hover:bg-white/30 transition-all flex-1 flex items-center justify-center space-x-2">
+                    <span>Transfer</span> <ArrowUpRight className="w-4 h-4" />
+                  </button>
+                  <button className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-xl hover:bg-white/30 transition-all flex-1 flex items-center justify-center space-x-2">
+                    <span>Deposit</span> <ArrowDownRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 

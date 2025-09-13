@@ -83,6 +83,7 @@ const config: Config = {
           400: "#C2BAF3",
           500: "#E8E5FA",
           600: "#1B1737",
+          650: "#04329C",
         },
         secondary: "#A42600",
         success: {
