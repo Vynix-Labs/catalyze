@@ -1,6 +1,6 @@
 import React from "react";
 import { ChevronLeft } from "lucide-react";
-import type { Transaction } from "../components/Transactions";
+import type { Transaction } from "../../components/Transactions";
 
 interface TransactionDetailsPageProps {
   transactions: Transaction[];

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import BottomNav from "../components/BottomNav";
-import Transactions, { type Transaction } from "../components/Transactions";
-import Assets, { type Asset } from "../components/Assets";
+import BottomNav from "../../components/BottomNav";
+import Transactions, { type Transaction } from "../../components/Transactions";
+import Assets, { type Asset } from "../../components/Assets";
 import CurrencyDetailPage from "./CurrencyDetailPage";
 import TransactionDetailsPage from "./transactionDetails";
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
-import { BellIcon, EyeIcon, EyeOffIcon } from "../assets/svg";
+import { BellIcon, EyeIcon, EyeOffIcon } from "../../assets/svg";
 
 const Home: React.FC = () => {
   const [activeTab, setActiveTab] = useState("home");

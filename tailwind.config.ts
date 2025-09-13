@@ -75,6 +75,7 @@ const config: Config = {
           50: "#FAFAFA",
           100: "#F5F5F5",
           150: "#F2F2F2",
+          200: "#F3F3F3",
         },
         primary: {
           50: "#1B1737",
@@ -86,7 +87,12 @@ const config: Config = {
           600: "#1B1737",
           650: "#04329C",
         },
-        secondary: "#A42600",
+
+        secondary: {
+          base: "#A42600",
+          100: "#F59E0B",
+        },
+
         success: {
           500: "#26902B",
           400: "#173719",

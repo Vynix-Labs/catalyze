@@ -6,8 +6,8 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
-import type { Transaction } from "../components/Transactions";
-import Button from "../common/ui/button";
+import type { Transaction } from "../../components/Transactions";
+import Button from "../../common/ui/button";
 
 interface CurrencyDetailPageProps {
   currencyType: string;
