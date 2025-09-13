@@ -106,7 +106,7 @@ function Slider() {
   }, [activeSlide, previousSlide]);
 
   return (
-    <div className=" flex justify-center gap-10  items-center h-screen w-screen  flex-col  px-5 pb-6">
+    <div className=" flex justify-center gap-10  items-center h-screen w-auto  flex-col  px-5 pb-6">
       <div
         ref={containerRef}
         className="relative overflow-hidden flex h-full  w-full "
