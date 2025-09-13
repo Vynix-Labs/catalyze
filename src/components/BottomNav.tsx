@@ -1,8 +1,5 @@
 import React from "react";
-import HomeIcon from "./icons/HomeIcon";
-import InvestmentIcon from "./icons/Investment";
-import RewardIcon from "./icons/Reward";
-import MoreIcon from "./icons/More";
+import { HomeIcon, MoreIcon, RewardsIcon, InvestmentIcon } from "../assets/svg";
 
 interface BottomNavProps {
   activeTab?: string;
@@ -13,8 +10,7 @@ const BottomNav: React.FC<BottomNavProps> = ({
   activeTab = "home",
   onTabChange,
 }) => {
-  //
-  const navItems: { id: string; label: string; icon: React.ReactNode }[] = [
+  const navItems = [
     {
       id: "home",
       label: "Home",
@@ -33,10 +29,9 @@ const BottomNav: React.FC<BottomNavProps> = ({
       id: "rewards",
       label: "Rewards",
       icon: (
-        <RewardIcon color={activeTab === "rewards" ? "#4F46E5" : "#6A7282"} />
+        <RewardsIcon color={activeTab === "rewards" ? "#4F46E5" : "#6A7282"} />
       ),
     },
-
     {
       id: "more",
       label: "More",

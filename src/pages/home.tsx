@@ -4,8 +4,8 @@ import Transactions, { type Transaction } from "../components/Transactions";
 import Assets, { type Asset } from "../components/Assets";
 import CurrencyDetailPage from "./CurrencyDetailPage";
 import TransactionDetailsPage from "./transactionDetails";
-import { ArrowDownRight, ArrowUpRight, Eye, EyeOff } from "lucide-react";
-import { FaBell } from "react-icons/fa";
+import { ArrowDownRight, ArrowUpRight } from "lucide-react";
+import { BellIcon, EyeIcon, EyeOffIcon } from "../assets/svg";
 
 const Home: React.FC = () => {
   const [activeTab, setActiveTab] = useState("home");
@@ -198,7 +198,7 @@ const Home: React.FC = () => {
                   <h1 className=" font-black text-gray-800">Amara</h1>
                 </div>
               </div>
-              <FaBell className="w-4 h-5 cursor-pointer fill-gray-100" />
+              <BellIcon className="w-6 h-6 cursor-pointer" />
             </div>
           </div>
 
@@ -228,9 +228,9 @@ const Home: React.FC = () => {
                         className="ml-3 p-1 hover:bg-white/10 rounded-full transition-colors bg-black/40"
                       >
                         {isBalanceVisible ? (
-                          <Eye className="w-4 h-4 text-white/80" />
+                          <EyeIcon className="w-4 h-4 text-white/80" />
                         ) : (
-                          <EyeOff className="w-4 h-4 text-white/80" />
+                          <EyeOffIcon className="w-4 h-4 text-white/80" />
                         )}
                       </button>
                     </div>
