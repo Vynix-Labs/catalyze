@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
@@ -32,4 +33,12 @@ function App() {
   );
 }
 
+=======
+import { RouterProvider } from "react-router-dom";
+import { routes } from "./routes";
+
+function App() {
+  return <RouterProvider router={routes} />;
+}
+>>>>>>> 69f2ee95b88c84e573dfdba3b218f57c25353eb3
 export default App;

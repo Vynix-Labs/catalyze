@@ -17,6 +17,9 @@ const config: Config = {
       4: "4px",
       8: "8px",
     },
+    fontFamily: {
+      Manrope: ["Manrope", "sans-serif"], // Ensure fallback font
+    },
 
     // changed the line height
     fontSize: {
@@ -62,22 +65,18 @@ const config: Config = {
         black: "#000000", // tenant's darkest grey
         // warning: "#C64242", // tenant's warning colour
         gray: {
-          50: "#FFFFFF",
-          100: "#F5F6F7",
-          150: "#DCE0E5",
-          200: "#BDC5D1",
-          250: "#222222",
-          300: "#7F8C9F",
-          350: "#aaaaaa",
-          400: "#414F62",
-          500: "#1A1A1A",
-          600: "#0E0E11",
-          700: "#23272B",
-          800: "#2B2B2B",
+          100: "#414141",
+          400: "#99A1AF",
+          600: "#4A5565",
+          800: "#0A0A0A",
+        },
+        neutral: {
+          50: "#FAFAFA",
+          100: "#F5F5F5",
         },
         primary: {
           50: "#1B1737",
-          100: "#2A188B",
+          100: "#0647DF",
           200: "#5A42DE",
           300: "#8674E7",
           400: "#C2BAF3",
