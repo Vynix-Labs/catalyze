@@ -16,3 +16,8 @@ export interface AuthHeaderProps {
   };
   isLink: boolean;
 }
+
+export interface AuthFooterProps {
+  text: string;
+  handleBtnClick?: () => void;
+}
