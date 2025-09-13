@@ -1,28 +1,33 @@
 import { createBrowserRouter } from "react-router-dom";
 import { RoutePath } from "./routePath";
-import Home from "../pages/home";
+import Home from "../pages/dashboard";
 import NotFound from "../pages/notFound";
 import VerifyEmail from "../pages/auth/verifyEmail";
 import Onboarding from "../pages/auth/onBoarding";
 import SignUp from "../pages/auth/signup";
 import CreatePin from "../pages/auth/createPin";
+import CryptoTransferFlow from "../pages/dashboard/CryptoTransferFlow";
 import Login from "../pages/auth/login";
 import ForgetPassword from "../pages/auth/forget-password";
 import CreatePassword from "../pages/auth/createPassword";
 
 export const routes = createBrowserRouter([
   {
-    path: "/home",
+    path: RoutePath.DASHBOARD,
     element: <Home />,
     errorElement: <NotFound />, // handles errors on this route
   },
   {
-    path: "/",
+    path: RoutePath.ROOT,
     element: <Onboarding />,
   },
   {
     path: "*", // catch-all
     element: <NotFound />,
+  },
+  {
+    path: RoutePath.TRANSFER,
+    element: <CryptoTransferFlow />,
   },
 
   {
