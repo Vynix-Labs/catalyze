@@ -66,6 +66,7 @@ const config: Config = {
         // warning: "#C64242", // tenant's warning colour
         gray: {
           100: "#414141",
+          200: "#E5E7EB",
           400: "#99A1AF",
           600: "#4A5565",
           800: "#0A0A0A",

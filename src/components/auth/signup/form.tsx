@@ -1,7 +1,9 @@
+import { EyeDropCloseIcon } from "../../../assets/svg";
+
 function SignUpForm() {
   return (
-    <form className="space-y-6">
-      <div className="form-control">
+    <form className="gap-y-6 flex b items-center w-full flex-col">
+      <div className="form-control w-full">
         <label htmlFor="email">Email</label>
         <input
           type="text"
@@ -10,7 +12,7 @@ function SignUpForm() {
           placeholder="Enter Email Address"
         />
       </div>
-      <div>
+      <div className="w-full">
         <label htmlFor="password">Password</label>
         <div className="relative form-control">
           <input
@@ -19,6 +21,9 @@ function SignUpForm() {
             id="password"
             placeholder="Create Password"
           />
+          <div className=" absolute top-1/2 -translate-y-1/2 right-5">
+            <EyeDropCloseIcon />
+          </div>
         </div>
       </div>
     </form>

@@ -44,7 +44,7 @@ body {
 
   .form-control input,
   .form-control textarea {
-    @apply font-semibold text-[15px] px-5 py-4 bg-neutral-100 rounded-lg border border-neutral-50 focus:border-primary-200 outline-0 focus:ring-0;
+    @apply font-semibold text-[15px] px-5 py-4 bg-neutral-100 rounded-lg border border-neutral-50 focus:border-primary-100 outline-0 focus:ring-0;
   }
 
   .form-control textarea {
