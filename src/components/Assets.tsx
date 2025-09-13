@@ -37,7 +37,7 @@ const Assets: React.FC<AssetsProps> = ({
   // Show only limited items if maxDisplayItems is provided
   const displayAssets = assets.slice(0, maxDisplayItems);
   return (
-    <div>
+    <div className="mb-6 rounded-lg bg-white p-3">
       <div className="space-y-4">
         {displayAssets.map((asset) => {
           const iconPath =

@@ -53,7 +53,7 @@ const Transactions: React.FC<TransactionsProps> = ({
   const hasMoreTransactions = transactions.length > maxDisplayItems;
 
   return (
-    <div className="mb-6">
+    <div className="mb-6 rounded-lg bg-white p-3">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-sm font-bold text-gray-800">{title}</h2>
         {hasMoreTransactions && onViewAll && (

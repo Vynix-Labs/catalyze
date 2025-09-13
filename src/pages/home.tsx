@@ -114,9 +114,9 @@ const Home: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-neutral-50">
       {/* Main content container with proper spacing for bottom nav */}
-      <div className="max-w-md mx-auto min-h-screen bg-white flex flex-col pb-16">
+      <div className="max-w-md mx-auto min-h-screen flex flex-col pb-16">
         {/* Scrollable content area */}
         <div className="flex-1 overflow-y-auto">
           {/* Header */}
@@ -131,7 +131,7 @@ const Home: React.FC = () => {
                   <h1 className=" font-black text-gray-800">Amara</h1>
                 </div>
               </div>
-              <FaBell className="w-7 h-7 cursor-pointer" />
+              <FaBell className="w-4 h-5 cursor-pointer fill-gray-100" />
             </div>
           </div>
 
@@ -143,8 +143,8 @@ const Home: React.FC = () => {
               <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-5 rounded-full translate-y-12 -translate-x-12"></div>
 
               {/* Balance Section */}
-              <div className="relative z-10">
-                <div className="flex justify-between items-start mb-6">
+              <div className="relative z-10 space-y-3">
+                <div className="flex justify-between items-start">
                   <div>
                     <p className="text-white text-sm font-semibold">
                       Total Balance
@@ -154,7 +154,7 @@ const Home: React.FC = () => {
                       {isBalanceVisible ? (
                         <p className="text-4xl font-bold">₦40,000</p>
                       ) : (
-                        <p className="text-4xl font-bold">••••••</p>
+                        <p className="text-4xl font-bold">*******</p>
                       )}
                       <button
                         onClick={toggleBalanceVisibility}
@@ -183,12 +183,12 @@ const Home: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-5">
+          <div className="px-4">
             {/* Transactions */}
             <div className="max-w-md mx-auto">
               <Transactions
                 transactions={transactionsData}
-                title="Recent Transactions"
+                title="Transactions"
                 showDivider={false}
                 maxDisplayItems={2}
                 onViewAll={handleViewAllTransactions}
