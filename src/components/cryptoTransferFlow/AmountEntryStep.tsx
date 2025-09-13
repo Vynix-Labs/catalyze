@@ -19,7 +19,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col relative">
-      <div className="bg-white">
+      <div className="bg-white h-full">
         <CurrencyTabs
           activeTab={transferType}
           onTabChange={onTransferTypeChange}
@@ -29,10 +29,11 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
         {transferType === "fiat" ? (
           <div className="p-4 space-y-4">
             <div className="">
-              <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
-                <span>Enter Amount</span>
+              <div className="flex items-center justify-between text-sm mb-2">
+                <div className="font-bold">Enter Amount</div>
                 <span>Available Amount: 10,000</span>
               </div>
+
               <div className="relative">
                 <input
                   type="text"
@@ -67,8 +68,8 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
         ) : (
           <div className="p-4 space-y-4">
             <div className="">
-              <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
-                <label> Amount</label>
+              <div className="flex items-center justify-between text-sm mb-2">
+                <div className="font-bold"> Amount</div>
                 <span>Available Amount: 10,000</span>
               </div>
               <div className="relative">
@@ -83,7 +84,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
             </div>
 
             <div className="mb-4">
-              <label className="text-sm text-gray-600 mb-2">Address</label>
+              <div className="text-sm font-bold mb-2">Address</div>
 
               <div className="relative">
                 <input
@@ -97,9 +98,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Network
-              </label>
+              <div className="block text-sm font-bold mb-2">Network</div>
               <select className="w-full p-3 border border-gray-200 rounded-lg text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 <option value="">Select Network</option>
                 <option value="access">Bep 20</option>
