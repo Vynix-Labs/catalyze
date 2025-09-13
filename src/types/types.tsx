@@ -29,6 +29,8 @@ export interface HeaderProps {
 export interface AmountEntryStepProps {
   amount: string;
   setAmount: React.Dispatch<React.SetStateAction<string>>;
+  transferType: string;
+  onTransferTypeChange: (type: string) => void;
   onNext: () => void;
   onBack: () => void;
 }
@@ -50,12 +52,14 @@ export interface BankSelectionStepProps {
 export interface PinEntryStepProps {
   pin: string;
   setPin: React.Dispatch<React.SetStateAction<string>>;
+  transferType: string;
   onNext: () => void;
   onBack: () => void;
 }
 
 export interface SuccessStepProps {
   onDone: () => void;
+  transferType: string;
 }
 
 export interface NumberPadProps {

@@ -7,10 +7,11 @@ import { SwapIcon } from "../../assets/svg";
 
 const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   amount,
-  setAmount,
   onNext,
+  transferType,
+  onTransferTypeChange,
 }) => {
-  const [activeTab, setActiveTab] = useState("fiat");
+  // const [activeTab, setActiveTab] = useState("fiat");
 
   //
   const [amountUSDC, setAmountUSDC] = useState("");
@@ -19,10 +20,13 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col relative">
       <div className="bg-white">
-        <CurrencyTabs activeTab={activeTab} onTabChange={setActiveTab} />
+        <CurrencyTabs
+          activeTab={transferType}
+          onTabChange={onTransferTypeChange}
+        />
 
         {/* Show different content based on active tab */}
-        {activeTab === "fiat" ? (
+        {transferType === "fiat" ? (
           <div className="p-4 space-y-4">
             <div className="">
               <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
@@ -61,43 +65,65 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
             </div>
           </div>
         ) : (
-          <div className="p-4">
-            <div className="mb-4">
+          <div className="p-4 space-y-4">
+            <div className="">
               <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
-                <span>Enter Crypto Amount</span>
-                <span>Available Amount: 75,000 USDC</span>
+                <label> Amount</label>
+                <span>Available Amount: 10,000</span>
               </div>
               <div className="relative">
                 <input
                   type="text"
                   placeholder="Enter USDC"
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  onChange={(e) => setAmountUSDC(e.target.value)}
                   className="w-full placeholder:text-sm p-3 border border-gray-200 bg-neutral-50 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
 
-            <div className="text-sm text-gray-600 mb-1">
-              Minimum limit: 75,000 NGN equivalent
+            <div className="mb-4">
+              <label className="text-sm text-gray-600 mb-2">Address</label>
+
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Enter NGN"
+                  value={amountNGN}
+                  onChange={(e) => setAmountNGN(e.target.value)}
+                  className="w-full placeholder:text-sm p-3 border border-gray-200 bg-neutral-50 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
             </div>
-            <div className="text-sm text-gray-600">
-              Amount limit: 75,000 NGN equivalent
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Network
+              </label>
+              <select className="w-full p-3 border border-gray-200 rounded-lg text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="">Select Network</option>
+                <option value="access">Bep 20</option>
+                <option value="gtb">Eth</option>
+                <option value="zenith">Solana</option>
+                <option value="uba">Polygon</option>
+              </select>
             </div>
           </div>
         )}
 
-        <div className="flex items-start space-x-2 bg-yellow-50 border border-yellow-200 rounded-lg mx-4 p-3">
-          <AlertCircle className="w-5 h-5 text-secondary-100 mt-0.5 flex-shrink-0" />
-          <div className="text-sm text-secondary-100">
-            <span className="font-medium">Info</span>
-            <div className="mt-1">
-              {activeTab === "fiat"
-                ? "Your fiat amount will be converted to cryptocurrency at the current exchange rate."
-                : "The transfer amount of Naira with our current rate will be transferred to beneficiary"}
+        {transferType === "fiat" && (
+          <div className="flex items-start space-x-2 bg-yellow-50 border border-yellow-200 rounded-lg mx-4 p-3">
+            <AlertCircle className="w-5 h-5 text-secondary-100 mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-secondary-100">
+              <span className="font-medium">Info</span>
+              <div className="mt-1">
+                {transferType === "fiat"
+                  ? "Your fiat amount will be converted to cryptocurrency at the current exchange rate."
+                  : "The transfer amount of Naira with our current rate will be transferred to beneficiary"}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       <div className="w-full bottom-0 mx-auto flex justify-center p-4 absolute ">

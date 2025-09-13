@@ -12,6 +12,7 @@ const CryptoTransferFlow: React.FC = () => {
   const [accountNumber, setAccountNumber] = useState("");
   const [pin, setPin] = useState("");
   const [username] = useState("Username");
+  const [transferType, setTransferType] = useState("fiat"); // 'fiat' or 'crypto'
 
   const resetForm = () => {
     setCurrentStep(1);
@@ -19,14 +20,29 @@ const CryptoTransferFlow: React.FC = () => {
     setSelectedBank("");
     setAccountNumber("");
     setPin("");
+    setTransferType("fiat");
   };
 
   const goToNextStep = () => {
-    setCurrentStep((prev) => prev + 1);
+    // If transferring crypto and we're on amount entry, skip bank selection
+    if (transferType === "crypto" && currentStep === 1) {
+      setCurrentStep(3); // Skip to pin entry
+    } else {
+      setCurrentStep((prev) => prev + 1);
+    }
   };
 
   const goToPrevStep = () => {
-    setCurrentStep((prev) => Math.max(1, prev - 1));
+    // If transferring crypto and we're on pin entry, go back to amount entry
+    if (transferType === "crypto" && currentStep === 3) {
+      setCurrentStep(1);
+    } else {
+      setCurrentStep((prev) => Math.max(1, prev - 1));
+    }
+  };
+
+  const handleTransferTypeChange = (type: string) => {
+    setTransferType(type);
   };
 
   const renderCurrentStep = () => {
@@ -37,6 +53,8 @@ const CryptoTransferFlow: React.FC = () => {
             amount={amount}
             setAmount={setAmount}
             onNext={goToNextStep}
+            transferType={transferType}
+            onTransferTypeChange={handleTransferTypeChange}
             onBack={goToPrevStep}
           />
         );
@@ -57,17 +75,21 @@ const CryptoTransferFlow: React.FC = () => {
           <PinEntryStep
             pin={pin}
             setPin={setPin}
+            transferType={transferType}
             onNext={goToNextStep}
             onBack={goToPrevStep}
           />
         );
       case 4:
-        return <SuccessStep onDone={resetForm} />;
+        // return <SuccessStep onDone={resetForm} />;
+        return <SuccessStep transferType={transferType} onDone={resetForm} />;
       default:
         return (
           <AmountEntryStep
             amount={amount}
             setAmount={setAmount}
+            transferType={transferType}
+            onTransferTypeChange={handleTransferTypeChange}
             onNext={goToNextStep}
             onBack={goToPrevStep}
           />
