@@ -93,7 +93,7 @@ const Transactions: React.FC<TransactionsProps> = ({
                     <img
                       src={iconPath}
                       alt={`${currencyType} logo`}
-                      className="object-contain w-5 h-5"
+                      className="object-contain "
                     />
                   ) : (
                     <FallbackIcon currencyType={currencyType} />

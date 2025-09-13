@@ -99,9 +99,9 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
           <div className="p-4 bg-white">
             {/* Currency Icon and Balance */}
             <div className="flex items-center space-x-2 mb-2">
-              <CurrencyIcon currencyType={currencyType} size="large" />
+              <CurrencyIcon currencyType={currencyType} size="small" />
               <div>
-                <h2 className="text-sm font-medium text-blue-700">
+                <h2 className="text-sm font-medium text-gray-100">
                   {currencyType} Balance
                 </h2>
               </div>
@@ -156,7 +156,7 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
             </div>
 
             {/* Transaction List */}
-            <div className="space-y-3  bg-white rounded-lg">
+            <div className="space-y-3 bg-white rounded-lg">
               {currencyTransactions.map((transaction) => (
                 <div
                   key={transaction.id}
@@ -164,8 +164,8 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
                 >
                   {/* Left side */}
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <CurrencyIcon currencyType={currencyType} />
+                    <div className=" rounded-full flex items-center justify-center">
+                      <CurrencyIcon currencyType={currencyType} size="large" />
                     </div>
                     <div>
                       <h3 className="font-medium text-gray-900 text-sm">

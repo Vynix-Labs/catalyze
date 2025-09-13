@@ -225,12 +225,12 @@ const Home: React.FC = () => {
                       )}
                       <button
                         onClick={toggleBalanceVisibility}
-                        className="ml-3 p-2 hover:bg-white/10 rounded-full transition-colors bg-black/40"
+                        className="ml-3 p-1 hover:bg-white/10 rounded-full transition-colors bg-black/40"
                       >
                         {isBalanceVisible ? (
-                          <Eye className="w-5 h-5 text-white/80" />
+                          <Eye className="w-4 h-4 text-white/80" />
                         ) : (
-                          <EyeOff className="w-5 h-5 text-white/80" />
+                          <EyeOff className="w-4 h-4 text-white/80" />
                         )}
                       </button>
                     </div>

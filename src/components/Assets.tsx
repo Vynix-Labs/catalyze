@@ -62,7 +62,7 @@ const Assets: React.FC<AssetsProps> = ({
                     <img
                       src={iconPath}
                       alt={`${asset.symbol} logo`}
-                      className="object-contain w-5 h-5"
+                      className="object-contain"
                     />
                   ) : (
                     <FallbackIcon symbol={asset.symbol} />
