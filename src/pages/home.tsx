@@ -239,10 +239,10 @@ const Home: React.FC = () => {
 
                 {/* Action Buttons */}
                 <div className="flex space-x-3">
-                  <button className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:bg-white/30 transition-all flex-1 flex items-center justify-center space-x-2">
+                  <button className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2">
                     <span>Transfer</span> <ArrowUpRight className="w-4 h-4" />
                   </button>
-                  <button className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:bg-white/30 transition-all flex-1 flex items-center justify-center space-x-2">
+                  <button className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2">
                     <span>Deposit</span> <ArrowDownRight className="w-4 h-4" />
                   </button>
                 </div>

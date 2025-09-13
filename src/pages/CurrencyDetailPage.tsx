@@ -86,7 +86,7 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
           <button
             onClick={onBack}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -98,7 +98,7 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
         <div className="space-y-4">
           <div className="p-4 bg-white">
             {/* Currency Icon and Balance */}
-            <div className="flex items-center space-x-3 mb-4">
+            <div className="flex items-center space-x-2 mb-2">
               <CurrencyIcon currencyType={currencyType} size="large" />
               <div>
                 <h2 className="text-sm font-medium text-blue-700">
@@ -117,6 +117,7 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
                 ) : (
                   <p className="text-[40px] font-bold text-gray-900">••••••</p>
                 )}
+
                 <button
                   onClick={toggleBalanceVisibility}
                   className="p-2 hover:bg-blue-100 rounded-full transition-colors"
@@ -135,11 +136,11 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
             </div>
 
             {/* Action Buttons */}
-            <div className="flex space-x-3">
-              <Button variants="primary">
+            <div className="flex space-x-3 ">
+              <Button variants="primary" classes="text-xs">
                 <span>Transfer</span> <ArrowUpRight className="w-4 h-4" />
               </Button>
-              <Button variants="primary">
+              <Button variants="primary" classes="text-xs">
                 <span>Deposit</span> <ArrowDownRight className="w-4 h-4" />
               </Button>
             </div>
