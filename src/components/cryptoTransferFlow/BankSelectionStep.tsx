@@ -11,7 +11,7 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
   onNext,
 }) => {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col relative">
       <div className="bg-white flex-1">
         <div className="p-4">
           <div className="mb-4">
@@ -55,7 +55,7 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
         </div>
       </div>
 
-      <div className="p-4 bg-white">
+      <div className="w-full bottom-0 mx-auto flex justify-center p-4 absolute ">
         <Button variants="primary" handleClick={onNext}>
           Proceed
         </Button>
