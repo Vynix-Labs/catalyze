@@ -11,7 +11,7 @@ import {
 } from 'drizzle-orm/pg-core';
 
 // Prefix all tables with catalyze
-export const createTable = pgTableCreator((name) => `catalyze${name}`);
+export const createTable = pgTableCreator((name) => `catalyze_${name}`);
 
 // ----------------- ENUMS -----------------
 export const transactionTypeEnum = pgEnum('transaction_type', [
