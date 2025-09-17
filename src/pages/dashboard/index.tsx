@@ -13,6 +13,7 @@ import {
 
 import { useNavigate } from "react-router-dom";
 import GlobalModal from "../../common/ui/modal/GlobalModal";
+import Layout from "../../layout";
 
 const Home: React.FC = () => {
   const [showTransactionDetails, setShowTransactionDetails] = useState(false);
@@ -251,7 +252,10 @@ const Home: React.FC = () => {
                     >
                       <span>Transfer</span> <ArrowUpRightIcon />
                     </button>
-                    <button className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2">
+                    <button
+                      onClick={toggleModal}
+                      className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
+                    >
                       <span>Deposit</span> <ArrowDownRight />
                     </button>
                   </div>
@@ -293,7 +297,7 @@ const Home: React.FC = () => {
           <Assets assets={assetsData} onAssetClick={handleAssetClick} />
         }
       />
-    </div>
+    </Layout>
   );
 };
 
