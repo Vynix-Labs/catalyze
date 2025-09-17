@@ -11,4 +11,7 @@ export const RoutePath = {
   CREATE_PASSWORD: "/auth/create-password",
   DASHBOARD: "/dashboard",
   TRANSFER: "/dashboard/transfer",
+  INVESTMENT: "/dashboard/investment",
+  REWARD: "/dashboard/reward",
+  MORE: "/dashboard/more",
 };

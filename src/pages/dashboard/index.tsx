@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import BottomNav from "../../components/BottomNav";
 import Transactions, { type Transaction } from "../../components/Transactions";
 import Assets, { type Asset } from "../../components/Assets";
 import CurrencyDetailPage from "./CurrencyDetailPage";
@@ -13,13 +12,12 @@ import {
 } from "../../assets/svg";
 
 import { useNavigate } from "react-router-dom";
+import Layout from "../../layout";
 
 const Home: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("home");
   const [showTransactionDetails, setShowTransactionDetails] = useState(false);
   const [showCurrencyDetail, setShowCurrencyDetail] = useState(false);
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
-
   const navigate = useNavigate();
 
   const toggleBalanceVisibility = () => {
@@ -31,10 +29,6 @@ const Home: React.FC = () => {
     balance: string;
     nairaValue: string;
   } | null>(null);
-
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-  };
 
   const handleViewAllTransactions = () => {
     setShowTransactionDetails(true);
@@ -190,105 +184,102 @@ const Home: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      {/* Main content container with proper spacing for bottom nav */}
-      <div className="max-w-md mx-auto min-h-screen flex flex-col pb-16">
-        {/* Scrollable content area */}
-        <div className="flex-1 overflow-y-auto space-y-4">
-          {/* Header */}
-          <div className="p-5">
-            <div className="flex justify-between items-center">
-              <div className="flex gap-2 items-center">
-                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-                  <span className="text-white font-black">AO</span>
-                </div>
-                <div className="text-sm">
-                  <p className=" text-gray-600 font-semibold">Good Morning</p>
-                  <h1 className=" font-black text-gray-800">Amara</h1>
-                </div>
-              </div>
-              <BellIcon className="w-6 h-6 cursor-pointer" />
-            </div>
-          </div>
-
-          {/* Total Balance Card */}
-          <div className="mx-5 mb-5">
-            <div className="bg-gradient-to-br from-primary-100 to-blue-700 rounded-2xl p-6 text-white relative overflow-hidden">
-              {/* Background decoration */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -translate-y-16 translate-x-16"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-5 rounded-full translate-y-12 -translate-x-12"></div>
-
-              {/* Balance Section */}
-              <div className="relative z-10 space-y-3">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-white text-sm font-semibold">
-                      Total Balance
-                    </p>
-
-                    <div className="flex items-center mt-2">
-                      <p className="text-4xl font-bold min-w-[125px]">
-                        {isBalanceVisible ? "₦40,000" : "*******"}
-                      </p>
-                      <button
-                        onClick={toggleBalanceVisibility}
-                        className="ml-3 p-1 hover:bg-white/10 rounded-full transition-colors bg-black/40"
-                      >
-                        {isBalanceVisible ? (
-                          <EyeIcon className="w-4 h-4 text-white/80" />
-                        ) : (
-                          <EyeOffIcon className="w-4 h-4 text-white/80" />
-                        )}
-                      </button>
-                    </div>
+    <Layout>
+      <div className="min-h-screen bg-neutral-50">
+        {/* Main content container with proper spacing for bottom nav */}
+        <div className="max-w-md mx-auto min-h-screen flex flex-col pb-16">
+          {/* Scrollable content area */}
+          <div className="flex-1 overflow-y-auto space-y-4">
+            {/* Header */}
+            <div className="p-5">
+              <div className="flex justify-between items-center">
+                <div className="flex gap-2 items-center">
+                  <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+                    <span className="text-white font-black">AO</span>
+                  </div>
+                  <div className="text-sm">
+                    <p className=" text-gray-600 font-semibold">Good Morning</p>
+                    <h1 className=" font-black text-gray-800">Amara</h1>
                   </div>
                 </div>
+                <BellIcon className="w-6 h-6 cursor-pointer" />
+              </div>
+            </div>
 
-                {/* Action Buttons */}
-                <div className="flex space-x-3">
-                  <button
-                    onClick={() => navigate("/dashboard/transfer")}
-                    className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
-                  >
-                    <span>Transfer</span> <ArrowUpRightIcon />
-                  </button>
-                  <button className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2">
-                    <span>Deposit</span> <ArrowDownRight />
-                  </button>
+            {/* Total Balance Card */}
+            <div className="mx-5 mb-5">
+              <div className="bg-gradient-to-br from-primary-100 to-blue-700 rounded-2xl p-6 text-white relative overflow-hidden">
+                {/* Background decoration */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -translate-y-16 translate-x-16"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-5 rounded-full translate-y-12 -translate-x-12"></div>
+
+                {/* Balance Section */}
+                <div className="relative z-10 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-white text-sm font-semibold">
+                        Total Balance
+                      </p>
+
+                      <div className="flex items-center mt-2">
+                        <p className="text-4xl font-bold min-w-[125px]">
+                          {isBalanceVisible ? "₦40,000" : "*******"}
+                        </p>
+                        <button
+                          onClick={toggleBalanceVisibility}
+                          className="ml-3 p-1 hover:bg-white/10 rounded-full transition-colors bg-black/40"
+                        >
+                          {isBalanceVisible ? (
+                            <EyeIcon className="w-4 h-4 text-white/80" />
+                          ) : (
+                            <EyeOffIcon className="w-4 h-4 text-white/80" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => navigate("/dashboard/transfer")}
+                      className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
+                    >
+                      <span>Transfer</span> <ArrowUpRightIcon />
+                    </button>
+                    <button className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2">
+                      <span>Deposit</span> <ArrowDownRight />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="p-5">
-            {/* Transactions */}
-            <div className="max-w-md mx-auto">
-              <Transactions
-                transactions={transactionsData}
-                title="Recent Transactions"
-                showDivider={false}
-                maxDisplayItems={2}
-                onViewAll={handleViewAllTransactions}
-                onTransactionClick={handleTransactionClick}
-              />
+            <div className="p-5">
+              {/* Transactions */}
+              <div className="max-w-md mx-auto">
+                <Transactions
+                  transactions={transactionsData}
+                  title="Recent Transactions"
+                  showDivider={false}
+                  maxDisplayItems={2}
+                  onViewAll={handleViewAllTransactions}
+                  onTransactionClick={handleTransactionClick}
+                />
+              </div>
+
+              {/* Divider */}
+              <h2 className="text-sm font-bold text-gray-600 mb-4">Assets</h2>
+
+              {/* Assets */}
+              <div className="max-w-md mx-auto overflow-hidden">
+                <Assets assets={assetsData} onAssetClick={handleAssetClick} />
+              </div>
             </div>
-
-            {/* Divider */}
-            <h2 className="text-sm font-bold text-gray-600 mb-4">Assets</h2>
-
-            {/* Assets */}
-            <div className="max-w-md mx-auto overflow-hidden">
-              <Assets assets={assetsData} onAssetClick={handleAssetClick} />
-            </div>
           </div>
-        </div>
-
-        {/* Fixed bottom navigation */}
-        <div className="fixed bottom-0 left-0 right-0 max-w-[420px] mx-auto">
-          <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

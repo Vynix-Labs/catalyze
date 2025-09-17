@@ -10,6 +10,9 @@ import CryptoTransferFlow from "../pages/dashboard/CryptoTransferFlow";
 import Login from "../pages/auth/login";
 import ForgetPassword from "../pages/auth/forget-password";
 import CreatePassword from "../pages/auth/CreatePassword";
+import MorePage from "../pages/more";
+import InvestmentPage from "../pages/investment";
+import RewardPage from "../pages/reward";
 
 export const routes = createBrowserRouter([
   {
@@ -24,6 +27,18 @@ export const routes = createBrowserRouter([
   {
     path: "*", // catch-all
     element: <NotFound />,
+  },
+  {
+    path: RoutePath.MORE,
+    element: <MorePage />,
+  },
+  {
+    path: RoutePath.INVESTMENT,
+    element: <InvestmentPage />,
+  },
+  {
+    path: RoutePath.REWARD,
+    element: <RewardPage />,
   },
   {
     path: RoutePath.TRANSFER,
