@@ -11,14 +11,23 @@ import {
   EyeOffIcon,
 } from "../../assets/svg";
 
-import { useNavigate } from "react-router-dom";
+import GlobalModal from "../../common/ui/modal/GlobalModal";
 import Layout from "../../layout";
+import { useNavigate } from "react-router-dom";
 
 const Home: React.FC = () => {
   const [showTransactionDetails, setShowTransactionDetails] = useState(false);
   const [showCurrencyDetail, setShowCurrencyDetail] = useState(false);
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedAssetForModal, setSelectedAssetForModal] =
+    useState<Asset | null>(null);
+
   const navigate = useNavigate();
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
 
   const toggleBalanceVisibility = () => {
     setIsBalanceVisible(!isBalanceVisible);
@@ -46,6 +55,27 @@ const Home: React.FC = () => {
       nairaValue: asset.value,
     });
     setShowCurrencyDetail(true);
+  };
+
+  // Handle asset click in modal
+  const handleModalAssetClick = (asset: Asset) => {
+    setSelectedAssetForModal(asset);
+  };
+
+  // Handle proceed button click in modal
+  const handleModalProceed = () => {
+    if (selectedAssetForModal) {
+      // Close modal first
+      setIsModalOpen(false);
+      setSelectedAssetForModal(null);
+
+      // Navigate to transfer page with selected asset data
+      navigate("/transfer", {
+        state: {
+          selectedAsset: selectedAssetForModal,
+        },
+      });
+    }
   };
 
   const handleTransactionClick = (transaction: Transaction) => {
@@ -242,12 +272,15 @@ const Home: React.FC = () => {
                   {/* Action Buttons */}
                   <div className="flex space-x-3">
                     <button
-                      onClick={() => navigate("/dashboard/transfer")}
+                      onClick={toggleModal}
                       className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
                     >
                       <span>Transfer</span> <ArrowUpRightIcon />
                     </button>
-                    <button className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2">
+                    <button
+                      onClick={toggleModal}
+                      className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
+                    >
                       <span>Deposit</span> <ArrowDownRight />
                     </button>
                   </div>
@@ -279,6 +312,19 @@ const Home: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <GlobalModal
+        onClose={toggleModal}
+        open={isModalOpen}
+        setOpen={setIsModalOpen}
+        headingText="Select Currency"
+        btnText="Proceed"
+        onProceed={handleModalProceed}
+        isProceedDisabled={!selectedAssetForModal}
+        children={
+          <Assets assets={assetsData} onAssetClick={handleModalAssetClick} />
+        }
+      />
     </Layout>
   );
 };

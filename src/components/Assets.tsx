@@ -1,5 +1,4 @@
 import React from "react";
-
 export interface Asset {
   id: string;
   symbol: string;
@@ -14,9 +13,12 @@ interface AssetsProps {
   title?: string;
   maxDisplayItems?: number;
   onAssetClick?: (asset: Asset) => void;
+  isModalMode?: boolean; // New prop to distinguish modal mode
+  selectedAsset?: Asset | null; // Track selected asset
 }
 
-// Currency icon mapping - using proper image paths (same as transactions)
+
+// Currency icon mapping - using proper image paths
 const currencyIcons = {
   USDT: "/images/usdt.png",
   USDC: "/images/usdc.png",
@@ -34,6 +36,8 @@ const Assets: React.FC<AssetsProps> = ({
   assets,
   maxDisplayItems = assets.length,
   onAssetClick,
+  isModalMode = false,
+  selectedAsset,
 }) => {
   // Show only limited items if maxDisplayItems is provided
   const displayAssets = assets.slice(0, maxDisplayItems);
@@ -45,13 +49,17 @@ const Assets: React.FC<AssetsProps> = ({
           const iconPath =
             currencyIcons[asset.symbol as keyof typeof currencyIcons];
 
+          const isSelected = selectedAsset?.id === asset.id;
+
           return (
             <div
               key={asset.id}
-              className={`flex justify-between items-center py-2 ${
-                onAssetClick
-                  ? "cursor-pointer hover:bg-gray-50 rounded-lg p-2"
-                  : ""
+              className={`flex justify-between items-center py-2 rounded-lg p-2 cursor-pointer transition-colors ${
+                isModalMode
+                  ? isSelected
+                    ? "bg-primary-50 border-2 border-primary-100"
+                    : "hover:bg-gray-50 border-2 border-transparent"
+                  : "hover:bg-gray-50"
               }`}
               onClick={() => onAssetClick && onAssetClick(asset)}
             >
@@ -78,12 +86,33 @@ const Assets: React.FC<AssetsProps> = ({
 
               {/* Right side with balance and value */}
               <div className="text-right">
-                <p className="font-black text-black text-base">{asset.balance}</p>
+                <p className="font-black text-black text-base">
+                  {asset.balance}
+                </p>
                 <p className="text-base text-gray-500">
                   ≈{asset.currency || "₦"}
                   {asset.value}
                 </p>
               </div>
+
+              {/* Selection indicator for modal mode */}
+              {isModalMode && (
+                <div className="ml-3">
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 ${
+                      isSelected
+                        ? "bg-primary-100 border-primary-100"
+                        : "border-gray-300"
+                    }`}
+                  >
+                    {isSelected && (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}
