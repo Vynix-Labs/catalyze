@@ -4,6 +4,7 @@ import type { AmountEntryStepProps } from "../../types/types";
 import CurrencyTabs from "./CurrencyTabs";
 import Button from "../../common/ui/button";
 import { SwapIcon } from "../../assets/svg";
+import GlobalModal from "../../common/ui/modal/GlobalModal";
 
 const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   amount,
@@ -17,6 +18,8 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   const [address, setAddress] = useState("");
   const [selectedNetwork, setSelectedNetwork] = useState("");
   const [isSwapped, setIsSwapped] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   // Exchange rate calculation
   const exchangeRate = 1500; // 1 USD = 1500 NGN
 
@@ -43,6 +46,79 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
     setAmount?.(tempNGN);
     setAmountNGN(tempUSDC);
     setIsSwapped(!isSwapped);
+  };
+
+  const handleProceedClick = () => {
+    if (transferType === "crypto") {
+      // For crypto, validate and show confirmation modal first
+      if (!amount || !address || !selectedNetwork) {
+        alert("Please fill in all crypto transfer details");
+        return;
+      }
+      setIsModalOpen(true);
+    } else {
+      // For fiat, validate and proceed directly to next step (BankSelectionStep)
+      if (!amount || !amountNGN) {
+        alert("Please enter both USDC and NGN amounts");
+        return;
+      }
+      onNext();
+    }
+  };
+
+  const handleModalProceed = () => {
+    setIsModalOpen(false);
+    onNext(); // This will go to PinEntryStep (step 3) for crypto transfers
+  };
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+
+  // Currency icon mapping
+  const currencyIcons = {
+    USDT: "/images/usdt.png",
+    USDC: "/images/usdc.png",
+    STRK: "/images/strk.png",
+  };
+
+  // Fallback component for unknown currencies
+  const FallbackIcon = ({ currencyType }: { currencyType: string }) => (
+    <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center">
+      <span className="text-xs font-bold text-white">
+        {currencyType.charAt(0)}
+      </span>
+    </div>
+  );
+
+  // Currency Icon Component
+  const CurrencyIcon = ({ currencyType }: { currencyType: string }) => {
+    const iconPath = currencyIcons[currencyType as keyof typeof currencyIcons];
+
+    if (iconPath) {
+      return (
+        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+          <img
+            src={iconPath}
+            alt={`${currencyType} logo`}
+            className="w-8 h-8 object-contain"
+          />
+        </div>
+      );
+    }
+
+    return <FallbackIcon currencyType={currencyType} />;
+  };
+
+  // Get network display name
+  const getNetworkName = (network: string) => {
+    const networks = {
+      bep20: "BEP-20",
+      erc20: "ERC-20",
+      spl: "SPL",
+      polygon: "Polygon",
+    };
+    return networks[network as keyof typeof networks] || network;
   };
 
   return (
@@ -170,7 +246,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
       <div className="w-full bottom-0 mx-auto flex justify-center p-4 absolute">
         <Button
           variants="primary"
-          handleClick={onNext}
+          handleClick={handleProceedClick}
           text="Proceed"
           disabled={
             transferType === "fiat"
@@ -179,6 +255,60 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
           }
         />
       </div>
+
+      {/* Crypto Confirmation Modal */}
+      {transferType === "crypto" && (
+        <GlobalModal
+          onClose={toggleModal}
+          open={isModalOpen}
+          setOpen={setIsModalOpen}
+          btnText="Proceed"
+          onProceed={handleModalProceed}
+          isProceedDisabled={false}
+        >
+          <div className="py-6">
+            {/* Currency Icon */}
+            <div className="flex justify-center mb-6">
+              <CurrencyIcon currencyType={currencyType} />
+            </div>
+
+            {/* Transfer Details */}
+            <div className="text-center mb-6">
+              <h1 className="text-base font-black text-gray-600 mb-2">
+                Transfer {currencyType}
+              </h1>
+              <h2 className="text-2xl font-bold text-black mb-1">
+                {amount || "0"}
+              </h2>
+              <p className="text-sm text-gray-500">
+                ≈₦{((parseFloat(amount) || 0) * exchangeRate).toLocaleString()}
+              </p>
+            </div>
+
+            {/* Transaction Details */}
+            <div className="space-y-3 text-left">
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Crypto</span>
+                <span className="text-sm font-medium text-black">
+                  {currencyType}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Address</span>
+                <span className="text-sm font-medium text-black break-all">
+                  {address || "N/A"}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Network</span>
+                <span className="text-sm font-medium text-black">
+                  {selectedNetwork ? getNetworkName(selectedNetwork) : "N/A"}
+                </span>
+              </div>
+            </div>
+          </div>
+        </GlobalModal>
+      )}
     </div>
   );
 };

@@ -90,7 +90,7 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
             accountNumber={accountNumber}
             setAccountNumber={setAccountNumber}
             username={username}
-            onNext={goToNextStep} 
+            onNext={goToNextStep}
             transferType={transferType} // Add transferType prop
             currencyType={currencyType} // Add currencyType prop
           />
