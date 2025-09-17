@@ -58,8 +58,8 @@ export interface BankSelectionStepProps {
   accountNumber: string;
   setAccountNumber: React.Dispatch<React.SetStateAction<string>>;
   username: string;
-  onNext: () => void;
-  onBack: () => void;
+  onNext?: () => void;
+  onBack?: () => void;
 }
 
 export interface PinEntryStepProps {
@@ -67,7 +67,7 @@ export interface PinEntryStepProps {
   setPin: React.Dispatch<React.SetStateAction<string>>;
   transferType: string;
   onNext: () => void;
-  onBack: () => void;
+  onBack?: () => void;
   currencyType: string;
 }
 

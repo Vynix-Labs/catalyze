@@ -46,6 +46,7 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
   };
 
   const goToNextStep = () => {
+    console.log("Going to next step from:", currentStep);
     // If transferring crypto and we're on amount entry, skip bank selection
     if (transferType === "crypto" && currentStep === 1) {
       setCurrentStep(3); // Skip to pin entry
@@ -79,7 +80,6 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
             onTransferTypeChange={handleTransferTypeChange}
             currencyType={currencyType} // Pass currency type to step
             selectedAsset={selectedAsset} // Pass selected asset data
-            onBack={goToPrevStep}
           />
         );
       case 2:
@@ -90,8 +90,7 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
             accountNumber={accountNumber}
             setAccountNumber={setAccountNumber}
             username={username}
-            onNext={goToNextStep}
-            onBack={goToPrevStep}
+            onNext={goToNextStep} // Add the missing onNext prop
           />
         );
       case 3:
@@ -102,11 +101,9 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
             transferType={transferType}
             onNext={goToNextStep}
             currencyType={currencyType} // Pass currency type to step
-            onBack={goToPrevStep}
           />
         );
       case 4:
-        // return <SuccessStep onDone={resetForm} />;
         return <SuccessStep transferType={transferType} onDone={resetForm} />;
       default:
         return (
@@ -125,7 +122,7 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
   };
 
   return (
-    <div className="max-w-[420px] mx-auto min-h-screen">
+    <div className="max-w-[420px] mx-auto relative min-h-screen">
       <div className="bg-white">
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
           <button
@@ -139,6 +136,9 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
         </div>
       </div>
       {renderCurrentStep()}
+
+      {/* Remove the conflicting global button - let each step handle its own buttons */}
+      {/* The BankSelectionStep has its own button, so we don't need this global one */}
     </div>
   );
 };

@@ -15,14 +15,19 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
 
   const handleProceedClick = () => {
     // Validate form before showing modal
+    console.log("Proceed clicked", { selectedBank, accountNumber });
     if (selectedBank && accountNumber) {
       setIsModalOpen(true);
     }
   };
 
   const handleModalProceed = () => {
+    if (!selectedBank || !accountNumber) {
+      alert("Please select a bank and enter account number");
+      return;
+    }
     setIsModalOpen(false);
-    onNext(); // Navigate to PIN entry step
+    onNext?.(); // Navigate to PIN entry step
   };
 
   const toggleModal = () => {
