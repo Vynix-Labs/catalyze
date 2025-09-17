@@ -10,6 +10,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   onNext,
   transferType,
   onTransferTypeChange,
+
 }) => {
   // const [activeTab, setActiveTab] = useState("fiat");
 

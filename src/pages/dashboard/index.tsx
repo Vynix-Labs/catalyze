@@ -70,7 +70,7 @@ const Home: React.FC = () => {
       setSelectedAssetForModal(null);
 
       // Navigate to transfer page with selected asset data
-      navigate("/transfer", {
+      navigate("/dashboard/transfer", {
         state: {
           selectedAsset: selectedAssetForModal,
         },

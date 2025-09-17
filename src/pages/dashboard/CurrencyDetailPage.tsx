@@ -6,16 +6,8 @@ import {
   EyeIcon,
   EyeOffIcon,
 } from "../../assets/svg";
-import type { Transaction } from "../../components/Transactions";
 import Button from "../../common/ui/button";
-
-interface CurrencyDetailPageProps {
-  currencyType: string;
-  balance: string;
-  nairaValue: string;
-  transactions: Transaction[];
-  onBack: () => void;
-}
+import type { CurrencyDetailPageProps } from "../../types/types";
 
 // Currency icon mapping
 const currencyIcons = {
@@ -75,7 +67,7 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
   };
 
   // Filter transactions for this currency
-  const currencyTransactions = transactions.filter(
+  const currencyTransactions = (transactions ?? []).filter(
     (transaction) => transaction.currencyType === currencyType
   );
 
@@ -99,7 +91,7 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
           <div className="p-4 bg-white">
             {/* Currency Icon and Balance */}
             <div className="flex items-center space-x-2 mb-2">
-              <CurrencyIcon currencyType={currencyType} size="small" />
+              <CurrencyIcon currencyType={currencyType ?? ""} size="small" />
               <div>
                 <h2 className="text-sm font-medium text-gray-100">
                   {currencyType} Balance
@@ -161,7 +153,10 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
                   {/* Left side */}
                   <div className="flex items-center space-x-3">
                     <div className=" rounded-full flex items-center justify-center">
-                      <CurrencyIcon currencyType={currencyType} size="large" />
+                      <CurrencyIcon
+                        currencyType={currencyType ?? ""}
+                        size="large"
+                      />
                     </div>
                     <div>
                       <h3 className="font-medium text-gray-900 text-sm">

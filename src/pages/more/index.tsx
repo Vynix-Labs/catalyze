@@ -36,21 +36,21 @@ const MorePage = () => {
       title: "Gamification",
       description: "Lorem ipsum dolor sit amet consectetur.",
       icon: <MagicWandIcon className="h-6 w-6" />,
-      onClick: () => handleNavigation("gamification", "/more/gamification"),
+      onClick: () => handleNavigation("gamification", "/more/"),
     },
     {
       id: "history",
       title: "History",
       description: "Lorem ipsum dolor sit amet consectetur.",
       icon: <VideoIcon className="h-6 w-6" />,
-      onClick: () => handleNavigation("history", "/more/history"),
+      onClick: () => handleNavigation("history", "/more/"),
     },
     {
       id: "learning-hub",
       title: "Learning Hub",
       description: "Lorem ipsum dolor sit amet consectetur.",
       icon: <VideoIcon className="h-6 w-6" />,
-      onClick: () => handleNavigation("learning-hub", "/more/learning-hub"),
+      onClick: () => handleNavigation("learning-hub", "/more/"),
     },
     {
       id: "staking",
@@ -65,7 +65,7 @@ const MorePage = () => {
       title: "Settings",
       description: "Lorem ipsum dolor sit amet consectetur.",
       icon: <SettingsIcon className="h-6 w-6" />,
-      onClick: () => handleNavigation("settings", "/more/settings"),
+      onClick: () => handleNavigation("settings", "/more/"),
     },
   ];
 

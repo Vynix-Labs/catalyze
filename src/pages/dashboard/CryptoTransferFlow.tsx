@@ -1,11 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AmountEntryStep from "../../components/cryptoTransferFlow/AmountEntryStep";
 import BankSelectionStep from "../../components/cryptoTransferFlow/BankSelectionStep";
 import PinEntryStep from "../../components/cryptoTransferFlow/PinEntryStep";
 import SuccessStep from "../../components/cryptoTransferFlow/SuccessStep";
-import Header from "../../components/cryptoTransferFlow/Header";
+import { ChevronLeftIcon } from "../../assets/svg";
+import { useLocation, useNavigate } from "react-router-dom";
+import type { CurrencyDetailPageProps } from "../../types/types";
 
-const CryptoTransferFlow: React.FC = () => {
+const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
+  currencyType: propCurrencyType,
+}) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [currentStep, setCurrentStep] = useState(1);
   const [amount, setAmount] = useState("");
   const [selectedBank, setSelectedBank] = useState("");
@@ -13,6 +20,21 @@ const CryptoTransferFlow: React.FC = () => {
   const [pin, setPin] = useState("");
   const [username] = useState("Username");
   const [transferType, setTransferType] = useState("fiat"); // 'fiat' or 'crypto'
+
+  // Get the selected asset from navigation state or use prop
+  const selectedAsset = location.state?.selectedAsset;
+  const [currencyType, setCurrencyType] = useState(
+    propCurrencyType || selectedAsset?.symbol || "Crypto"
+  );
+
+  // Update currency type when component mounts or when selectedAsset changes
+  useEffect(() => {
+    if (selectedAsset?.symbol) {
+      setCurrencyType(selectedAsset.symbol);
+    } else if (propCurrencyType) {
+      setCurrencyType(propCurrencyType);
+    }
+  }, [selectedAsset, propCurrencyType]);
 
   const resetForm = () => {
     setCurrentStep(1);
@@ -55,6 +77,8 @@ const CryptoTransferFlow: React.FC = () => {
             onNext={goToNextStep}
             transferType={transferType}
             onTransferTypeChange={handleTransferTypeChange}
+            currencyType={currencyType} // Pass currency type to step
+            selectedAsset={selectedAsset} // Pass selected asset data
             onBack={goToPrevStep}
           />
         );
@@ -77,6 +101,7 @@ const CryptoTransferFlow: React.FC = () => {
             setPin={setPin}
             transferType={transferType}
             onNext={goToNextStep}
+            currencyType={currencyType} // Pass currency type to step
             onBack={goToPrevStep}
           />
         );
@@ -91,6 +116,8 @@ const CryptoTransferFlow: React.FC = () => {
             transferType={transferType}
             onTransferTypeChange={handleTransferTypeChange}
             onNext={goToNextStep}
+            currencyType={currencyType} // Pass currency type to step
+            selectedAsset={selectedAsset} // Pass selected asset data
             onBack={goToPrevStep}
           />
         );
@@ -100,7 +127,16 @@ const CryptoTransferFlow: React.FC = () => {
   return (
     <div className="max-w-[420px] mx-auto min-h-screen">
       <div className="bg-white">
-        <Header title="USDC" onBack={goToPrevStep} />
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
+          >
+            <ChevronLeftIcon />
+          </button>
+          <h1 className="text-lg font-semibold">{currencyType}</h1>
+          <div className="w-9 h-9"></div>
+        </div>
       </div>
       {renderCurrentStep()}
     </div>
