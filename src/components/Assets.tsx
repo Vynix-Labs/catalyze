@@ -78,7 +78,9 @@ const Assets: React.FC<AssetsProps> = ({
 
               {/* Right side with balance and value */}
               <div className="text-right">
-                <p className="font-black text-black text-base">{asset.balance}</p>
+                <p className="font-black text-black text-base">
+                  {asset.balance}
+                </p>
                 <p className="text-base text-gray-500">
                   ≈{asset.currency || "₦"}
                   {asset.value}

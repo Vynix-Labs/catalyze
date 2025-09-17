@@ -12,14 +12,18 @@ import {
 } from "../../assets/svg";
 
 import { useNavigate } from "react-router-dom";
-import Layout from "../../layout";
+import GlobalModal from "../../common/ui/modal/GlobalModal";
 
 const Home: React.FC = () => {
   const [showTransactionDetails, setShowTransactionDetails] = useState(false);
   const [showCurrencyDetail, setShowCurrencyDetail] = useState(false);
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
   const toggleBalanceVisibility = () => {
     setIsBalanceVisible(!isBalanceVisible);
   };
@@ -279,7 +283,17 @@ const Home: React.FC = () => {
           </div>
         </div>
       </div>
-    </Layout>
+      <GlobalModal
+        onClose={toggleModal}
+        open={isModalOpen}
+        setOpen={setIsModalOpen}
+        headingText="Select Currency"
+        btnText="Proceed"
+        children={
+          <Assets assets={assetsData} onAssetClick={handleAssetClick} />
+        }
+      />
+    </div>
   );
 };
 
