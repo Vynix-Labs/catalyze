@@ -20,6 +20,13 @@ export const buildApp = async () => {
   await fastify.register(dbPlugin);
   await fastify.register(authPlugin);
 
+  fastify.get("/api/debug-auth", async (request, reply) => {
+    const hasAuth = "auth" in fastify;
+    const sessionFunc = hasAuth && typeof (fastify as any).auth.getSession === "function";
+    return { hasAuth, sessionFunc };
+  });
+
+
   // Register Better Auth handler
   await fastify.register(betterAuthHandler, { prefix: '/api' });
 

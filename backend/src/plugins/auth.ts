@@ -1,4 +1,3 @@
-// src/plugins/auth.ts
 import { FastifyPluginAsync } from "fastify";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -6,6 +5,7 @@ import { db } from "./db"
 import * as schema from "../db/schema"
 import { emailOTP } from 'better-auth/plugins';
 import { sendOtp } from "../utils/email/otp";
+import fp from "fastify-plugin";
 
 export const auth = betterAuth({
   secret: process.env.JWT_SECRET!,
@@ -48,4 +48,4 @@ declare module "fastify" {
   }
 }
 
-export default authPlugin;
+export default fp(authPlugin);
