@@ -62,7 +62,13 @@ const config: Config = {
         transparent: "transparent", // leave this…
         current: "currentColor", // and this…
         white: colors.white, // tenant's white colour
-        black: "#000000", // tenant's darkest grey
+        black: {
+          DEFAULT: "#000000",
+          100: "#0B0C0B",
+          200: "#1A1A1A",
+          300: "#2C2C2C",
+        }, // tenant's darkest grey
+
         // warning: "#C64242", // tenant's warning colour
         gray: {
           100: "#414141",
@@ -74,6 +80,8 @@ const config: Config = {
         neutral: {
           50: "#FAFAFA",
           100: "#F5F5F5",
+          150: "#F2F2F2",
+          200: "#F3F3F3",
         },
         primary: {
           50: "#1B1737",
@@ -83,8 +91,15 @@ const config: Config = {
           400: "#C2BAF3",
           500: "#E8E5FA",
           600: "#1B1737",
+          650: "#04329C",
         },
-        secondary: "#A42600",
+
+        secondary: {
+          base: "#A42600",
+          100: "#F59E0B",
+          200: "#FDECCE33",
+        },
+
         success: {
           500: "#26902B",
           400: "#173719",

@@ -1,28 +1,27 @@
 import React from "react";
-import HomeIcon from "./icons/HomeIcon";
-import InvestmentIcon from "./icons/Investment";
-import RewardIcon from "./icons/Reward";
-import MoreIcon from "./icons/More";
+import { useNavigate } from "react-router-dom";
+import { HomeIcon, MoreIcon, RewardsIcon, InvestmentIcon } from "../assets/svg";
+import { RoutePath } from "../routes/routePath";
 
 interface BottomNavProps {
   activeTab?: string;
   onTabChange?: (tab: string) => void;
 }
 
-const BottomNav: React.FC<BottomNavProps> = ({
-  activeTab = "home",
-  onTabChange,
-}) => {
-  //
-  const navItems: { id: string; label: string; icon: React.ReactNode }[] = [
+const BottomNav: React.FC<BottomNavProps> = ({ activeTab = "home" }) => {
+  const navigate = useNavigate();
+
+  const navItems = [
     {
       id: "home",
       label: "Home",
+      path: RoutePath.DASHBOARD,
       icon: <HomeIcon color={activeTab === "home" ? "#4F46E5" : "#6A7282"} />,
     },
     {
       id: "investment",
       label: "Investment",
+      path: RoutePath.INVESTMENT,
       icon: (
         <InvestmentIcon
           color={activeTab === "investment" ? "#4F46E5" : "#6A7282"}
@@ -32,14 +31,15 @@ const BottomNav: React.FC<BottomNavProps> = ({
     {
       id: "rewards",
       label: "Rewards",
+      path: RoutePath.REWARD,
       icon: (
-        <RewardIcon color={activeTab === "rewards" ? "#4F46E5" : "#6A7282"} />
+        <RewardsIcon color={activeTab === "rewards" ? "#4F46E5" : "#6A7282"} />
       ),
     },
-
     {
       id: "more",
       label: "More",
+      path: RoutePath.MORE,
       icon: <MoreIcon color={activeTab === "more" ? "#4F46E5" : "#6A7282"} />,
     },
   ];
@@ -55,7 +55,7 @@ const BottomNav: React.FC<BottomNavProps> = ({
                 className={`flex flex-col items-center justify-center w-16 ${
                   activeTab === item.id ? "text-primary-100" : "text-gray-400"
                 }`}
-                onClick={() => onTabChange?.(item.id)}
+                onClick={() => navigate(item.path)}
               >
                 <div
                   className={`w-8 h-8 flex items-center justify-center ${
