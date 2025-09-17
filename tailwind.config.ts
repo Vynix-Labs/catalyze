@@ -62,7 +62,13 @@ const config: Config = {
         transparent: "transparent", // leave this…
         current: "currentColor", // and this…
         white: colors.white, // tenant's white colour
-        black: "#000000", // tenant's darkest grey
+        black: {
+          DEFAULT: "#000000",
+          100: "#0B0C0B",
+          200: "#1A1A1A",
+          300: "#2C2C2C",
+        }, // tenant's darkest grey
+
         // warning: "#C64242", // tenant's warning colour
         gray: {
           100: "#414141",
