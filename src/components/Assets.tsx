@@ -17,7 +17,6 @@ interface AssetsProps {
   selectedAsset?: Asset | null; // Track selected asset
 }
 
-
 // Currency icon mapping - using proper image paths
 const currencyIcons = {
   USDT: "/images/usdt.png",
@@ -57,7 +56,7 @@ const Assets: React.FC<AssetsProps> = ({
               className={`flex justify-between items-center py-2 rounded-lg p-2 cursor-pointer transition-colors ${
                 isModalMode
                   ? isSelected
-                    ? "bg-primary-50 border-2 border-primary-100"
+                    ? " border-2 border-primary-100"
                     : "hover:bg-gray-50 border-2 border-transparent"
                   : "hover:bg-gray-50"
               }`}
@@ -94,25 +93,6 @@ const Assets: React.FC<AssetsProps> = ({
                   {asset.value}
                 </p>
               </div>
-
-              {/* Selection indicator for modal mode */}
-              {isModalMode && (
-                <div className="ml-3">
-                  <div
-                    className={`w-5 h-5 rounded-full border-2 ${
-                      isSelected
-                        ? "bg-primary-100 border-primary-100"
-                        : "border-gray-300"
-                    }`}
-                  >
-                    {isSelected && (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <div className="w-2 h-2 bg-white rounded-full"></div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
           );
         })}

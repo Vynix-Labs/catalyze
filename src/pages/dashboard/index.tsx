@@ -273,13 +273,13 @@ const Home: React.FC = () => {
                   <div className="flex space-x-3">
                     <button
                       onClick={toggleModal}
-                      className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
+                      className="bg-[#04329C] text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
                     >
                       <span>Transfer</span> <ArrowUpRightIcon />
                     </button>
                     <button
                       onClick={toggleModal}
-                      className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
+                      className="bg-[#04329C] text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
                     >
                       <span>Deposit</span> <ArrowDownRight />
                     </button>
@@ -322,7 +322,12 @@ const Home: React.FC = () => {
         onProceed={handleModalProceed}
         isProceedDisabled={!selectedAssetForModal}
         children={
-          <Assets assets={assetsData} onAssetClick={handleModalAssetClick} />
+          <Assets
+            assets={assetsData}
+            onAssetClick={handleModalAssetClick}
+            isModalMode={true} // Add this prop
+            selectedAsset={selectedAssetForModal} // Add this prop
+          />
         }
       />
     </Layout>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Add this import
 import {
   ArrowDownRight,
   ArrowUpRightIcon,
@@ -6,8 +7,9 @@ import {
   EyeIcon,
   EyeOffIcon,
 } from "../../assets/svg";
-import Button from "../../common/ui/button";
 import type { CurrencyDetailPageProps } from "../../types/types";
+import GlobalModal from "../../common/ui/modal/GlobalModal";
+import Assets, { type Asset } from "../../components/Assets";
 
 // Currency icon mapping
 const currencyIcons = {
@@ -60,7 +62,10 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
   transactions,
   onBack,
 }) => {
+  const navigate = useNavigate(); // Add this line
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
+  const [selectedAssetForModal, setSelectedAssetForModal] =
+    useState<Asset | null>(null);
 
   const toggleBalanceVisibility = () => {
     setIsBalanceVisible(!isBalanceVisible);
@@ -70,6 +75,65 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
   const currencyTransactions = (transactions ?? []).filter(
     (transaction) => transaction.currencyType === currencyType
   );
+
+  // State for modal (for Transfer/Deposit actions)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+    // Reset selected asset when closing modal
+    if (isModalOpen) {
+      setSelectedAssetForModal(null);
+    }
+  };
+
+  // Handle asset click in modal
+  const handleModalAssetClick = (asset: Asset) => {
+    setSelectedAssetForModal(asset);
+  };
+
+  // Handle proceed button click in modal
+  const handleModalProceed = () => {
+    if (selectedAssetForModal) {
+      // Close modal first
+      setIsModalOpen(false);
+      setSelectedAssetForModal(null);
+
+      // Navigate to transfer page with selected asset data
+      navigate("/dashboard/transfer", {
+        state: {
+          selectedAsset: selectedAssetForModal,
+        },
+      });
+    }
+  };
+
+  // Add the assetsData here (you can pass this as a prop later if needed)
+  const assetsData: Asset[] = [
+    {
+      id: "1",
+      symbol: "USDT",
+      name: "Tether",
+      balance: "10,000",
+      value: "100,000",
+      currency: "₦",
+    },
+    {
+      id: "2",
+      symbol: "USDC",
+      name: "USD Coin",
+      balance: "5.00023",
+      value: "6,000,000.00",
+      currency: "₦",
+    },
+    {
+      id: "3",
+      symbol: "STRK",
+      name: "Starknet",
+      balance: "10,000",
+      value: "100,000",
+      currency: "₦",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -124,13 +188,19 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
             </div>
 
             {/* Action Buttons */}
-            <div className="flex space-x-3 ">
-              <Button variants="primary" classes="text-xs">
+            <div className="flex space-x-3">
+              <button
+                onClick={toggleModal}
+                className="bg-primary-100 backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88 transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
+              >
                 <span>Transfer</span> <ArrowUpRightIcon />
-              </Button>
-              <Button variants="primary" classes="text-xs">
+              </button>
+              <button
+                onClick={toggleModal}
+                className="bg-primary-100 backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88 transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
+              >
                 <span>Deposit</span> <ArrowDownRight />
-              </Button>
+              </button>
             </div>
           </div>
 
@@ -152,7 +222,7 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
                 >
                   {/* Left side */}
                   <div className="flex items-center space-x-3">
-                    <div className=" rounded-full flex items-center justify-center">
+                    <div className="rounded-full flex items-center justify-center">
                       <CurrencyIcon
                         currencyType={currencyType ?? ""}
                         size="large"
@@ -209,6 +279,24 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
           </div>
         </div>
       </div>
+
+      <GlobalModal
+        onClose={toggleModal}
+        open={isModalOpen}
+        setOpen={setIsModalOpen}
+        headingText="Select Currency"
+        btnText="Proceed"
+        onProceed={handleModalProceed}
+        isProceedDisabled={!selectedAssetForModal} // Add this prop
+        children={
+          <Assets
+            assets={assetsData}
+            onAssetClick={handleModalAssetClick}
+            isModalMode={true} // Add this prop
+            selectedAsset={selectedAssetForModal} // Add this prop
+          />
+        }
+      />
     </div>
   );
 };
