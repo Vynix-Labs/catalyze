@@ -2,12 +2,15 @@ import React from "react";
 import Layout from "../../layout";
 import { MagicWandIcon, SettingsIcon, VideoIcon } from "../../assets/svg";
 import { ChevronRightIcon } from "lucide-react";
+import { RoutePath } from "../../routes/routePath";
+import { useNavigate } from "react-router-dom";
 
 interface MenuItem {
   id: string;
   title: string;
   description: string;
   icon: React.ReactNode;
+  path?: string;
   onClick?: () => void;
 }
 
@@ -15,56 +18,54 @@ const MorePage = () => {
   // Fixed: Set initial state to the learning-hub id (string), not undefined variable
   const [activeItem, setActiveItem] = React.useState<string>("learning-hub");
 
+  const navigate = useNavigate(); // ✅ React Router hook
+
+  // Navigation helper function
+  const handleNavigation = (itemId: string, path?: string) => {
+    setActiveItem(itemId);
+
+    if (path) {
+      navigate(path); // ✅ navigate instead of router.push
+    }
+
+    console.log(`Navigate to ${itemId}`);
+  };
   const menuItems: MenuItem[] = [
     {
       id: "gamification",
       title: "Gamification",
       description: "Lorem ipsum dolor sit amet consectetur.",
       icon: <MagicWandIcon className="h-6 w-6" />,
-      onClick: () => {
-        setActiveItem("gamification");
-        console.log("Navigate to Gamification");
-      },
+      onClick: () => handleNavigation("gamification", "/more/gamification"),
     },
     {
       id: "history",
       title: "History",
       description: "Lorem ipsum dolor sit amet consectetur.",
       icon: <VideoIcon className="h-6 w-6" />,
-      onClick: () => {
-        setActiveItem("history");
-        console.log("Navigate to History");
-      },
+      onClick: () => handleNavigation("history", "/more/history"),
     },
     {
       id: "learning-hub",
       title: "Learning Hub",
       description: "Lorem ipsum dolor sit amet consectetur.",
       icon: <VideoIcon className="h-6 w-6" />,
-      onClick: () => {
-        setActiveItem("learning-hub");
-        console.log("Navigate to Learning Hub");
-      },
+      onClick: () => handleNavigation("learning-hub", "/more/learning-hub"),
     },
     {
       id: "staking",
       title: "Staking",
       description: "Lorem ipsum dolor sit amet consectetur.",
+      path: RoutePath.STAKING,
       icon: <VideoIcon className="h-6 w-6" />,
-      onClick: () => {
-        setActiveItem("staking");
-        console.log("Navigate to Staking");
-      },
+      onClick: () => handleNavigation("staking", "/more/staking"),
     },
     {
       id: "settings",
       title: "Settings",
       description: "Lorem ipsum dolor sit amet consectetur.",
       icon: <SettingsIcon className="h-6 w-6" />,
-      onClick: () => {
-        setActiveItem("settings");
-        console.log("Navigate to Settings");
-      },
+      onClick: () => handleNavigation("settings", "/more/settings"),
     },
   ];
 
