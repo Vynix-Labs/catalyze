@@ -9,7 +9,7 @@ import CreatePin from "../pages/auth/createPin";
 import CryptoTransferFlow from "../pages/dashboard/CryptoTransferFlow";
 import Login from "../pages/auth/login";
 import ForgetPassword from "../pages/auth/forget-password";
-import CreatePassword from "../pages/auth/createPassword";
+import CreatePassword from "../pages/auth/CreatePassword";
 
 export const routes = createBrowserRouter([
   {
