@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import {
-  ChevronLeft,
-  Eye,
-  EyeOff,
-  ArrowUpRight,
   ArrowDownRight,
-} from "lucide-react";
+  ArrowUpRightIcon,
+  ChevronLeftIcon,
+  EyeIcon,
+  EyeOffIcon,
+} from "../../assets/svg";
 import type { Transaction } from "../../components/Transactions";
 import Button from "../../common/ui/button";
 
@@ -88,7 +88,7 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
             onClick={onBack}
             className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeftIcon />
           </button>
           <h1 className="text-lg font-semibold">{currencyType}</h1>
           <div className="w-9 h-9"></div>
@@ -110,22 +110,18 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
             {/* Balance Display */}
             <div className="mb-4">
               <div className="flex items-center space-x-2">
-                {isBalanceVisible ? (
-                  <p className="text-[40px] font-black text-gray-900">
-                    {balance}
-                  </p>
-                ) : (
-                  <p className="text-[40px] font-bold text-gray-900">••••••</p>
-                )}
+                <p className="text-4xl font-bold min-w-[125px]">
+                  {isBalanceVisible ? balance : "*******"}
+                </p>
 
                 <button
                   onClick={toggleBalanceVisibility}
                   className="p-2 hover:bg-blue-100 rounded-full transition-colors"
                 >
                   {isBalanceVisible ? (
-                    <Eye className="w-5 h-5 text-primary-100" />
+                    <EyeIcon className="text-primary-100" />
                   ) : (
-                    <EyeOff className="w-5 h-5 text-primary-100" />
+                    <EyeOffIcon className="text-primary-100" />
                   )}
                 </button>
               </div>
@@ -138,10 +134,10 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
             {/* Action Buttons */}
             <div className="flex space-x-3 ">
               <Button variants="primary" classes="text-xs">
-                <span>Transfer</span> <ArrowUpRight className="w-4 h-4" />
+                <span>Transfer</span> <ArrowUpRightIcon />
               </Button>
               <Button variants="primary" classes="text-xs">
-                <span>Deposit</span> <ArrowDownRight className="w-4 h-4" />
+                <span>Deposit</span> <ArrowDownRight />
               </Button>
             </div>
           </div>

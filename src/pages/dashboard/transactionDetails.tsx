@@ -1,6 +1,6 @@
 import React from "react";
-import { ChevronLeft } from "lucide-react";
 import type { Transaction } from "../../components/Transactions";
+import { ChevronLeftIcon } from "../../assets/svg";
 
 interface TransactionDetailsPageProps {
   transactions: Transaction[];
@@ -86,7 +86,7 @@ const TransactionDetailsPage: React.FC<TransactionDetailsPageProps> = ({
             onClick={onBack}
             className="p-2 hover:bg-neutral-100 rounded-full"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeftIcon />
           </button>
           <h1 className="text-lg font-semibold">Transactions</h1>
           <div className="w-9 h-9"></div> {/* Spacer for center alignment */}

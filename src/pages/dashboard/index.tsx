@@ -4,8 +4,14 @@ import Transactions, { type Transaction } from "../../components/Transactions";
 import Assets, { type Asset } from "../../components/Assets";
 import CurrencyDetailPage from "./CurrencyDetailPage";
 import TransactionDetailsPage from "./transactionDetails";
-import { ArrowDownRight, ArrowUpRight } from "lucide-react";
-import { BellIcon, EyeIcon, EyeOffIcon } from "../../assets/svg";
+import {
+  ArrowDownRight,
+  ArrowUpRightIcon,
+  BellIcon,
+  EyeIcon,
+  EyeOffIcon,
+} from "../../assets/svg";
+
 import { useNavigate } from "react-router-dom";
 
 const Home: React.FC = () => {
@@ -221,11 +227,9 @@ const Home: React.FC = () => {
                     </p>
 
                     <div className="flex items-center mt-2">
-                      {isBalanceVisible ? (
-                        <p className="text-4xl font-bold">₦40,000</p>
-                      ) : (
-                        <p className="text-4xl font-bold">*******</p>
-                      )}
+                      <p className="text-4xl font-bold min-w-[125px]">
+                        {isBalanceVisible ? "₦40,000" : "*******"}
+                      </p>
                       <button
                         onClick={toggleBalanceVisibility}
                         className="ml-3 p-1 hover:bg-white/10 rounded-full transition-colors bg-black/40"
@@ -246,10 +250,10 @@ const Home: React.FC = () => {
                     onClick={() => navigate("/dashboard/transfer")}
                     className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
                   >
-                    <span>Transfer</span> <ArrowUpRight className="w-4 h-4" />
+                    <span>Transfer</span> <ArrowUpRightIcon />
                   </button>
                   <button className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2">
-                    <span>Deposit</span> <ArrowDownRight className="w-4 h-4" />
+                    <span>Deposit</span> <ArrowDownRight />
                   </button>
                 </div>
               </div>
