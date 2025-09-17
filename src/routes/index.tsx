@@ -13,6 +13,7 @@ import CreatePassword from "../pages/auth/CreatePassword";
 import MorePage from "../pages/more";
 import InvestmentPage from "../pages/investment";
 import RewardPage from "../pages/reward";
+import StakingPage from "../pages/more/staking";
 
 export const routes = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ export const routes = createBrowserRouter([
   {
     path: RoutePath.REWARD,
     element: <RewardPage />,
+  },
+  {
+    path: RoutePath.STAKING,
+    element: <StakingPage />,
   },
   {
     path: RoutePath.TRANSFER,
