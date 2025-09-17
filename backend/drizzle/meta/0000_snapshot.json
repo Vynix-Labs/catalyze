@@ -1,5 +1,5 @@
 {
-  "id": "26268050-2952-41ae-b2eb-e7b78d8e79d0",
+  "id": "ce6e0100-992c-4ed6-bbad-20b9f2479f2f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -17,7 +17,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -43,10 +43,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "catalyze_audit_logs_user_id_catalyze_users_id_fk": {
-          "name": "catalyze_audit_logs_user_id_catalyze_users_id_fk",
+        "catalyze_audit_logs_user_id_catalyze_user_id_fk": {
+          "name": "catalyze_audit_logs_user_id_catalyze_user_id_fk",
           "tableFrom": "catalyze_audit_logs",
-          "tableTo": "catalyze_users",
+          "tableTo": "catalyze_user",
           "columnsFrom": [
             "user_id"
           ],
@@ -76,7 +76,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -103,10 +103,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "catalyze_balances_user_id_catalyze_users_id_fk": {
-          "name": "catalyze_balances_user_id_catalyze_users_id_fk",
+        "catalyze_balances_user_id_catalyze_user_id_fk": {
+          "name": "catalyze_balances_user_id_catalyze_user_id_fk",
           "tableFrom": "catalyze_balances",
-          "tableTo": "catalyze_users",
+          "tableTo": "catalyze_user",
           "columnsFrom": [
             "user_id"
           ],
@@ -136,7 +136,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -194,10 +194,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "catalyze_crypto_deposits_user_id_catalyze_users_id_fk": {
-          "name": "catalyze_crypto_deposits_user_id_catalyze_users_id_fk",
+        "catalyze_crypto_deposits_user_id_catalyze_user_id_fk": {
+          "name": "catalyze_crypto_deposits_user_id_catalyze_user_id_fk",
           "tableFrom": "catalyze_crypto_deposits",
-          "tableTo": "catalyze_users",
+          "tableTo": "catalyze_user",
           "columnsFrom": [
             "user_id"
           ],
@@ -235,7 +235,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -293,10 +293,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "catalyze_deposit_intents_user_id_catalyze_users_id_fk": {
-          "name": "catalyze_deposit_intents_user_id_catalyze_users_id_fk",
+        "catalyze_deposit_intents_user_id_catalyze_user_id_fk": {
+          "name": "catalyze_deposit_intents_user_id_catalyze_user_id_fk",
           "tableFrom": "catalyze_deposit_intents",
-          "tableTo": "catalyze_users",
+          "tableTo": "catalyze_user",
           "columnsFrom": [
             "user_id"
           ],
@@ -429,7 +429,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -468,10 +468,10 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "catalyze_reward_claims_user_id_catalyze_users_id_fk": {
-          "name": "catalyze_reward_claims_user_id_catalyze_users_id_fk",
+        "catalyze_reward_claims_user_id_catalyze_user_id_fk": {
+          "name": "catalyze_reward_claims_user_id_catalyze_user_id_fk",
           "tableFrom": "catalyze_reward_claims",
-          "tableTo": "catalyze_users",
+          "tableTo": "catalyze_user",
           "columnsFrom": [
             "user_id"
           ],
@@ -501,7 +501,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -559,10 +559,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "catalyze_stakes_user_id_catalyze_users_id_fk": {
-          "name": "catalyze_stakes_user_id_catalyze_users_id_fk",
+        "catalyze_stakes_user_id_catalyze_user_id_fk": {
+          "name": "catalyze_stakes_user_id_catalyze_user_id_fk",
           "tableFrom": "catalyze_stakes",
-          "tableTo": "catalyze_users",
+          "tableTo": "catalyze_user",
           "columnsFrom": [
             "user_id"
           ],
@@ -605,7 +605,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -683,10 +683,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "catalyze_transactions_user_id_catalyze_users_id_fk": {
-          "name": "catalyze_transactions_user_id_catalyze_users_id_fk",
+        "catalyze_transactions_user_id_catalyze_user_id_fk": {
+          "name": "catalyze_transactions_user_id_catalyze_user_id_fk",
           "tableFrom": "catalyze_transactions",
-          "tableTo": "catalyze_users",
+          "tableTo": "catalyze_user",
           "columnsFrom": [
             "user_id"
           ],
@@ -711,22 +711,28 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.catalyze_users": {
-      "name": "catalyze_users",
+    "public.catalyze_user": {
+      "name": "catalyze_user",
       "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "email": {
           "name": "email",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
+        },
+        "email_verified": {
+          "name": "email_verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         },
         "phone": {
           "name": "phone",
@@ -790,8 +796,8 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "catalyze_users_email_unique": {
-          "name": "catalyze_users_email_unique",
+        "catalyze_user_email_unique": {
+          "name": "catalyze_user_email_unique",
           "nullsNotDistinct": false,
           "columns": [
             "email"
@@ -815,7 +821,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -879,10 +885,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "catalyze_withdraw_requests_user_id_catalyze_users_id_fk": {
-          "name": "catalyze_withdraw_requests_user_id_catalyze_users_id_fk",
+        "catalyze_withdraw_requests_user_id_catalyze_user_id_fk": {
+          "name": "catalyze_withdraw_requests_user_id_catalyze_user_id_fk",
           "tableFrom": "catalyze_withdraw_requests",
-          "tableTo": "catalyze_users",
+          "tableTo": "catalyze_user",
           "columnsFrom": [
             "user_id"
           ],

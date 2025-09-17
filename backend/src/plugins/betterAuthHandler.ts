@@ -36,16 +36,16 @@ const betterAuthHandler: FastifyPluginAsync = async (fastify) => {
           const json = await response.json();
           reply.send(json);
         } else {
-          // fallback for plain text or other responses
+          // fallback for plain text
           const text = await response.text();
           reply.send(text);
         }
       } catch (error) {
-        fastify.log.error("Authentication Error:", error);
-        reply.status(500).send({
-          error: "Internal authentication error",
-          code: "AUTH_FAILURE",
-        });
+        fastify.log.error({ err: error }, "Authentication Error");
+          reply.status(500).send({
+            error: "Internal authentication error",
+            code: "AUTH_FAILURE",
+          });
       }
     },
   });
