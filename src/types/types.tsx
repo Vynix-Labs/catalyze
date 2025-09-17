@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
 import type { Transaction } from "../components/Transactions";
- export interface CurrencyDetailPageProps {
+export interface CurrencyDetailPageProps {
   currencyType?: string;
   balance?: string;
   nairaValue?: string;
   transactions?: Transaction[];
-  onBack: () => void;
+  onBack?: () => void;
 }
 export interface buttonProps {
   variants: "primary" | "secondary";
@@ -39,7 +39,7 @@ export interface AmountEntryStepProps {
   transferType: string;
   onTransferTypeChange: (type: string) => void;
   onNext: () => void;
-  onBack: () => void;
+  onBack?: () => void;
   selectedAsset?: {
     name: string;
     symbol: string;

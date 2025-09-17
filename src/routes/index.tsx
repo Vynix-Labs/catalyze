@@ -6,7 +6,6 @@ import VerifyEmail from "../pages/auth/verifyEmail";
 import Onboarding from "../pages/auth/onBoarding";
 import SignUp from "../pages/auth/signup";
 import CreatePin from "../pages/auth/createPin";
-import CryptoTransferFlow from "../pages/dashboard/CryptoTransferFlow";
 import Login from "../pages/auth/login";
 import ForgetPassword from "../pages/auth/forget-password";
 import CreatePassword from "../pages/auth/CreatePassword";
@@ -14,6 +13,7 @@ import MorePage from "../pages/more";
 import InvestmentPage from "../pages/investment";
 import RewardPage from "../pages/reward";
 import StakingPage from "../pages/more/staking";
+import CryptoTransferFlow from "../pages/dashboard/CryptoTransferFlow";
 
 export const routes = createBrowserRouter([
   {
