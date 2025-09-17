@@ -7,15 +7,43 @@ import { SwapIcon } from "../../assets/svg";
 
 const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   amount,
+  setAmount,
   onNext,
   transferType,
   onTransferTypeChange,
+  currencyType = "USDC",
 }) => {
-  // const [activeTab, setActiveTab] = useState("fiat");
-
-  //
-  const [amountUSDC, setAmountUSDC] = useState("");
   const [amountNGN, setAmountNGN] = useState("");
+  const [address, setAddress] = useState("");
+  const [selectedNetwork, setSelectedNetwork] = useState("");
+  const [isSwapped, setIsSwapped] = useState(false);
+  // Exchange rate calculation
+  const exchangeRate = 1500; // 1 USD = 1500 NGN
+
+  const handleUSDCChange = (value: string) => {
+    setAmount?.(value);
+    // Auto-calculate NGN equivalent
+    const usdcAmount = parseFloat(value) || 0;
+    const ngnEquivalent = (usdcAmount * exchangeRate).toFixed(2);
+    setAmountNGN(ngnEquivalent);
+  };
+
+  const handleNGNChange = (value: string) => {
+    setAmountNGN(value);
+    // Auto-calculate USDC equivalent
+    const ngnAmount = parseFloat(value) || 0;
+    const usdcEquivalent = (ngnAmount / exchangeRate).toFixed(6);
+    setAmount?.(usdcEquivalent);
+  };
+
+  const handleSwap = () => {
+    // Swap the values between USDC and NGN inputs
+    const tempUSDC = amount;
+    const tempNGN = amountNGN;
+    setAmount?.(tempNGN);
+    setAmountNGN(tempUSDC);
+    setIsSwapped(!isSwapped);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col relative">
@@ -37,29 +65,38 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Enter USDC"
-                  value={amountUSDC}
-                  onChange={(e) => setAmountUSDC(e.target.value)}
+                  placeholder={`Enter ${currencyType}`}
+                  inputMode="numeric"
+                  value={amount}
+                  onChange={(e) => handleUSDCChange(e.target.value)}
                   className="w-full placeholder:text-sm p-3 border border-gray-200 bg-neutral-50 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
 
-            <div className="flex justify-center cursor-pointer items-center">
-              <SwapIcon className="" />
+            <div
+              className="flex justify-center cursor-pointer items-center"
+              onClick={handleSwap}
+            >
+              <SwapIcon
+                className={`hover:scale-110 transition-all duration-300 hover:text-blue-600 active:text-red-500 ${
+                  isSwapped ? "rotate-180" : "rotate-0"
+                }`}
+              />
             </div>
 
             <div className="mb-4">
               <div className="text-sm text-gray-600 mb-2">
-                Exchange Rate: $1,500/NGN
+                Exchange Rate: ₦{exchangeRate.toLocaleString()}/{currencyType}
               </div>
 
               <div className="relative">
                 <input
                   type="text"
                   placeholder="Enter NGN"
+                  inputMode="numeric"
                   value={amountNGN}
-                  onChange={(e) => setAmountNGN(e.target.value)}
+                  onChange={(e) => handleNGNChange(e.target.value)}
                   className="w-full placeholder:text-sm p-3 border border-gray-200 bg-neutral-50 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -69,15 +106,16 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
           <div className="p-4 space-y-4">
             <div className="">
               <div className="flex items-center justify-between text-sm mb-2">
-                <div className="font-bold"> Amount</div>
-                <span>Available Amount: 10,000</span>
+                <div className="font-bold">Amount</div>
+                <span>Available Amount: 10,000 {currencyType}</span>
               </div>
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Enter USDC"
+                  inputMode="numeric"
+                  placeholder={`Enter ${currencyType} amount`}
                   value={amount}
-                  onChange={(e) => setAmountUSDC(e.target.value)}
+                  onChange={(e) => setAmount?.(e.target.value)}
                   className="w-full placeholder:text-sm p-3 border border-gray-200 bg-neutral-50 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -89,9 +127,9 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Enter NGN"
-                  value={amountNGN}
-                  onChange={(e) => setAmountNGN(e.target.value)}
+                  placeholder={`Enter ${currencyType} address`}
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                   className="w-full placeholder:text-sm p-3 border border-gray-200 bg-neutral-50 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -99,34 +137,47 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
 
             <div className="mb-4">
               <div className="block text-sm font-bold mb-2">Network</div>
-              <select className="w-full p-3 border border-gray-200 rounded-lg text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <select
+                value={selectedNetwork}
+                onChange={(e) => setSelectedNetwork(e.target.value)}
+                className="w-full p-3 border border-gray-200 rounded-lg text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
                 <option value="">Select Network</option>
-                <option value="access">Bep 20</option>
-                <option value="gtb">Eth</option>
-                <option value="zenith">Solana</option>
-                <option value="uba">Polygon</option>
+                <option value="bep20">BEP-20 (Binance Smart Chain)</option>
+                <option value="erc20">ERC-20 (Ethereum)</option>
+                <option value="spl">SPL (Solana)</option>
+                <option value="polygon">Polygon</option>
               </select>
             </div>
           </div>
         )}
 
         {transferType === "fiat" && (
-          <div className="flex items-start space-x-2 bg-yellow-50 border border-yellow-200 rounded-lg mx-4 p-3">
-            <AlertCircle className="w-5 h-5 text-secondary-100 mt-0.5 flex-shrink-0" />
-            <div className="text-sm text-secondary-100">
+          <div className="flex items-start flex-col space-x-2 text-sm text-secondary-100 bg-secondary-200 space-y-2 rounded-lg mx-4 p-3">
+            <div className="text-sm flex gap-2 items-center">
+              <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
               <span className="font-medium">Info</span>
-              <div className="mt-1">
-                {transferType === "fiat"
-                  ? "Your fiat amount will be converted to cryptocurrency at the current exchange rate."
-                  : "The transfer amount of Naira with our current rate will be transferred to beneficiary"}
-              </div>
+            </div>
+
+            <div className="">
+              Estimated amount of naira with our current rate will be
+              transferred to beneficiary
             </div>
           </div>
         )}
       </div>
 
-      <div className="w-full bottom-0 mx-auto flex justify-center p-4 absolute ">
-        <Button variants="primary" handleClick={onNext} text="Proceed" />
+      <div className="w-full bottom-0 mx-auto flex justify-center p-4 absolute">
+        <Button
+          variants="primary"
+          handleClick={onNext}
+          text="Proceed"
+          disabled={
+            transferType === "fiat"
+              ? !amount || !amountNGN
+              : !amount || !address || !selectedNetwork
+          }
+        />
       </div>
     </div>
   );

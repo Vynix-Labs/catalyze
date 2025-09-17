@@ -90,7 +90,9 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
             accountNumber={accountNumber}
             setAccountNumber={setAccountNumber}
             username={username}
-            onNext={goToNextStep} // Add the missing onNext prop
+            onNext={goToNextStep} 
+            transferType={transferType} // Add transferType prop
+            currencyType={currencyType} // Add currencyType prop
           />
         );
       case 3:
@@ -136,9 +138,6 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
         </div>
       </div>
       {renderCurrentStep()}
-
-      {/* Remove the conflicting global button - let each step handle its own buttons */}
-      {/* The BankSelectionStep has its own button, so we don't need this global one */}
     </div>
   );
 };

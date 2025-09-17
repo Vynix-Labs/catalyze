@@ -60,6 +60,8 @@ export interface BankSelectionStepProps {
   username: string;
   onNext?: () => void;
   onBack?: () => void;
+  transferType: string;
+  currencyType: string;
 }
 
 export interface PinEntryStepProps {
