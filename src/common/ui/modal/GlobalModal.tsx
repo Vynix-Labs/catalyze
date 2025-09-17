@@ -10,7 +10,7 @@ interface Props {
   handleOnBtnClick?: () => void;
   isProceedDisabled?: boolean;
   btnText: string;
-  headingText: string;
+  headingText?: string;
 }
 
 export default function GlobalModal({
