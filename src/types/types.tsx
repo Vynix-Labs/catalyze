@@ -75,9 +75,9 @@ export interface CryptoTransferFlowProps {
   setAmount: React.Dispatch<React.SetStateAction<string>>;
   onNext: () => void;
   onBack: () => void;
+}
 
-  
-  export interface AuthFooterProps {
+export interface AuthFooterProps {
   text: string;
   handleBtnClick?: () => void;
 }

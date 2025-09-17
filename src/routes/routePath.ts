@@ -10,5 +10,9 @@ export const RoutePath = {
   RESET_OTP: "/auth/reset-otp",
   CREATE_PASSWORD: "/auth/create-password",
   DASHBOARD: "/dashboard",
-  TRANSFER: "/dashboard/transfer",
+  TRANSFER: "/transfer",
+  INVESTMENT: "/investment",
+  REWARD: "/reward",
+  MORE: "/more",
+  STAKING: "/more/staking",
 };
