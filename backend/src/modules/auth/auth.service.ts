@@ -1,75 +1,72 @@
-import { users } from "../../db/schema";
+import { eq } from "drizzle-orm";
+import { user } from "../../db/schema";
 import { hashPin, verifyPinHash } from "../../utils/hash";
 import { FastifyInstance } from "fastify";
 
-export async function createUserWithPin(
-  fastify: FastifyInstance,
-  {
-    betterAuthId,
-    email,
-    phone,
-    pin,
-  }: {
-    betterAuthId: string;
-    email: string;
-    phone?: string;
-    pin: string;
-  }
-) {
-  const { hash } = await hashPin(pin);
+export async function setUserPin(fastify: FastifyInstance, userId: string, pin: string) {
+  const { hash, salt } = await hashPin(pin);
+  if (!hash || !salt) throw new Error("Failed to generate PIN hash");
 
-  await fastify.db.insert(users).values({
-    betterAuthId,
-    email,
-    phone,
-    pinHash: hash,
-  });
+  const [updated] = await fastify.db
+    .update(user)
+    .set({
+      pinHash: hash,
+      pinSalt: salt,
+      pinFailedAttempts: 0,
+      pinLockedUntil: null,
+    })
+    .where(eq(user.id, userId))
+    .returning();
+
+  if (!updated) throw new Error("Failed to set PIN");
+  return { message: "PIN set successfully" };
 }
 
 export async function verifyUserPin(
   fastify: FastifyInstance,
-  {
-    userId,
-    pin,
-  }: {
-    userId: string;
-    pin: string;
-  }
+  { userId, pin }: { userId: string; pin: string }
 ) {
-  const [user] = await fastify.db
-    .select({
-      pinHash: users.pinHash,
-      failedAttempts: users.pinFailedAttempts,
-      lockedUntil: users.pinLockedUntil,
-    })
-    .from(users)
-    .where(users.id.eq(userId));
+  // Fetch the user
+  const rows = await fastify.db
+    .select()
+    .from(user)
+    .where(eq(user.id, userId))
 
-  if (!user) throw new Error("User not found");
+  const existing = rows[0];
+  if (!existing) throw new Error("User not found");
+  if (!existing.pinHash) throw new Error("User has no PIN set");
 
-  if (user.lockedUntil && user.lockedUntil > new Date()) {
-    throw new Error("Account locked. Try again later.");
+  // Check if the PIN is temporarily locked
+  if (existing.pinLockedUntil && existing.pinLockedUntil > new Date()) {
+    throw new Error("PIN is temporarily locked due to multiple failed attempts");
   }
 
-  const isValid = await verifyPinHash(pin, user.pinHash);
+  // Verify PIN
+  const isValid = await verifyPinHash(pin, existing.pinHash, existing.pinSalt);
 
   if (!isValid) {
-    const attempts = user.failedAttempts + 1;
-    const updates: any = { pinFailedAttempts: attempts };
-
-    if (attempts >= 5) {
-      updates.pinLockedUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
-      updates.pinFailedAttempts = 0;
-    }
-
-    await fastify.db.update(users).set(updates).where(users.id.eq(userId));
+    // Increment failed attempts and  lock
+    const failedAttempts = (existing.pinFailedAttempts || 0) + 1;
+    await fastify.db
+      .update(user)
+      .set({
+        pinFailedAttempts: failedAttempts,
+        pinLockedUntil:
+          failedAttempts >= 5
+            ? new Date(Date.now() + 15 * 60 * 1000) // lock 15 minutes
+            : existing.pinLockedUntil,
+      })
+      .where(eq(user.id, userId));
     throw new Error("Invalid PIN");
   }
 
-  await fastify.db
-    .update(users)
-    .set({ pinFailedAttempts: 0, pinLockedUntil: null })
-    .where(users.id.eq(userId));
+  // Reset failed attempts on success
+  if (existing.pinFailedAttempts) {
+    await fastify.db
+      .update(user)
+      .set({ pinFailedAttempts: 0, pinLockedUntil: null })
+      .where(eq(user.id, userId));
+  }
 
   return true;
 }

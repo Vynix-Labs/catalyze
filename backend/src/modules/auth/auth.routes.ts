@@ -1,55 +1,51 @@
 import { FastifyPluginAsync } from "fastify";
-import { registerSchema, verifyPinSchema } from "./auth.schema";
-import { createUserWithPin, verifyUserPin } from "./auth.service";
+import { verifyPinSchema, setPinSchema } from "./auth.schema";
+import { setUserPin, verifyUserPin } from "./auth.service";
+import { requireAuth } from "../../plugins/requireAuth";
 
 const authRoutes: FastifyPluginAsync = async (fastify) => {
-  // Register
-  fastify.post("/register", async (request, reply) => {
-    const body = registerSchema.parse(request.body);
-
-    try {
-      const authUser = await fastify.auth.emailAndPassword.register({
-        email: body.email,
-        password: body.password,
-      });
-
-      if (!authUser) {
-        return reply.code(400).send({ error: "Registration failed" });
+  // ------------------- SET PIN -------------------
+  fastify.post(
+    "/set-pin",
+    {
+      preHandler: requireAuth(fastify),
+      schema: {
+        body: setPinSchema,
+      },
+    },
+    async (request, reply) => {
+      try {
+        const userId = (request as any).currentUserId as string;
+        const { pin } = setPinSchema.parse(request.body);
+        await setUserPin(fastify, userId, pin);
+        return reply.code(201).send({ success: true, message: "PIN set successfully" });
+      } catch (err: any) {
+        fastify.log.error(err);
+        return reply.code(400).send({ error: err.message });
       }
-
-      await createUserWithPin({
-        betterAuthId: authUser.id,
-        email: body.email,
-        pin: body.pin,
-      });
-
-      const session = await fastify.auth.session.create(authUser.id);
-
-      return reply.send({
-        userId: authUser.id,
-        email: body.email,
-        token: session.token,
-        expiresAt: session.expiresAt,
-      });
-    } catch (err: any) {
-      fastify.log.error(err);
-      return reply.code(500).send({ error: err.message || "Registration error" });
     }
-  });
+  );
 
-  fastify.post("/verify-pin", async (request, reply) => { // remove /auth here
-    const body = verifyPinSchema.parse(request.body);
-    const userId = request.user?.id;
-
-    if (!userId) return reply.code(401).send({ error: "Unauthorized" });
-
-    try {
-      await verifyUserPin({ userId, pin: body.pin });
-      return reply.send({ success: true });
-    } catch (err: any) {
-      return reply.code(400).send({ error: err.message });
+  // ------------------- VERIFY PIN -------------------
+  fastify.post(
+    "/verify-pin",
+    {
+      preHandler: requireAuth(fastify),
+      schema: {
+        body: verifyPinSchema,
+      },
+    },
+    async (request, reply) => {
+      try {
+        const userId = (request as any).currentUserId as string;
+        const { pin } = verifyPinSchema.parse(request.body);
+        await verifyUserPin(fastify, { userId, pin });
+        return reply.send({ success: true, message: "PIN verified successfully" });
+      } catch (err: any) {
+        return reply.code(400).send({ error: err.message });
+      }
     }
-  });
+  );
 };
 
 export default authRoutes;
