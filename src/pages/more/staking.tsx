@@ -92,8 +92,8 @@ const StakingPage = () => {
     size?: "small" | "large";
   }) => {
     const iconPath = currencyIcons[currencyType as keyof typeof currencyIcons];
-    const sizeClass = size === "large" ? "w-8 h-8" : "w-6 h-6";
-    const imgSizeClass = size === "large" ? "w-6 h-6" : "w-4 h-4";
+    const sizeClass = size === "large" ? "w-12 h-12" : "w-6 h-6"; // increased large
+    const imgSizeClass = size === "large" ? "w-12 h-12" : "w-6 h-6";
 
     if (iconPath) {
       return (
@@ -191,7 +191,7 @@ const StakingPage = () => {
                 >
                   <div className="p-4">
                     <div className="flex justify-between items-center border-b pb-4 border-neutral-200">
-                      <div className=" flex gap-2 w-full">
+                      <div className=" flex gap-2 w-full items-center">
                         <div className="rounded-full w-10 h-10 flex items-center justify-center overflow-hidden">
                           <CurrencyIcon
                             currencyType={currencyType ?? ""}
@@ -240,8 +240,8 @@ const StakingPage = () => {
                   className="bg-white rounded-lg p-4 space-y-4"
                 >
                   <div className="flex justify-between items-start">
-                    <div className="flex gap-2">
-                      <div className="rounded-full w-10 h-10 flex items-center justify-center overflow-hidden">
+                    <div className="flex items-center gap-2">
+                      <div className="rounded-full flex items-center justify-center overflow-hidden">
                         <CurrencyIcon
                           currencyType={currencyType ?? ""}
                           size="large"
@@ -258,7 +258,7 @@ const StakingPage = () => {
                           <span className="">{stake.apy}% APY</span>
                         </div>
                         <p className="text-neutral-400 text-xs mt-1">
-                          Lock Period:{" "}
+                          Lock Period
                           <span className="text-gray-800">
                             {stake.lockPeriod}
                           </span>
@@ -279,9 +279,9 @@ const StakingPage = () => {
                         {stake.progress}%
                       </span>
                     </div>
-                    <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden mt-2">
+                    <div className="h-2 w-full bg-neutral-200 rounded-full overflow-hidden mt-2">
                       <div
-                        className="h-full bg-blue-600 transition-all duration-300"
+                        className="h-full bg-neutral-900 transition-all duration-300"
                         style={{ width: `${stake.progress}%` }}
                       ></div>
                     </div>
