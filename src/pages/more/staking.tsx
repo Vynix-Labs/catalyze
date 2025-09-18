@@ -1,6 +1,11 @@
 import { useState } from "react";
 import Layout from "../../layout";
-import { MedalIcon, MinusIcon } from "../../assets/svg";
+import {
+  ArrowSquareOutIcon,
+  LockIcon,
+  MedalIcon,
+  MinusIcon,
+} from "../../assets/svg";
 
 // Currency detection function
 const detectCurrencyType = (title: string): string => {
@@ -129,19 +134,22 @@ const StakingPage = () => {
         {hasStakes && (
           <div className="flex w-full py-4 gap-2">
             <div className="border space-y-2 border-neutral-100 bg-white p-4 rounded-lg w-full">
-              <p className="text-gray-600 text-sm">Total Staked</p>
+              <p className="text-gray-600 flex gap-2 items-center text-sm font-bold">
+                <LockIcon className="text-primary-100" /> Total Staked
+              </p>
               <h2 className="text-base font-bold text-gray-800">N127,450</h2>
               <span className="text-green-500 text-sm font-medium">
-                +0.5% earned
+                +12.5% earned
               </span>
             </div>
 
             <div className="border space-y-2 border-neutral-100 bg-white p-4 rounded-lg w-full">
-              <p className="text-gray-600 text-sm">Avg. APY</p>
+              <p className="text-gray-600 flex gap-2 items-center text-sm font-bold">
+                <ArrowSquareOutIcon className="text-green-500" />
+                Avg. APY
+              </p>
               <h2 className="text-base font-bold text-gray-800">5.0%</h2>
-              <span className="text-gray-500 text-sm">
-                Account in post
-              </span>
+              <span className="text-gray-500 text-sm">Account in post</span>
             </div>
           </div>
         )}
