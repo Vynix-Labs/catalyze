@@ -123,8 +123,8 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col relative">
-      <div className="bg-white h-full">
+    <div className="flex-1 flex flex-col items-center bg-neutral-100">
+      <div className=" h-full">
         <CurrencyTabs
           activeTab={transferType}
           onTabChange={onTransferTypeChange}

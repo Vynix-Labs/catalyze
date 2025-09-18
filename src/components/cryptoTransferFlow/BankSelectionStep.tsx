@@ -91,8 +91,8 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col relative">
-      <div className="bg-white flex-1">
+    <div className="flex-1 flex flex-col bg-neutral-100">
+      <div className="">
         <div className="p-4">
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">

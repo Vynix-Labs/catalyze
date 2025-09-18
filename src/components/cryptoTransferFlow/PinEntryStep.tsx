@@ -2,11 +2,7 @@ import React from "react";
 import NumberPad from "./NumberPad";
 import type { PinEntryStepProps } from "../../types/types";
 
-const PinEntryStep: React.FC<PinEntryStepProps> = ({
-  pin,
-  setPin,
-  onNext,
-}) => {
+const PinEntryStep: React.FC<PinEntryStepProps> = ({ pin, setPin, onNext }) => {
   const handleNumberPress = (num: string) => {
     if (pin.length < 4) {
       setPin((prev) => prev + num);
@@ -24,39 +20,43 @@ const PinEntryStep: React.FC<PinEntryStepProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-neutral-100 flex flex-col">
-
-      <div className="flex-1 flex flex-col justify- p-4">
-        <div className="mb-12">
-          <h2 className="text-2xl font-black">Enter Transaction Pin</h2>
-          <p className="text-gray-600 text-sm">
-            Enter a 4-digit transaction code to complete transfer
+    <div className=" flex flex-col">
+      <div className="flex flex-col flex-1 p-6 space-y-4">
+        {/* Header */}
+        <div className="">
+          <h2 className="text-2xl font-black text-gray-900">
+            Enter Transaction PIN
+          </h2>
+          <p className="text-gray-600 text-sm mt-1">
+            Enter a 4-digit code to complete transfer
           </p>
         </div>
 
-        <div className="flex justify-center space-x-4 mb-12">
+        {/* PIN Boxes */}
+        <div className="flex justify-center space-x-6 ">
           {[0, 1, 2, 3].map((index) => (
             <div
               key={index}
-              className={`w-10 h-10 flex items-center justify-center rounded-md border border-gray-300 text-lg font-semibold ${
+              className={`w-14 h-14 flex items-center justify-center rounded-lg border text-xl font-bold transition ${
                 pin.length > index
-                  ? "bg-white text-black"
-                  : "border-neutral-100 bg-white"
+                  ? "bg-white text-gray-900 border-gray-400"
+                  : "bg-white text-gray-400 border-gray-200"
               }`}
             >
               {pin[index] ?? ""}
             </div>
           ))}
         </div>
-
-        <NumberPad
-          onNumberPress={handleNumberPress}
-          onProceed={handleProceed}
-          canProceed={pin.length === 4}
-          onClear={handleClear}
-          showClear={pin.length > 0}
-        />
       </div>
+
+      {/* NumberPad */}
+      <NumberPad
+        onNumberPress={handleNumberPress}
+        onProceed={handleProceed}
+        canProceed={pin.length === 4}
+        onClear={handleClear}
+        showClear={pin.length > 0}
+      />
     </div>
   );
 };
