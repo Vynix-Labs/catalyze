@@ -100,6 +100,23 @@ export const MedalIcon = ({ className }: MagicWandIconProps) => (
   </svg>
 );
 
+// minus icon
+export const MinusIcon = ({ className }: { className?: string }) => (
+  <svg
+    width="17"
+    height="17"
+    viewBox="0 0 17 17"
+    className={className}
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M14.5 8.5C14.5 8.63261 14.4473 8.75979 14.3536 8.85355C14.2598 8.94732 14.1326 9 14 9H3C2.86739 9 2.74021 8.94732 2.64645 8.85355C2.55268 8.75979 2.5 8.63261 2.5 8.5C2.5 8.36739 2.55268 8.24021 2.64645 8.14645C2.74021 8.05268 2.86739 8 3 8H14C14.1326 8 14.2598 8.05268 14.3536 8.14645C14.4473 8.24021 14.5 8.36739 14.5 8.5Z"
+      fill="currentColor"
+    />
+  </svg>
+);
+
 export const MagicWandIcon = ({ className }: MagicWandIconProps) => (
   <svg
     width="24"
