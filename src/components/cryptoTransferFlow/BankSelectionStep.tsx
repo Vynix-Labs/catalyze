@@ -91,7 +91,7 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-neutral-100">
+    <div className="flex-1 flex flex-col bg-white">
       <div className="">
         <div className="p-4">
           <div className="mb-4">
