@@ -11,20 +11,24 @@ import {
   EyeOffIcon,
 } from "../../assets/svg";
 
-import { useNavigate } from "react-router-dom";
 import GlobalModal from "../../common/ui/modal/GlobalModal";
 import Layout from "../../layout";
+import { useNavigate } from "react-router-dom";
 
 const Home: React.FC = () => {
   const [showTransactionDetails, setShowTransactionDetails] = useState(false);
   const [showCurrencyDetail, setShowCurrencyDetail] = useState(false);
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedAssetForModal, setSelectedAssetForModal] =
+    useState<Asset | null>(null);
+
   const navigate = useNavigate();
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
+
   const toggleBalanceVisibility = () => {
     setIsBalanceVisible(!isBalanceVisible);
   };
@@ -51,6 +55,27 @@ const Home: React.FC = () => {
       nairaValue: asset.value,
     });
     setShowCurrencyDetail(true);
+  };
+
+  // Handle asset click in modal
+  const handleModalAssetClick = (asset: Asset) => {
+    setSelectedAssetForModal(asset);
+  };
+
+  // Handle proceed button click in modal
+  const handleModalProceed = () => {
+    if (selectedAssetForModal) {
+      // Close modal first
+      setIsModalOpen(false);
+      setSelectedAssetForModal(null);
+
+      // Navigate to transfer page with selected asset data
+      navigate("/dashboard/transfer", {
+        state: {
+          selectedAsset: selectedAssetForModal,
+        },
+      });
+    }
   };
 
   const handleTransactionClick = (transaction: Transaction) => {
@@ -190,9 +215,9 @@ const Home: React.FC = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-neutral-50">
+      <div className="bg-neutral-50">
         {/* Main content container with proper spacing for bottom nav */}
-        <div className="max-w-md mx-auto min-h-screen flex flex-col pb-16">
+        <div className="max-w-md mx-auto flex flex-col">
           {/* Scrollable content area */}
           <div className="flex-1 overflow-y-auto space-y-4">
             {/* Header */}
@@ -247,14 +272,14 @@ const Home: React.FC = () => {
                   {/* Action Buttons */}
                   <div className="flex space-x-3">
                     <button
-                      onClick={() => navigate("/dashboard/transfer")}
-                      className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
+                      onClick={toggleModal}
+                      className="bg-[#04329C] text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
                     >
                       <span>Transfer</span> <ArrowUpRightIcon />
                     </button>
                     <button
                       onClick={toggleModal}
-                      className="bg-[#04329C] backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
+                      className="bg-[#04329C] text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
                     >
                       <span>Deposit</span> <ArrowDownRight />
                     </button>
@@ -287,14 +312,22 @@ const Home: React.FC = () => {
           </div>
         </div>
       </div>
+
       <GlobalModal
         onClose={toggleModal}
         open={isModalOpen}
         setOpen={setIsModalOpen}
         headingText="Select Currency"
         btnText="Proceed"
+        onProceed={handleModalProceed}
+        isProceedDisabled={!selectedAssetForModal}
         children={
-          <Assets assets={assetsData} onAssetClick={handleAssetClick} />
+          <Assets
+            assets={assetsData}
+            onAssetClick={handleModalAssetClick}
+            isModalMode={true} // Add this prop
+            selectedAsset={selectedAssetForModal} // Add this prop
+          />
         }
       />
     </Layout>
