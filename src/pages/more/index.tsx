@@ -147,20 +147,3 @@ const MorePage = () => {
 };
 
 export default MorePage;
-   {
-     /* <div className="bg-white shadow-md h-full flex flex-col justify-center mx-auto items-center  p-4 text-center">
-          <div className="max-w-md mx-auto">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              No Active Stakes Yet
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Start Earning Rewards By Staking Your Crypto Assets: 1st Secure,
-              Beginner-Friendly, And You Can Begin With Small Amounts.
-            </p>
-            <div className="flex w-full gap-2 text-sm">
-              <Button variants="primary">Available Pools</Button>
-              <Button variants="primary">Learn Staking</Button>
-            </div>
-          </div>
-        </div> */
-   }

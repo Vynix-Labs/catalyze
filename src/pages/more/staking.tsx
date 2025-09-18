@@ -6,6 +6,7 @@ import {
   MedalIcon,
   MinusIcon,
 } from "../../assets/svg";
+import Button from "../../common/ui/button";
 
 // Currency detection function
 const detectCurrencyType = (title: string): string => {
@@ -84,6 +85,7 @@ const StakingPage = () => {
     },
   ];
 
+  // currency icon component
   const CurrencyIcon = ({
     currencyType,
     size = "small",
@@ -279,11 +281,12 @@ const StakingPage = () => {
                         {stake.progress}%
                       </span>
                     </div>
+
                     <div className="h-2 w-full bg-neutral-200 rounded-full overflow-hidden mt-2">
                       <div
                         className="h-full bg-neutral-900 transition-all duration-300"
                         style={{ width: `${stake.progress}%` }}
-                      ></div>
+                      />
                     </div>
                   </div>
 
@@ -304,7 +307,7 @@ const StakingPage = () => {
           </div>
         ) : (
           /* No Active Stakes State */
-          <div className="bg-white rounded-xl shadow-md p-8 text-center">
+          <div className="bg-white shadow-md h-full flex flex-col justify-center mx-auto items-center  p-4 text-center">
             <div className="max-w-md mx-auto">
               <h2 className="text-2xl font-bold text-gray-800 mb-4">
                 No Active Stakes Yet
@@ -313,12 +316,10 @@ const StakingPage = () => {
                 Start Earning Rewards By Staking Your Crypto Assets: 1st Secure,
                 Beginner-Friendly, And You Can Begin With Small Amounts.
               </p>
-              <button
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors"
-                onClick={() => setActiveTab("pools")}
-              >
-                Start Staking
-              </button>
+              <div className="flex w-full gap-2 text-sm">
+                <Button variants="primary">Available Pools</Button>
+                <Button variants="primary">Learn Staking</Button>
+              </div>
             </div>
           </div>
         )}

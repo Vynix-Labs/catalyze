@@ -84,7 +84,7 @@ const config: Config = {
           200: "#F3F3F3",
         },
         primary: {
-          50: "#1B1737",
+          50: "#DBEAFE",
           100: "#0647DF",
           200: "#5A42DE",
           300: "#8674E7",
@@ -98,12 +98,15 @@ const config: Config = {
           base: "#A42600",
           100: "#F59E0B",
           200: "#FDECCE33",
+          300: "#FFEDD5",
         },
 
         success: {
           500: "#26902B",
           400: "#173719",
           300: "#EDFEEC",
+          200: "#5DD689",
+          100: "#DCFCE7",
         },
 
         error: {

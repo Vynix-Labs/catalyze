@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { AlertCircle } from "lucide-react";
 import type { AmountEntryStepProps } from "../../types/types";
-import CurrencyTabs from "./CurrencyTabs";
 import Button from "../../common/ui/button";
 import { SwapIcon } from "../../assets/svg";
 import GlobalModal from "../../common/ui/modal/GlobalModal";
 import DepositModal from "../../common/ui/modal/DepositModal";
+import Tabs from "../Tabs";
 
 const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   amount,
@@ -14,13 +14,13 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   setAmount,
   onNext,
   transferType,
-  onTransferTypeChange,
   currencyType = "USDC",
 }) => {
   const [address, setAddress] = useState("");
   const [selectedNetwork, setSelectedNetwork] = useState("");
   const [isSwapped, setIsSwapped] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("fiat");
 
   // Exchange rate calculation
   const exchangeRate = 1500; // 1 USD = 1500 NGN
@@ -52,33 +52,6 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
 
   // Add this state to your AmountEntryStep component
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
-
-  // Modify the handleProceedClick function
-  // const handleProceedClick = () => {
-  //   if (transferType === "crypto") {
-  //     // For crypto, validate and show confirmation modal first
-  //     if (!amount || !address || !selectedNetwork) {
-  //       alert("Please fill in all crypto transfer details");
-  //       return;
-  //     }
-  //     setIsModalOpen(true);
-  //   } else if (transferType === "deposit") {
-  //     // Add this condition
-  //     // For deposit, show deposit instructions modal
-  //     if (!amount || !amountNGN) {
-  //       alert("Please enter both amount values");
-  //       return;
-  //     }
-  //     setIsDepositModalOpen(true);
-  //   } else {
-  //     // For fiat transfer, proceed to bank selection
-  //     if (!amount || !amountNGN) {
-  //       alert("Please enter both USDC and NGN amounts");
-  //       return;
-  //     }
-  //     onNext();
-  //   }
-  // };
 
   const handleProceedClick = () => {
     if (transferType === "crypto") {
@@ -164,9 +137,14 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   return (
     <div className="flex-1 flex flex-col bg-white">
       <div className=" h-full">
-        <CurrencyTabs
-          activeTab={transferType}
-          onTabChange={onTransferTypeChange}
+        <Tabs
+          className="max-w-44 m-2"
+          tabs={[
+            { key: "fiat", label: "Fiat" },
+            { key: "crypto", label: "Cryptocurrency" },
+          ]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
         />
 
         {/* Show different content based on active tab */}
