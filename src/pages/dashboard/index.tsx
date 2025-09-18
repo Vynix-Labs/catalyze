@@ -215,9 +215,9 @@ const Home: React.FC = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-neutral-50">
+      <div className="bg-neutral-50">
         {/* Main content container with proper spacing for bottom nav */}
-        <div className="max-w-md mx-auto min-h-screen flex flex-col pb-16">
+        <div className="max-w-md mx-auto flex flex-col">
           {/* Scrollable content area */}
           <div className="flex-1 overflow-y-auto space-y-4">
             {/* Header */}

@@ -71,7 +71,7 @@ const MorePage = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+      <div className=" bg-gray-50 p-4">
         <div className="mx-auto max-w-md space-y-4">
           {/* Header */}
           <div className="space-y-1">
