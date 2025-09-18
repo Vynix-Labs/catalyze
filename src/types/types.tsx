@@ -34,7 +34,9 @@ export interface HeaderProps {
 }
 
 export interface AmountEntryStepProps {
-  amount: string;
+  amount?: string;
+  amountNGN?: string;
+  setAmountNGN: React.Dispatch<React.SetStateAction<string>>; // New prop for setting NGN amount
   setAmount: React.Dispatch<React.SetStateAction<string>>;
   transferType: string;
   onTransferTypeChange: (type: string) => void;
@@ -60,8 +62,10 @@ export interface BankSelectionStepProps {
   username: string;
   onNext?: () => void;
   onBack?: () => void;
-  transferType: string;
+  transferType?: string;
   currencyType: string;
+  amount: string;
+  amountNGN: string;
 }
 
 export interface PinEntryStepProps {
@@ -71,11 +75,16 @@ export interface PinEntryStepProps {
   onNext: () => void;
   onBack?: () => void;
   currencyType: string;
+  amount?: string;
+  amountNGN?: string;
 }
 
 export interface SuccessStepProps {
-  onDone: () => void;
   transferType: string;
+  onDone: () => void;
+  amount?: string;
+  amountNGN?: string;
+  currencyType?: string;
 }
 
 export interface NumberPadProps {

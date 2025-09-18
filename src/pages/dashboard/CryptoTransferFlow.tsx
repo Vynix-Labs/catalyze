@@ -15,6 +15,7 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
 
   const [currentStep, setCurrentStep] = useState(1);
   const [amount, setAmount] = useState("");
+  const [amountNGN, setAmountNGN] = useState("");
   const [selectedBank, setSelectedBank] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [pin, setPin] = useState("");
@@ -39,6 +40,7 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
   const resetForm = () => {
     setCurrentStep(1);
     setAmount("");
+    setAmountNGN(""); // Reset amountNGN too
     setSelectedBank("");
     setAccountNumber("");
     setPin("");
@@ -74,12 +76,15 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
         return (
           <AmountEntryStep
             amount={amount}
+            amountNGN={amountNGN}
             setAmount={setAmount}
+            setAmountNGN={setAmountNGN}
             onNext={goToNextStep}
             transferType={transferType}
             onTransferTypeChange={handleTransferTypeChange}
-            currencyType={currencyType} // Pass currency type to step
-            selectedAsset={selectedAsset} // Pass selected asset data
+            currencyType={currencyType}
+            selectedAsset={selectedAsset}
+            onBack={goToPrevStep}
           />
         );
       case 2:
@@ -91,8 +96,10 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
             setAccountNumber={setAccountNumber}
             username={username}
             onNext={goToNextStep}
-            transferType={transferType} // Add transferType prop
-            currencyType={currencyType} // Add currencyType prop
+            onBack={goToPrevStep}
+            amount={amount} // Add this prop
+            amountNGN={amountNGN} // Add this prop
+            currencyType={currencyType} // Add this prop
           />
         );
       case 3:
@@ -102,21 +109,34 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
             setPin={setPin}
             transferType={transferType}
             onNext={goToNextStep}
-            currencyType={currencyType} // Pass currency type to step
+            onBack={goToPrevStep}
+            currencyType={currencyType}
+            amount={amount} // Add if needed
+            amountNGN={amountNGN} // Add if needed
           />
         );
       case 4:
-        return <SuccessStep transferType={transferType} onDone={resetForm} />;
+        return (
+          <SuccessStep
+            transferType={transferType}
+            onDone={resetForm}
+            amount={amount} // Add if needed
+            amountNGN={amountNGN} // Add if needed
+            currencyType={currencyType} // Add if needed
+          />
+        );
       default:
         return (
           <AmountEntryStep
             amount={amount}
+            amountNGN={amountNGN}
             setAmount={setAmount}
+            setAmountNGN={setAmountNGN}
             transferType={transferType}
             onTransferTypeChange={handleTransferTypeChange}
             onNext={goToNextStep}
-            currencyType={currencyType} // Pass currency type to step
-            selectedAsset={selectedAsset} // Pass selected asset data
+            currencyType={currencyType}
+            selectedAsset={selectedAsset}
             onBack={goToPrevStep}
           />
         );

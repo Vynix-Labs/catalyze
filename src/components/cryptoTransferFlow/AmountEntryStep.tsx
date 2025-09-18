@@ -8,13 +8,14 @@ import GlobalModal from "../../common/ui/modal/GlobalModal";
 
 const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   amount,
+  amountNGN,
+  setAmountNGN,
   setAmount,
   onNext,
   transferType,
   onTransferTypeChange,
   currencyType = "USDC",
 }) => {
-  const [amountNGN, setAmountNGN] = useState("");
   const [address, setAddress] = useState("");
   const [selectedNetwork, setSelectedNetwork] = useState("");
   const [isSwapped, setIsSwapped] = useState(false);
@@ -43,8 +44,8 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
     // Swap the values between USDC and NGN inputs
     const tempUSDC = amount;
     const tempNGN = amountNGN;
-    setAmount?.(tempNGN);
-    setAmountNGN(tempUSDC);
+    setAmount?.(tempNGN ?? "");
+    setAmountNGN(tempUSDC ?? "");
     setIsSwapped(!isSwapped);
   };
 
@@ -281,7 +282,10 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
                 {amount || "0"}
               </h2>
               <p className="text-sm text-gray-500">
-                ≈₦{((parseFloat(amount) || 0) * exchangeRate).toLocaleString()}
+                ≈₦
+                {(
+                  (parseFloat(amount ?? "") || 0) * exchangeRate
+                ).toLocaleString()}
               </p>
             </div>
 
