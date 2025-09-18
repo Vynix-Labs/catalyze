@@ -5,6 +5,7 @@ import CurrencyTabs from "./CurrencyTabs";
 import Button from "../../common/ui/button";
 import { SwapIcon } from "../../assets/svg";
 import GlobalModal from "../../common/ui/modal/GlobalModal";
+import DepositModal from "../../common/ui/modal/DepositModal";
 
 const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   amount,
@@ -49,6 +50,36 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
     setIsSwapped(!isSwapped);
   };
 
+  // Add this state to your AmountEntryStep component
+  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+
+  // Modify the handleProceedClick function
+  // const handleProceedClick = () => {
+  //   if (transferType === "crypto") {
+  //     // For crypto, validate and show confirmation modal first
+  //     if (!amount || !address || !selectedNetwork) {
+  //       alert("Please fill in all crypto transfer details");
+  //       return;
+  //     }
+  //     setIsModalOpen(true);
+  //   } else if (transferType === "deposit") {
+  //     // Add this condition
+  //     // For deposit, show deposit instructions modal
+  //     if (!amount || !amountNGN) {
+  //       alert("Please enter both amount values");
+  //       return;
+  //     }
+  //     setIsDepositModalOpen(true);
+  //   } else {
+  //     // For fiat transfer, proceed to bank selection
+  //     if (!amount || !amountNGN) {
+  //       alert("Please enter both USDC and NGN amounts");
+  //       return;
+  //     }
+  //     onNext();
+  //   }
+  // };
+
   const handleProceedClick = () => {
     if (transferType === "crypto") {
       // For crypto, validate and show confirmation modal first
@@ -57,6 +88,14 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
         return;
       }
       setIsModalOpen(true);
+    } else if (transferType === "deposit") {
+      // Add this condition
+      // For deposit, show deposit instructions modal
+      if (!amount || !amountNGN) {
+        alert("Please enter both amount values");
+        return;
+      }
+      setIsDepositModalOpen(true);
     } else {
       // For fiat, validate and proceed directly to next step (BankSelectionStep)
       if (!amount || !amountNGN) {
@@ -312,6 +351,21 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
             </div>
           </div>
         </GlobalModal>
+      )}
+
+      {/* Add the DepositModal to your return statement */}
+      {transferType === "deposit" && (
+        <DepositModal
+          isOpen={isDepositModalOpen}
+          onClose={() => setIsDepositModalOpen(false)}
+          onConfirm={() => {
+            setIsDepositModalOpen(false);
+            onNext(); // Proceed to next step after deposit confirmation
+          }}
+          amount={amount ?? ""}
+          amountNGN={amountNGN ?? ""}
+          currencyType={currencyType}
+        />
       )}
     </div>
   );

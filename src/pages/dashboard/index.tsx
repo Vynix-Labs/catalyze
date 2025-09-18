@@ -22,12 +22,11 @@ const Home: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAssetForModal, setSelectedAssetForModal] =
     useState<Asset | null>(null);
+  const [transferType, setTransferType] = useState<"transfer" | "deposit">(
+    "transfer"
+  );
 
   const navigate = useNavigate();
-
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
 
   const toggleBalanceVisibility = () => {
     setIsBalanceVisible(!isBalanceVisible);
@@ -57,6 +56,18 @@ const Home: React.FC = () => {
     setShowCurrencyDetail(true);
   };
 
+  // Handle Transfer button click from dashboard
+  const handleTransferClick = () => {
+    setTransferType("transfer");
+    setIsModalOpen(true);
+  };
+
+  // Handle Deposit button click from dashboard
+  const handleDepositClick = () => {
+    setTransferType("deposit");
+    setIsModalOpen(true);
+  };
+
   // Handle asset click in modal
   const handleModalAssetClick = (asset: Asset) => {
     setSelectedAssetForModal(asset);
@@ -69,10 +80,12 @@ const Home: React.FC = () => {
       setIsModalOpen(false);
       setSelectedAssetForModal(null);
 
-      // Navigate to transfer page with selected asset data
+      // Navigate to transfer page with selected asset data and transfer type
       navigate("/dashboard/transfer", {
         state: {
           selectedAsset: selectedAssetForModal,
+          transferType: transferType,
+          fromDashboard: true, // Flag to indicate source
         },
       });
     }
@@ -269,16 +282,16 @@ const Home: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
+                  {/* Action Buttons - Multi-currency operations */}
                   <div className="flex space-x-3">
                     <button
-                      onClick={toggleModal}
+                      onClick={handleTransferClick}
                       className="bg-[#04329C] text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
                     >
                       <span>Transfer</span> <ArrowUpRightIcon />
                     </button>
                     <button
-                      onClick={toggleModal}
+                      onClick={handleDepositClick}
                       className="bg-[#04329C] text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
                     >
                       <span>Deposit</span> <ArrowDownRight />
@@ -313,11 +326,17 @@ const Home: React.FC = () => {
         </div>
       </div>
 
+      {/* Modal for multi-currency selection */}
       <GlobalModal
-        onClose={toggleModal}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedAssetForModal(null);
+        }}
         open={isModalOpen}
         setOpen={setIsModalOpen}
-        headingText="Select Currency"
+        headingText={`Select Currency for ${
+          transferType === "deposit" ? "Deposit" : "Transfer"
+        }`}
         btnText="Proceed"
         onProceed={handleModalProceed}
         isProceedDisabled={!selectedAssetForModal}
@@ -325,8 +344,8 @@ const Home: React.FC = () => {
           <Assets
             assets={assetsData}
             onAssetClick={handleModalAssetClick}
-            isModalMode={true} // Add this prop
-            selectedAsset={selectedAssetForModal} // Add this prop
+            isModalMode={true}
+            selectedAsset={selectedAssetForModal}
           />
         }
       />
