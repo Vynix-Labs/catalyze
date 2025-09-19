@@ -1,5 +1,12 @@
 import type { ReactNode } from "react";
-
+import type { Transaction } from "../components/Transactions";
+export interface CurrencyDetailPageProps {
+  currencyType?: string;
+  balance?: string;
+  nairaValue?: string;
+  transactions?: Transaction[];
+  onBack?: () => void;
+}
 export interface buttonProps {
   variants: "primary" | "secondary";
   classes?: string;
@@ -27,12 +34,20 @@ export interface HeaderProps {
 }
 
 export interface AmountEntryStepProps {
-  amount: string;
+  amount?: string;
+  amountNGN?: string;
+  setAmountNGN: React.Dispatch<React.SetStateAction<string>>; // New prop for setting NGN amount
   setAmount: React.Dispatch<React.SetStateAction<string>>;
   transferType: string;
   onTransferTypeChange: (type: string) => void;
   onNext: () => void;
-  onBack: () => void;
+  onBack?: () => void;
+  selectedAsset?: {
+    name: string;
+    symbol: string;
+    icon: string;
+  };
+  currencyType: string;
 }
 
 export interface CurrencyTabProps {
@@ -45,8 +60,12 @@ export interface BankSelectionStepProps {
   accountNumber: string;
   setAccountNumber: React.Dispatch<React.SetStateAction<string>>;
   username: string;
-  onNext: () => void;
-  onBack: () => void;
+  onNext?: () => void;
+  onBack?: () => void;
+  transferType?: string;
+  currencyType: string;
+  amount: string;
+  amountNGN: string;
 }
 
 export interface PinEntryStepProps {
@@ -54,12 +73,18 @@ export interface PinEntryStepProps {
   setPin: React.Dispatch<React.SetStateAction<string>>;
   transferType: string;
   onNext: () => void;
-  onBack: () => void;
+  onBack?: () => void;
+  currencyType: string;
+  amount?: string;
+  amountNGN?: string;
 }
 
 export interface SuccessStepProps {
-  onDone: () => void;
   transferType: string;
+  onDone: () => void;
+  amount?: string;
+  amountNGN?: string;
+  currencyType?: string;
 }
 
 export interface NumberPadProps {
@@ -75,9 +100,10 @@ export interface CryptoTransferFlowProps {
   setAmount: React.Dispatch<React.SetStateAction<string>>;
   onNext: () => void;
   onBack: () => void;
+}
 
-  
-  export interface AuthFooterProps {
+export interface AuthFooterProps {
   text: string;
   handleBtnClick?: () => void;
+  disabled?: boolean; // Add this line
 }

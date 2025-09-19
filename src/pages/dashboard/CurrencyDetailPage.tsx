@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ArrowDownRight,
   ArrowUpRightIcon,
@@ -6,16 +7,9 @@ import {
   EyeIcon,
   EyeOffIcon,
 } from "../../assets/svg";
-import type { Transaction } from "../../components/Transactions";
-import Button from "../../common/ui/button";
-
-interface CurrencyDetailPageProps {
-  currencyType: string;
-  balance: string;
-  nairaValue: string;
-  transactions: Transaction[];
-  onBack: () => void;
-}
+import type { CurrencyDetailPageProps } from "../../types/types";
+import GlobalModal from "../../common/ui/modal/GlobalModal";
+import Assets, { type Asset } from "../../components/Assets";
 
 // Currency icon mapping
 const currencyIcons = {
@@ -68,16 +62,87 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
   transactions,
   onBack,
 }) => {
+  const navigate = useNavigate();
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
+  const [selectedAssetForModal, setSelectedAssetForModal] =
+    useState<Asset | null>(null);
+
+  // State for modal and transfer type
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [transferType, setTransferType] = useState<"transfer" | "deposit">(
+    "transfer"
+  );
 
   const toggleBalanceVisibility = () => {
     setIsBalanceVisible(!isBalanceVisible);
   };
 
   // Filter transactions for this currency
-  const currencyTransactions = transactions.filter(
+  const currencyTransactions = (transactions ?? []).filter(
     (transaction) => transaction.currencyType === currencyType
   );
+
+  // When user clicks "Transfer"
+  const handleTransferClick = () => {
+    setTransferType("transfer");
+    setIsModalOpen(true);
+  };
+
+  // When user clicks "Deposit"
+  const handleDepositClick = () => {
+    setTransferType("deposit");
+    setIsModalOpen(true);
+  };
+
+  // Handle asset click in modal
+  const handleModalAssetClick = (asset: Asset) => {
+    setSelectedAssetForModal(asset);
+  };
+
+  // Handle proceed button click in modal
+  const handleModalProceed = () => {
+    if (selectedAssetForModal) {
+      // Close modal first
+      setIsModalOpen(false);
+      setSelectedAssetForModal(null);
+
+      // Navigate to transfer page with selected asset data and transfer type
+      navigate("/dashboard/transfer", {
+        state: {
+          selectedAsset: selectedAssetForModal,
+          transferType: transferType,
+        },
+      });
+    }
+  };
+
+  // Add the assetsData here (you can pass this as a prop later if needed)
+  const assetsData: Asset[] = [
+    {
+      id: "1",
+      symbol: "USDT",
+      name: "Tether",
+      balance: "10,000",
+      value: "100,000",
+      currency: "₦",
+    },
+    {
+      id: "2",
+      symbol: "USDC",
+      name: "USD Coin",
+      balance: "5.00023",
+      value: "6,000,000.00",
+      currency: "₦",
+    },
+    {
+      id: "3",
+      symbol: "STRK",
+      name: "Starknet",
+      balance: "10,000",
+      value: "100,000",
+      currency: "₦",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -99,7 +164,7 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
           <div className="p-4 bg-white">
             {/* Currency Icon and Balance */}
             <div className="flex items-center space-x-2 mb-2">
-              <CurrencyIcon currencyType={currencyType} size="small" />
+              <CurrencyIcon currencyType={currencyType ?? ""} size="small" />
               <div>
                 <h2 className="text-sm font-medium text-gray-100">
                   {currencyType} Balance
@@ -132,13 +197,19 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
             </div>
 
             {/* Action Buttons */}
-            <div className="flex space-x-3 ">
-              <Button variants="primary" classes="text-xs">
+            <div className="flex space-x-3">
+              <button
+                onClick={handleTransferClick}
+                className="bg-primary-100 backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88 transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
+              >
                 <span>Transfer</span> <ArrowUpRightIcon />
-              </Button>
-              <Button variants="primary" classes="text-xs">
+              </button>
+              <button
+                onClick={handleDepositClick}
+                className="bg-primary-100 backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88 transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
+              >
                 <span>Deposit</span> <ArrowDownRight />
-              </Button>
+              </button>
             </div>
           </div>
 
@@ -160,8 +231,11 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
                 >
                   {/* Left side */}
                   <div className="flex items-center space-x-3">
-                    <div className=" rounded-full flex items-center justify-center">
-                      <CurrencyIcon currencyType={currencyType} size="large" />
+                    <div className="rounded-full flex items-center justify-center">
+                      <CurrencyIcon
+                        currencyType={currencyType ?? ""}
+                        size="large"
+                      />
                     </div>
                     <div>
                       <h3 className="font-medium text-gray-900 text-sm">
@@ -214,6 +288,29 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
           </div>
         </div>
       </div>
+
+      <GlobalModal
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedAssetForModal(null);
+        }}
+        open={isModalOpen}
+        setOpen={setIsModalOpen}
+        headingText={`Select Currency for ${
+          transferType === "deposit" ? "Deposit" : "Transfer"
+        }`}
+        btnText="Proceed"
+        onProceed={handleModalProceed}
+        isProceedDisabled={!selectedAssetForModal}
+        children={
+          <Assets
+            assets={assetsData}
+            onAssetClick={handleModalAssetClick}
+            isModalMode={true}
+            selectedAsset={selectedAssetForModal}
+          />
+        }
+      />
     </div>
   );
 };
