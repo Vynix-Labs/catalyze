@@ -101,6 +101,7 @@ const RewardPage = () => {
       tokens: "100 Tokens",
     },
   ];
+  
   return (
     <Layout>
       <div className="max-w-4xl mx-auto">
