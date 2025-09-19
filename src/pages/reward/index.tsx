@@ -101,6 +101,7 @@ const RewardPage = () => {
       tokens: "100 Tokens",
     },
   ];
+  
   return (
     <Layout>
       <div className="max-w-4xl mx-auto">
@@ -309,7 +310,7 @@ const RewardPage = () => {
                         </div>
 
                         <div>
-                          <button className="px-4 py-2 text-sm cursor-pointer bg-primary-100 text-white border rounded-lg">
+                          <button className="px-4 py-2 text-sm cursor-pointer bg-primary-100 text-white rounded-lg">
                             start
                           </button>
                         </div>

@@ -29,7 +29,7 @@ const SuccessStep: React.FC<SuccessStepProps> = ({
   const { title, message, buttonText } = getSuccessContent();
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-6 bg-neutral-100">
+    <div className="flex-1 flex flex-col items-center justify-center px-6 bg-neutral-50">
       {/* Icon */}
       <div className="mb-6">
         <SuccessIcon className="w-20 h-20 text-white" />
