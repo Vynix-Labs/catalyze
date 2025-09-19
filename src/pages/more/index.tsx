@@ -30,6 +30,8 @@ const MorePage = () => {
 
     console.log(`Navigate to ${itemId}`);
   };
+
+  
   const menuItems: MenuItem[] = [
     {
       id: "gamification",

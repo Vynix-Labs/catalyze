@@ -6,6 +6,7 @@ import SuccessStep from "../../components/cryptoTransferFlow/SuccessStep";
 import { ChevronLeftIcon } from "../../assets/svg";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { CurrencyDetailPageProps } from "../../types/types";
+import DepositModal from "../../common/ui/modal/DepositModal";
 
 const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
   currencyType: propCurrencyType,
@@ -20,10 +21,15 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
   const [accountNumber, setAccountNumber] = useState("");
   const [pin, setPin] = useState("");
   const [username] = useState("Username");
-  const [transferType, setTransferType] = useState("fiat"); // 'fiat' or 'crypto'
+  const [showDepositModal, setShowDepositModal] = useState(false);
 
-  // Get the selected asset from navigation state or use prop
-  const selectedAsset = location.state?.selectedAsset;
+  // Get the selected asset and transfer type from navigation state or use prop
+  const { selectedAsset, transferType: stateTransferType } =
+    location.state || {};
+  const [transferType, setTransferType] = useState<
+    "transfer" | "deposit" | "fiat" | "crypto"
+  >(stateTransferType || "fiat");
+
   const [currencyType, setCurrencyType] = useState(
     propCurrencyType || selectedAsset?.symbol || "Crypto"
   );
@@ -40,15 +46,27 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
   const resetForm = () => {
     setCurrentStep(1);
     setAmount("");
-    setAmountNGN(""); // Reset amountNGN too
+    setAmountNGN("");
     setSelectedBank("");
     setAccountNumber("");
     setPin("");
-    setTransferType("fiat");
+    setTransferType(stateTransferType || "fiat");
   };
 
   const goToNextStep = () => {
-    console.log("Going to next step from:", currentStep);
+    console.log(
+      "Going to next step from:",
+      currentStep,
+      "Transfer type:",
+      transferType
+    );
+
+    // If it's deposit and we're on amount entry, show deposit modal instead of going to bank selection
+    if (transferType === "deposit" && currentStep === 1) {
+      setShowDepositModal(true);
+      return;
+    }
+
     // If transferring crypto and we're on amount entry, skip bank selection
     if (transferType === "crypto" && currentStep === 1) {
       setCurrentStep(3); // Skip to pin entry
@@ -67,7 +85,24 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
   };
 
   const handleTransferTypeChange = (type: string) => {
-    setTransferType(type);
+    setTransferType(type as "transfer" | "deposit" | "fiat" | "crypto");
+  };
+
+  const handleDepositConfirmation = () => {
+    setShowDepositModal(false);
+    setCurrentStep(4); // Go directly to success step after deposit
+  };
+
+  const handleDepositModalClose = () => {
+    setShowDepositModal(false);
+    // Don't change the step, stay on amount entry
+  };
+
+  const getPageTitle = () => {
+    if (transferType === "deposit") {
+      return `Deposit ${currencyType}`;
+    }
+    return currencyType;
   };
 
   const renderCurrentStep = () => {
@@ -84,10 +119,14 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
             onTransferTypeChange={handleTransferTypeChange}
             currencyType={currencyType}
             selectedAsset={selectedAsset}
-            onBack={goToPrevStep}
+            onBack={() => navigate("/dashboard")}
           />
         );
       case 2:
+        // Skip bank selection for deposit (handled by modal)
+        if (transferType === "deposit") {
+          return null;
+        }
         return (
           <BankSelectionStep
             selectedBank={selectedBank}
@@ -97,12 +136,16 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
             username={username}
             onNext={goToNextStep}
             onBack={goToPrevStep}
-            amount={amount} // Add this prop
-            amountNGN={amountNGN} // Add this prop
-            currencyType={currencyType} // Add this prop
+            amount={amount}
+            amountNGN={amountNGN}
+            currencyType={currencyType}
           />
         );
       case 3:
+        // Skip pin entry for deposit (handled by modal)
+        if (transferType === "deposit") {
+          return null;
+        }
         return (
           <PinEntryStep
             pin={pin}
@@ -111,8 +154,8 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
             onNext={goToNextStep}
             onBack={goToPrevStep}
             currencyType={currencyType}
-            amount={amount} // Add if needed
-            amountNGN={amountNGN} // Add if needed
+            amount={amount}
+            amountNGN={amountNGN}
           />
         );
       case 4:
@@ -120,9 +163,9 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
           <SuccessStep
             transferType={transferType}
             onDone={resetForm}
-            amount={amount} // Add if needed
-            amountNGN={amountNGN} // Add if needed
-            currencyType={currencyType} // Add if needed
+            amount={amount}
+            amountNGN={amountNGN}
+            currencyType={currencyType}
           />
         );
       default:
@@ -137,7 +180,7 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
             onNext={goToNextStep}
             currencyType={currencyType}
             selectedAsset={selectedAsset}
-            onBack={goToPrevStep}
+            onBack={() => navigate("/dashboard")}
           />
         );
     }
@@ -154,16 +197,27 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
           >
             <ChevronLeftIcon />
           </button>
-          <h1 className="text-lg font-semibold">{currencyType}</h1>
+          <h1 className="text-lg font-semibold">{getPageTitle()}</h1>
           <div className="w-9 h-9"></div>
         </div>
       </div>
 
       {/* Steps wrapper → this grows to fill remaining screen */}
       <div className="flex-1 flex flex-col">{renderCurrentStep()}</div>
+
+      {/* Deposit Modal */}
+      {showDepositModal && (
+        <DepositModal
+          isOpen={showDepositModal}
+          onClose={handleDepositModalClose}
+          onConfirm={handleDepositConfirmation}
+          amount={amount}
+          amountNGN={amountNGN}
+          currencyType={currencyType}
+        />
+      )}
     </div>
   );
 };
-
 
 export default CryptoTransferFlow;

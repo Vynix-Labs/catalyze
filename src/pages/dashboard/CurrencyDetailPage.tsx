@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Add this import
+import { useNavigate } from "react-router-dom";
 import {
   ArrowDownRight,
   ArrowUpRightIcon,
@@ -62,10 +62,16 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
   transactions,
   onBack,
 }) => {
-  const navigate = useNavigate(); // Add this line
+  const navigate = useNavigate();
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
   const [selectedAssetForModal, setSelectedAssetForModal] =
     useState<Asset | null>(null);
+
+  // State for modal and transfer type
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [transferType, setTransferType] = useState<"transfer" | "deposit">(
+    "transfer"
+  );
 
   const toggleBalanceVisibility = () => {
     setIsBalanceVisible(!isBalanceVisible);
@@ -76,14 +82,16 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
     (transaction) => transaction.currencyType === currencyType
   );
 
-  // State for modal (for Transfer/Deposit actions)
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-    // Reset selected asset when closing modal
-    if (isModalOpen) {
-      setSelectedAssetForModal(null);
-    }
+  // When user clicks "Transfer"
+  const handleTransferClick = () => {
+    setTransferType("transfer");
+    setIsModalOpen(true);
+  };
+
+  // When user clicks "Deposit"
+  const handleDepositClick = () => {
+    setTransferType("deposit");
+    setIsModalOpen(true);
   };
 
   // Handle asset click in modal
@@ -98,10 +106,11 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
       setIsModalOpen(false);
       setSelectedAssetForModal(null);
 
-      // Navigate to transfer page with selected asset data
+      // Navigate to transfer page with selected asset data and transfer type
       navigate("/dashboard/transfer", {
         state: {
           selectedAsset: selectedAssetForModal,
+          transferType: transferType,
         },
       });
     }
@@ -190,13 +199,13 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
             {/* Action Buttons */}
             <div className="flex space-x-3">
               <button
-                onClick={toggleModal}
+                onClick={handleTransferClick}
                 className="bg-primary-100 backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88 transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
               >
                 <span>Transfer</span> <ArrowUpRightIcon />
               </button>
               <button
-                onClick={toggleModal}
+                onClick={handleDepositClick}
                 className="bg-primary-100 backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full hover:opacity-88 transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
               >
                 <span>Deposit</span> <ArrowDownRight />
@@ -281,19 +290,24 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
       </div>
 
       <GlobalModal
-        onClose={toggleModal}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedAssetForModal(null);
+        }}
         open={isModalOpen}
         setOpen={setIsModalOpen}
-        headingText="Select Currency"
+        headingText={`Select Currency for ${
+          transferType === "deposit" ? "Deposit" : "Transfer"
+        }`}
         btnText="Proceed"
         onProceed={handleModalProceed}
-        isProceedDisabled={!selectedAssetForModal} // Add this prop
+        isProceedDisabled={!selectedAssetForModal}
         children={
           <Assets
             assets={assetsData}
             onAssetClick={handleModalAssetClick}
-            isModalMode={true} // Add this prop
-            selectedAsset={selectedAssetForModal} // Add this prop
+            isModalMode={true}
+            selectedAsset={selectedAssetForModal}
           />
         }
       />
