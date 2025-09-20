@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import AmountEntryStep from "../../components/cryptoTransferFlow/AmountEntryStep";
 import BankSelectionStep from "../../components/cryptoTransferFlow/BankSelectionStep";
 import PinEntryStep from "../../components/cryptoTransferFlow/PinEntryStep";
@@ -7,6 +7,10 @@ import { ChevronLeftIcon } from "../../assets/svg";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { CurrencyDetailPageProps } from "../../types/types";
 import DepositModal from "../../common/ui/modal/DepositModal";
+
+// Define proper types
+type FlowType = "deposit" | "transfer";
+type CurrencyMode = "crypto" | "fiat";
 
 const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
   currencyType: propCurrencyType,
@@ -23,12 +27,18 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
   const [username] = useState("Username");
   const [showDepositModal, setShowDepositModal] = useState(false);
 
-  // Get the selected asset and transfer type from navigation state or use prop
+  // Get the selected asset and transfer type from navigation state
   const { selectedAsset, transferType: stateTransferType } =
     location.state || {};
-  const [transferType, setTransferType] = useState<
-    "transfer" | "deposit" | "fiat" | "crypto"
-  >(stateTransferType || "fiat");
+
+  // Separate flow type from currency mode
+  const [flowType, setFlowType] = useState<FlowType>(
+    stateTransferType === "deposit" ? "deposit" : "transfer"
+  );
+
+  const [currencyMode, setCurrencyMode] = useState<CurrencyMode>(
+    stateTransferType === "crypto" ? "crypto" : "fiat"
+  );
 
   const [currencyType, setCurrencyType] = useState(
     propCurrencyType || selectedAsset?.symbol || "Crypto"
@@ -50,25 +60,28 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
     setSelectedBank("");
     setAccountNumber("");
     setPin("");
-    setTransferType(stateTransferType || "fiat");
+    setFlowType(stateTransferType === "deposit" ? "deposit" : "transfer");
+    setCurrencyMode(stateTransferType === "crypto" ? "crypto" : "fiat");
   };
 
   const goToNextStep = () => {
     console.log(
       "Going to next step from:",
       currentStep,
-      "Transfer type:",
-      transferType
+      "Flow type:",
+      flowType,
+      "Currency mode:",
+      currencyMode
     );
 
     // If it's deposit and we're on amount entry, show deposit modal instead of going to bank selection
-    if (transferType === "deposit" && currentStep === 1) {
+    if (flowType === "deposit" && currentStep === 1) {
       setShowDepositModal(true);
       return;
     }
 
     // If transferring crypto and we're on amount entry, skip bank selection
-    if (transferType === "crypto" && currentStep === 1) {
+    if (currencyMode === "crypto" && currentStep === 1) {
       setCurrentStep(3); // Skip to pin entry
     } else {
       setCurrentStep((prev) => prev + 1);
@@ -77,15 +90,19 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
 
   const goToPrevStep = () => {
     // If transferring crypto and we're on pin entry, go back to amount entry
-    if (transferType === "crypto" && currentStep === 3) {
+    if (currencyMode === "crypto" && currentStep === 3) {
       setCurrentStep(1);
     } else {
       setCurrentStep((prev) => Math.max(1, prev - 1));
     }
   };
 
-  const handleTransferTypeChange = (type: string) => {
-    setTransferType(type as "transfer" | "deposit" | "fiat" | "crypto");
+  const handleCurrencyModeChange = (mode: CurrencyMode) => {
+    setCurrencyMode(mode);
+  };
+
+  const handleFlowTypeChange = (type: FlowType) => {
+    setFlowType(type);
   };
 
   const handleDepositConfirmation = () => {
@@ -99,7 +116,7 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
   };
 
   const getPageTitle = () => {
-    if (transferType === "deposit") {
+    if (flowType === "deposit") {
       return `Deposit ${currencyType}`;
     }
     return currencyType;
@@ -115,16 +132,17 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
             setAmount={setAmount}
             setAmountNGN={setAmountNGN}
             onNext={goToNextStep}
-            transferType={transferType}
-            onTransferTypeChange={handleTransferTypeChange}
+            onCurrencyModeChange={handleCurrencyModeChange}
+            onFlowTypeChange={handleFlowTypeChange}
             currencyType={currencyType}
+            flowType={flowType}
+            currencyMode={currencyMode}
             selectedAsset={selectedAsset}
-            onBack={() => navigate("/dashboard")}
           />
         );
       case 2:
         // Skip bank selection for deposit (handled by modal)
-        if (transferType === "deposit") {
+        if (flowType === "deposit") {
           return null;
         }
         return (
@@ -143,14 +161,15 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
         );
       case 3:
         // Skip pin entry for deposit (handled by modal)
-        if (transferType === "deposit") {
+        if (flowType === "deposit") {
           return null;
         }
         return (
           <PinEntryStep
             pin={pin}
             setPin={setPin}
-            transferType={transferType}
+            flowType={flowType}
+            currencyMode={currencyMode}
             onNext={goToNextStep}
             onBack={goToPrevStep}
             currencyType={currencyType}
@@ -161,7 +180,8 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
       case 4:
         return (
           <SuccessStep
-            transferType={transferType}
+            flowType={flowType}
+            currencyMode={currencyMode}
             onDone={resetForm}
             amount={amount}
             amountNGN={amountNGN}
@@ -175,12 +195,13 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
             amountNGN={amountNGN}
             setAmount={setAmount}
             setAmountNGN={setAmountNGN}
-            transferType={transferType}
-            onTransferTypeChange={handleTransferTypeChange}
+            flowType={flowType}
+            currencyMode={currencyMode}
+            onCurrencyModeChange={handleCurrencyModeChange}
+            onFlowTypeChange={handleFlowTypeChange}
             onNext={goToNextStep}
             currencyType={currencyType}
             selectedAsset={selectedAsset}
-            onBack={() => navigate("/dashboard")}
           />
         );
     }
