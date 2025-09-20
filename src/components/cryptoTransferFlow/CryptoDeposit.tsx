@@ -1,7 +1,7 @@
-"use client";
-
+import { useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import type { CryptoComponentProps } from "../../types/types";
+import { CopyIcon } from "../../assets/svg";
 
 // Currency Icon Component (you need to implement this)
 const CurrencyIcon = ({ currencyType }: { currencyType: string }) => {
@@ -37,6 +37,15 @@ export const CryptoDeposit: React.FC<CryptoComponentProps> = ({
   currencyType,
   onNetworkChange,
 }) => {
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+  const handleCopy = (text: string, field: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+
+    // Reset after 3s
+    setTimeout(() => setCopiedField(null), 3000);
+  };
+
   const depositAddress = "Awsd4543685jdnnu556547addsa12454wr355";
 
   // Encode address + currency + network
@@ -62,7 +71,7 @@ export const CryptoDeposit: React.FC<CryptoComponentProps> = ({
         {/* Custom currency icon overlay in the center */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-white shadow-md">
-            <CurrencyIcon currencyType={currencyType}  />
+            <CurrencyIcon currencyType={currencyType} />
           </div>
         </div>
       </div>
@@ -95,13 +104,14 @@ export const CryptoDeposit: React.FC<CryptoComponentProps> = ({
             {depositAddress}
           </span>
           <button
-            className="text-blue-500 hover:text-blue-700 flex-shrink-0"
-            onClick={() => navigator.clipboard.writeText(depositAddress)}
+            className="text-blue-500 hover:text-blue-700 flex-shrink-0 cursor-pointer"
+            onClick={() => handleCopy(depositAddress, "account")}
           >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"></path>
-              <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"></path>
-            </svg>
+            {copiedField === "account" ? (
+              <CopyIcon /> // show "copied" state
+            ) : (
+              <CopyIcon className="text-gray-600" /> // default state
+            )}
           </button>
         </div>
       </div>

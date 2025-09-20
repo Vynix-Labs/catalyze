@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import GlobalModal from "./GlobalModal";
+import { CopyIcon } from "../../../assets/svg";
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -54,8 +55,9 @@ const DepositModal: React.FC<DepositModalProps> = ({
     >
       <div className=" space-y-4">
         <p className="text-base text-gray-600 py-2 max-w-[22rem]">
-          Transfer the sum <strong className="text-primary-100">{bankDetails.amount}</strong> to the checkout
-          details below
+          Transfer the sum{" "}
+          <strong className="text-primary-100">{bankDetails.amount}</strong> to
+          the checkout details below
         </p>
 
         {/* Loop Bank Details */}
@@ -70,7 +72,7 @@ const DepositModal: React.FC<DepositModalProps> = ({
                     onClick={() => handleCopy("1234567890", "account")}
                     className="text-blue-600 text-sm hover:text-blue-800"
                   >
-                    {copiedField === "account" ? "Copied!" : "Copy"}
+                    {copiedField === "account" ? <CopyIcon className="text-gray-600" /> : <CopyIcon />}
                   </button>
                 )}
               </div>
