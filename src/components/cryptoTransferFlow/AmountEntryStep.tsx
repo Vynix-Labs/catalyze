@@ -14,6 +14,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   setAmount,
   onNext,
   transferType,
+  onTransferTypeChange,
   currencyType = "USDC",
 }) => {
   // Separate states for crypto and fiat
@@ -88,8 +89,8 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
 
   const handleTabChange = (tabKey: string) => {
     setActiveTab(tabKey);
-    // You might want to emit an event to parent component to update transferType
-    // or handle this logic in the parent component
+    // Update the parent component's transferType using onTransferTypeChange
+    onTransferTypeChange(tabKey === "crypto" ? "crypto" : "fiat");
   };
 
   const getCurrentAmount = () => {
@@ -127,7 +128,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
 
   const handleModalProceed = () => {
     setIsModalOpen(false);
-    onNext(); // This will go to PinEntryStep (step 3) for crypto transfers
+    onNext(); // For crypto transfers, this should go directly to PinEntryStep, skipping bank selection
   };
 
   const toggleModal = () => {
