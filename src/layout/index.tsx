@@ -1,4 +1,3 @@
-import React from "react";
 import { useLocation } from "react-router-dom";
 import BottomNav from "./BottomNav";
 import { RoutePath } from "../routes/routePath";

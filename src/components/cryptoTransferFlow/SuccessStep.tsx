@@ -1,10 +1,9 @@
-import React from "react";
 import type { SuccessStepProps } from "../../types/types";
 import { SuccessIcon } from "../../assets/svg";
 
 const SuccessStep: React.FC<SuccessStepProps> = ({
   onDone,
-  transferType,
+  flowType: transferType,
   amount,
   amountNGN,
   currencyType,

@@ -1,9 +1,9 @@
-import React from "react";
 import Layout from "../../layout";
 import { MagicWandIcon, SettingsIcon, VideoIcon } from "../../assets/svg";
 import { ChevronRightIcon } from "lucide-react";
 import { RoutePath } from "../../routes/routePath";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 interface MenuItem {
   id: string;
@@ -16,7 +16,7 @@ interface MenuItem {
 
 const MorePage = () => {
   // Fixed: Set initial state to the learning-hub id (string), not undefined variable
-  const [activeItem, setActiveItem] = React.useState<string>("learning-hub");
+  const [activeItem, setActiveItem] = useState<string>("learning-hub");
 
   const navigate = useNavigate(); // ✅ React Router hook
 

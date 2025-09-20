@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { HomeIcon, MoreIcon, RewardsIcon, InvestmentIcon } from "../assets/svg";
 import { RoutePath } from "../routes/routePath";
