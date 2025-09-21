@@ -1,5 +1,5 @@
 function AssetsModalContent() {
-  return <div>AssetsModalContent</div>;
+  return <div></div>;
 }
 
 export default AssetsModalContent;

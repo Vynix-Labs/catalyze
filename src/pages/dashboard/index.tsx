@@ -12,7 +12,6 @@ import {
 } from "../../assets/svg";
 
 import GlobalModal from "../../common/ui/modal/GlobalModal";
-import Layout from "../../layout";
 import { useNavigate } from "react-router-dom";
 
 const Home: React.FC = () => {
@@ -227,7 +226,6 @@ const Home: React.FC = () => {
   }
 
   return (
-    <Layout>
       <div className="bg-neutral-50">
         {/* Main content container with proper spacing for bottom nav */}
         <div className="max-w-md mx-auto flex flex-col">
@@ -324,32 +322,31 @@ const Home: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Modal for multi-currency selection */}
-      <GlobalModal
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedAssetForModal(null);
-        }}
-        open={isModalOpen}
-        setOpen={setIsModalOpen}
-        headingText={`Select Currency for ${
-          transferType === "deposit" ? "Deposit" : "Transfer"
-        }`}
-        btnText="Proceed"
-        onProceed={handleModalProceed}
-        isProceedDisabled={!selectedAssetForModal}
-        children={
-          <Assets
-            assets={assetsData}
-            onAssetClick={handleModalAssetClick}
-            isModalMode={true}
-            selectedAsset={selectedAssetForModal}
-          />
-        }
-      />
-    </Layout>
+        {/* Modal for multi-currency selection */}
+        <GlobalModal
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedAssetForModal(null);
+          }}
+          open={isModalOpen}
+          setOpen={setIsModalOpen}
+          headingText={`Select Currency for ${
+            transferType === "deposit" ? "Deposit" : "Transfer"
+          }`}
+          btnText="Proceed"
+          onProceed={handleModalProceed}
+          isProceedDisabled={!selectedAssetForModal}
+          children={
+            <Assets
+              assets={assetsData}
+              onAssetClick={handleModalAssetClick}
+              isModalMode={true}
+              selectedAsset={selectedAssetForModal}
+            />
+          }
+        />
+      </div>
   );
 };
 
