@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Transactions, { type Transaction } from "../../components/Transactions";
 import Assets, { type Asset } from "../../components/Assets";
 import CurrencyDetailPage from "./CurrencyDetailPage";

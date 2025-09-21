@@ -36,18 +36,33 @@ export interface HeaderProps {
 export interface AmountEntryStepProps {
   amount?: string;
   amountNGN?: string;
-  setAmountNGN: React.Dispatch<React.SetStateAction<string>>; // New prop for setting NGN amount
-  setAmount: React.Dispatch<React.SetStateAction<string>>;
-  transferType: string;
-  onTransferTypeChange: (type: string) => void;
+  setAmountNGN: (amount: string) => void;
+  setAmount?: (amount: string) => void;
   onNext: () => void;
-  onBack?: () => void;
-  selectedAsset?: {
-    name: string;
-    symbol: string;
-    icon: string;
-  };
+  flowType: "deposit" | "transfer";
+  onFlowTypeChange?: (type: "deposit" | "transfer") => void;
+  currencyMode: "crypto" | "fiat";
+  onCurrencyModeChange: (mode: "crypto" | "fiat") => void;
+  currencyType?: string;
+  selectedAsset?: string;
+}
+
+export interface BaseComponentProps {
+  amount: string;
+  amountNGN: string;
   currencyType: string;
+  onAmountChange: (amount: string) => void;
+  onAmountNGNChange: (amount: string) => void;
+}
+
+export interface CryptoComponentProps {
+  cryptoAmount: string;
+  address: string;
+  selectedNetwork: string;
+  currencyType: string;
+  onCryptoAmountChange: (amount: string) => void;
+  onAddressChange: (address: string) => void;
+  onNetworkChange: (network: string) => void;
 }
 
 export interface CurrencyTabProps {
@@ -69,9 +84,10 @@ export interface BankSelectionStepProps {
 }
 
 export interface PinEntryStepProps {
+  flowType: "deposit" | "transfer";
+  currencyMode: "crypto" | "fiat";
   pin: string;
   setPin: React.Dispatch<React.SetStateAction<string>>;
-  transferType: string;
   onNext: () => void;
   onBack?: () => void;
   currencyType: string;
@@ -80,7 +96,8 @@ export interface PinEntryStepProps {
 }
 
 export interface SuccessStepProps {
-  transferType: string;
+  flowType: "deposit" | "transfer";
+  currencyMode: "crypto" | "fiat";
   onDone: () => void;
   amount?: string;
   amountNGN?: string;

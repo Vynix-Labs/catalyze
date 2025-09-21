@@ -1,4 +1,3 @@
-import React from "react";
 import type { Transaction } from "../../components/Transactions";
 import { ChevronLeftIcon } from "../../assets/svg";
 
