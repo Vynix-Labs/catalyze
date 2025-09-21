@@ -46,9 +46,10 @@ export default function GlobalModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="w-full">
-          <p className="font-bold text-2xl text-black">{headingText}</p>
+          <p className="font-bold text-xl text-black">{headingText}</p>
           {children}
         </div>
+        
         <AuthFooter
           text={btnText}
           handleBtnClick={buttonClickHandler}

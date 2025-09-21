@@ -1,8 +1,7 @@
-import React from "react";
 import NumberPad from "./NumberPad";
 import type { PinEntryStepProps } from "../../types/types";
 
-const PinEntryStep: React.FC<PinEntryStepProps> = ({ pin, setPin, onNext }) => {
+const PinEntryStep: React.FC<PinEntryStepProps> = ({ pin, setPin, onNext  }) => {
   const handleNumberPress = (num: string) => {
     if (pin.length < 4) {
       setPin((prev) => prev + num);

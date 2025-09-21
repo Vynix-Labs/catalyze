@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import type { BankSelectionStepProps } from "../../types/types";
 import Button from "../../common/ui/button";
 import GlobalModal from "../../common/ui/modal/GlobalModal";

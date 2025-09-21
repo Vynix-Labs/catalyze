@@ -1,13 +1,8 @@
-import React from "react";
-import { useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import BottomNav from "./BottomNav";
 import { RoutePath } from "../routes/routePath";
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout = () => {
   const location = useLocation();
 
   // Map pathname → tab id
@@ -25,7 +20,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="min-h-screen bg-neutral-50">
       {/* Page Content */}
       <div className="max-w-[420px] mx-auto min-h-screen flex flex-col pb-16">
-        <div className="flex-1 overflow-y-auto">{children}</div>
+        <div className="flex-1 overflow-y-auto">
+          <Outlet />
+        </div>
       </div>
 
       {/* Fixed Bottom Navigation */}

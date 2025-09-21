@@ -1,4 +1,3 @@
-import React from "react";
 import { FaceIcon } from "../../assets/svg";
 import type { NumberPadProps } from "../../types/types";
 

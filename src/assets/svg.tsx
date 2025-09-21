@@ -1,5 +1,3 @@
-import React from "react";
-
 interface IconProps {
   color?: string;
   size?: number;
@@ -15,6 +13,22 @@ interface MagicWandIconProps {
   className?: string;
   color?: string;
 }
+
+export const CopyIcon = ({ className }: IconProps) => (
+  <svg
+    width="24"
+    height="25"
+    viewBox="0 0 24 25"
+    className={className}
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M20.25 3.5H8.25C8.05109 3.5 7.86032 3.57902 7.71967 3.71967C7.57902 3.86032 7.5 4.05109 7.5 4.25V8H3.75C3.55109 8 3.36032 8.07902 3.21967 8.21967C3.07902 8.36032 3 8.55109 3 8.75V20.75C3 20.9489 3.07902 21.1397 3.21967 21.2803C3.36032 21.421 3.55109 21.5 3.75 21.5H15.75C15.9489 21.5 16.1397 21.421 16.2803 21.2803C16.421 21.1397 16.5 20.9489 16.5 20.75V17H20.25C20.4489 17 20.6397 16.921 20.7803 16.7803C20.921 16.6397 21 16.4489 21 16.25V4.25C21 4.05109 20.921 3.86032 20.7803 3.71967C20.6397 3.57902 20.4489 3.5 20.25 3.5ZM19.5 15.5H16.5V8.75C16.5 8.55109 16.421 8.36032 16.2803 8.21967C16.1397 8.07902 15.9489 8 15.75 8H9V5H19.5V15.5Z"
+      fill="currentColor"
+    />
+  </svg>
+);
 
 export const AppleIcon = () => (
   <svg
@@ -54,7 +68,9 @@ export const BellIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export const VideoIcon: React.FC<VideoIconProps> = ({ className }) => (
+export const VideoIcon: React.FC<VideoIconProps> = ({
+  className,
+}: IconProps) => (
   <svg
     width="24"
     height="25"
@@ -783,7 +799,7 @@ export const MoreIcon: React.FC<IconProps> = ({ color = "#6A7282" }) => (
 export const EyeIcon: React.FC<IconProps> = ({
   color = "#FFFFFF",
   className,
-}) => (
+}: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="18"
@@ -806,7 +822,7 @@ export const EyeIcon: React.FC<IconProps> = ({
 export const EyeOffIcon: React.FC<IconProps> = ({
   color = "#FFFFFF",
   className,
-}) => (
+}: IconProps) => (
   <svg
     className={className}
     xmlns="http://www.w3.org/2000/svg"
@@ -829,7 +845,7 @@ export const EyeOffIcon: React.FC<IconProps> = ({
 export const ArrowUpRightIcon: React.FC<IconProps> = ({
   color = "#FFFFFF",
   className,
-}) => (
+}: IconProps) => (
   <svg
     className={className}
     width="8"
@@ -849,7 +865,7 @@ export const ArrowUpRightIcon: React.FC<IconProps> = ({
 export const ChevronLeftIcon: React.FC<IconProps> = ({
   color = "#FFFFFF",
   className,
-}) => (
+}: IconProps) => (
   <svg
     width="9"
     height="14"
@@ -873,7 +889,7 @@ export const ChevronLeftIcon: React.FC<IconProps> = ({
 export const ArrowDownRight: React.FC<IconProps> = ({
   color = "#FFFFFF",
   className,
-}) => (
+}: IconProps) => (
   <svg
     width="9"
     height="8"
