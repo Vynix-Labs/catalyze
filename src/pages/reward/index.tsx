@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Layout from "../../layout";
 import Tabs from "../../components/Tabs";
 import {
   FileIcon,
@@ -103,7 +102,6 @@ const RewardPage = () => {
   ];
   
   return (
-    <Layout>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8 p-4">
@@ -426,7 +424,6 @@ const RewardPage = () => {
           </div>
         )}
       </div>
-    </Layout>
   );
 };
 

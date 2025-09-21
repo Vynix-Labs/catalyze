@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { HomeIcon, MoreIcon, RewardsIcon, InvestmentIcon } from "../assets/svg";
 import { RoutePath } from "../routes/routePath";
 
@@ -49,7 +49,9 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab = "home" }) => {
         <div className="bg-white border-t border-gray-200 shadow-lg">
           <div className="flex justify-around items-center py-3">
             {navItems.map((item) => (
-              <button
+              <Link
+                to={item.path}
+                role="link"
                 key={item.id}
                 className={`flex flex-col items-center justify-center w-16 ${
                   activeTab === item.id ? "text-primary-100" : "text-gray-400"
@@ -64,7 +66,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab = "home" }) => {
                   {item.icon}
                 </div>
                 <span className="text-xs font-medium mt-1">{item.label}</span>
-              </button>
+              </Link>
             ))}
           </div>
         </div>
