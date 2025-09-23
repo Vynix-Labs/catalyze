@@ -14,69 +14,51 @@ import InvestmentPage from "../pages/investment";
 import RewardPage from "../pages/reward";
 import StakingPage from "../pages/more/staking";
 import CryptoTransferFlow from "../pages/dashboard/CryptoTransferFlow";
+import Settings from "../pages/settings/settings";
+import Layout from "../layout";
+import PersonalInfo from "../pages/settings/PersonalInfo";
+import SetPin from "../pages/settings/SetPin";
+import UpdatePassword from "../pages/settings/updatePassword";
 
 export const routes = createBrowserRouter([
   {
-    path: RoutePath.DASHBOARD,
-    element: <Home />,
-    errorElement: <NotFound />, // handles errors on this route
-  },
-  {
     path: RoutePath.ROOT,
     element: <Onboarding />,
+    errorElement: <NotFound />,
+    index: true,
   },
   {
-    path: "*", // catch-all
-    element: <NotFound />,
+    path: "/dashboard",
+    element: <Layout />,
+    errorElement: <NotFound />,
+    children: [
+      { path: RoutePath.DASHBOARD, element: <Home />, index: true },
+      { path: RoutePath.MORE, element: <MorePage /> },
+      { path: RoutePath.INVESTMENT, element: <InvestmentPage /> },
+      { path: RoutePath.REWARD, element: <RewardPage /> },
+      { path: RoutePath.STAKING, element: <StakingPage /> },
+      { path: RoutePath.TRANSFER, element: <CryptoTransferFlow /> },
+      { path: RoutePath.SETTINGS, element: <Settings /> },
+    ],
   },
+  // Nested route under settings
+  { path: RoutePath.PERSONAL_INFO, element: <PersonalInfo /> },
   {
-    path: RoutePath.MORE,
-    element: <MorePage />,
+    path: RoutePath.TRANSACTION_PIN,
+    element: <SetPin />,
   },
-  {
-    path: RoutePath.INVESTMENT,
-    element: <InvestmentPage />,
-  },
-  {
-    path: RoutePath.REWARD,
-    element: <RewardPage />,
-  },
-  {
-    path: RoutePath.STAKING,
-    element: <StakingPage />,
-  },
-  {
-    path: RoutePath.TRANSFER,
-    element: <CryptoTransferFlow />,
-  },
+  { path: RoutePath.UPDATE_PASSWORD, element: <UpdatePassword /> },
 
   {
     path: "/auth",
     children: [
-      {
-        path: RoutePath.CREATE_ACCOUNT,
-        element: <SignUp />,
-      },
-      {
-        path: RoutePath.RESET_OTP,
-        element: <VerifyEmail />,
-      },
-      {
-        path: RoutePath.CREATE_TRANSACTION_PIN,
-        element: <CreatePin />,
-      },
-      {
-        path: RoutePath.SIGNIN,
-        element: <Login />,
-      },
-      {
-        path: RoutePath.FORGOT_PASSWORD,
-        element: <ForgetPassword />,
-      },
-      {
-        path: RoutePath.CREATE_PASSWORD,
-        element: <CreatePassword />,
-      },
+      { path: RoutePath.CREATE_ACCOUNT, element: <SignUp /> },
+      { path: RoutePath.RESET_OTP, element: <VerifyEmail /> },
+      { path: RoutePath.CREATE_TRANSACTION_PIN, element: <CreatePin /> },
+      { path: RoutePath.SIGNIN, element: <Login /> },
+      { path: RoutePath.FORGOT_PASSWORD, element: <ForgetPassword /> },
+      { path: RoutePath.CREATE_PASSWORD, element: <CreatePassword /> },
     ],
   },
+  { path: "*", element: <NotFound /> },
 ]);

@@ -1,4 +1,3 @@
-import Layout from "../../layout";
 import { MagicWandIcon, SettingsIcon, VideoIcon } from "../../assets/svg";
 import { ChevronRightIcon } from "lucide-react";
 import { RoutePath } from "../../routes/routePath";
@@ -27,11 +26,8 @@ const MorePage = () => {
     if (path) {
       navigate(path); // ✅ navigate instead of router.push
     }
-
-    console.log(`Navigate to ${itemId}`);
   };
 
-  
   const menuItems: MenuItem[] = [
     {
       id: "gamification",
@@ -60,39 +56,38 @@ const MorePage = () => {
       description: "Lorem ipsum dolor sit amet consectetur.",
       path: RoutePath.STAKING,
       icon: <VideoIcon className="h-6 w-6" />,
-      onClick: () => handleNavigation("staking", "/more/staking"),
+      onClick: () => handleNavigation("staking", RoutePath.STAKING),
     },
     {
       id: "settings",
       title: "Settings",
       description: "Lorem ipsum dolor sit amet consectetur.",
       icon: <SettingsIcon className="h-6 w-6" />,
-      onClick: () => handleNavigation("settings", "/more/"),
+      onClick: () => handleNavigation("settings", RoutePath.SETTINGS),
     },
   ];
 
   return (
-    <Layout>
-      <div className=" bg-gray-50 p-4">
-        <div className="mx-auto max-w-md space-y-4">
-          {/* Header */}
-          <div className="space-y-1">
-            <h1 className="text-[32px] font-bold text-black-100">More</h1>
-            <p className="text-sm text-gray-600 md:text-base">
-              Explore tools, settings, and extras
-            </p>
-          </div>
+    <div className=" bg-gray-50 p-4">
+      <div className="mx-auto max-w-md space-y-4">
+        {/* Header */}
+        <div className="space-y-1">
+          <h1 className="text-[32px] font-bold text-black-100">More</h1>
+          <p className="text-sm text-gray-600 md:text-base">
+            Explore tools, settings, and extras
+          </p>
+        </div>
 
-          {/* Menu Items */}
-          <div className="space-y-3">
-            {menuItems.map((item) => {
-              // Check if this item is currently active
-              const isHighlighted = activeItem === item.id;
-              return (
-                <div
-                  key={item.id}
-                  onClick={item.onClick}
-                  className={`
+        {/* Menu Items */}
+        <div className="space-y-3">
+          {menuItems.map((item) => {
+            // Check if this item is currently active
+            const isHighlighted = activeItem === item.id;
+            return (
+              <div
+                key={item.id}
+                onClick={item.onClick}
+                className={`
                     flex cursor-pointer items-center justify-between rounded-lg bg-white p-4 transition-all duration-200 hover:shadow-md hover:scale-[1.02]
                     ${
                       isHighlighted
@@ -100,11 +95,11 @@ const MorePage = () => {
                         : "border border-gray-200"
                     }
                   `}
-                >
-                  <div className="flex items-center space-x-4">
-                    {/* Icon */}
-                    <div
-                      className={`
+              >
+                <div className="flex items-center space-x-4">
+                  {/* Icon */}
+                  <div
+                    className={`
                         flex h-10 w-10 items-center justify-center rounded-lg
                         ${
                           isHighlighted
@@ -112,39 +107,36 @@ const MorePage = () => {
                             : " text-gray-600"
                         }
                       `}
-                    >
-                      {item.icon}
-                    </div>
-
-                    {/* Text Content */}
-                    <div className="flex flex-col">
-                      <h3 className="text-base font-semibold text-gray-900 md:text-lg">
-                        {item.title}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        {item.description}
-                      </p>
-                    </div>
+                  >
+                    {item.icon}
                   </div>
 
-                  {/* Chevron Arrow */}
-                  <ChevronRightIcon
-                    className={`h-5 w-5 transition-colors
+                  {/* Text Content */}
+                  <div className="flex flex-col">
+                    <h3 className="text-base font-semibold text-gray-900 md:text-lg">
+                      {item.title}
+                    </h3>
+                    <p className="text-sm text-gray-500">{item.description}</p>
+                  </div>
+                </div>
+
+                {/* Chevron Arrow */}
+                <ChevronRightIcon
+                  className={`h-5 w-5 transition-colors
                       ${isHighlighted ? "text-blue-600" : "text-gray-400"}
                     `}
-                  />
-                </div>
-              );
-            })}
-          </div>
+                />
+              </div>
+            );
+          })}
+        </div>
 
-          {/* Footer Space */}
-          <div className="mt-8 pb-4">
-            {/* Add any footer content or spacing here */}
-          </div>
+        {/* Footer Space */}
+        <div className="mt-8 pb-4">
+          {/* Add any footer content or spacing here */}
         </div>
       </div>
-    </Layout>
+    </div>
   );
 };
 
