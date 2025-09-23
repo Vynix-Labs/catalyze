@@ -79,6 +79,15 @@ export const user = createTable("user", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 
+export const wallet = createTable("wallet", {
+  id: text('id').primaryKey(),
+  userId: text('user_id').references(() => user.id).notNull(),
+  walletAddress: varchar("wallet_address", { length: 255 }).notNull(),
+  
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
 // ----------------- BETTER-AUTH REQUIRED TABLE -----------------
 export const session = createTable('session', {
   id: text('id').primaryKey(),

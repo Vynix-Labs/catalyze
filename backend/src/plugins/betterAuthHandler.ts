@@ -1,4 +1,4 @@
-import { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsync } from "fastify";
 import { auth } from "./auth"; // Better Auth instance
 
 const betterAuthHandler: FastifyPluginAsync = async (fastify) => {
