@@ -12,6 +12,11 @@ export const RoutePath = {
   STAKING: "/dashboard/more/staking",
   SETTINGS: "/dashboard/more/settings",
 
+  // nested under settings
+  PERSONAL_INFO: "/dashboard/more/settings/personal-info",
+  TRANSACTION_PIN: "/dashboard/more/settings/transaction-pin",
+  UPDATE_PASSWORD: "/dashboard/more/settings/update-password",
+
   // auth routes (standalone, can keep absolute or move under "auth")
   CREATE_ACCOUNT: "/auth/create-account",
   CREATE_TRANSACTION_PIN: "/auth/create-pin",
