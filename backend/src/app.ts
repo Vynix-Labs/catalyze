@@ -66,7 +66,7 @@ export const buildApp = async () => {
       deepLinking: false,
       persistAuthorization: true,
       displayRequestDuration: true,
-      layout: 'modern',
+      /* layout: 'modern', */
     },
     staticCSP: "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'; connect-src 'self'; font-src 'self' data:",
     transformStaticCSP: (header) => header
