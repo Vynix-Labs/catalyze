@@ -1,5 +1,6 @@
 import type { SentMessageInfo } from "nodemailer";
 import { transporter } from "./transporter";
+import env from "../../config/env";
 
 export async function sendOtp(
   email: string,
@@ -16,7 +17,7 @@ export async function sendOtp(
 
   try {
     return await transporter.sendMail({
-      from: `"Catalyze" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+      from: `"Catalyze" <${env.SMTP_FROM || env.SMTP_USER}>`,
       to: email,
       subject,
       html,

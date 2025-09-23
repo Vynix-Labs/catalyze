@@ -1,4 +1,4 @@
-import { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsync } from "fastify";
 import { auth } from "./auth"; // Better Auth instance
 
 const betterAuthHandler: FastifyPluginAsync = async (fastify) => {
@@ -30,16 +30,17 @@ const betterAuthHandler: FastifyPluginAsync = async (fastify) => {
         reply.status(response.status);
         response.headers.forEach((value, key) => reply.header(key, value));
 
-        // Parse JSON if content-type is JSON
-        const contentType = response.headers.get("content-type") || "";
-        if (contentType.includes("application/json")) {
-          const json = await response.json();
-          reply.send(json);
-        } else {
-          // fallback for plain text
-          const text = await response.text();
-          reply.send(text);
-        }
+        reply.send(response.body ? await response.text() : null);
+        // // Parse JSON if content-type is JSON
+        // const contentType = response.headers.get("content-type") || "";
+        // if (contentType.includes("application/json")) {
+        //   const json = await response.json();
+        //   reply.send(json);
+        // } else {
+        //   // fallback for plain text
+        //   const text = await response.text();
+        //   reply.send(text);
+        // }
       } catch (error) {
         fastify.log.error({ err: error }, "Authentication Error");
           reply.status(500).send({

@@ -1,13 +1,14 @@
-import { FastifyPluginAsync } from 'fastify'
+import type { FastifyPluginAsync } from 'fastify'
 import authRoutes from '../modules/auth/auth.routes'
 /* 
 import cryptoRoutes from '../modules/crypto/crypto.routes'
 import fiatRoutes from '../modules/fiat/fiat.routes'
 import stakingRoutes from '../modules/staking/staking.routes'
 import transactionsRoutes from '../modules/transactions/transactions.routes'
-import usersRoutes from '../modules/users/users.routes' */
+import usersRoutes from '../modules/users/users.routes' 
+*/
 
-const routes: FastifyPluginAsync = async (fastify, opts) => {
+const routes: FastifyPluginAsync = async (fastify) => {
   fastify.register(authRoutes, { prefix: '/auth' })
   /*
   fastify.register(cryptoRoutes, { prefix: '/crypto' })
