@@ -53,7 +53,7 @@ function Settings() {
       <Preferences />
       <Support />
 
-      <div>
+      <div className="flex items-center justify-center pb-8">
         <Button
           variants="primary"
           classes="w-full !h-12 !text-base !font-semibold !bg-red-500 hover:!bg-red-600s"
