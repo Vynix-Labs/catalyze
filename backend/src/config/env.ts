@@ -17,6 +17,14 @@ const envSchema = z.object({
     EMAIL_FROM: z.string().optional().default("Catalyze <no-reply@catalyze.com>"),
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
+
+  // ChipiPay JWKS Configuration (NEW)
+//   CHIPIPAY_JWT_ISSUER: z.string().url(),
+  CHIPIPAY_CLIENT_ID: z.string().min(1),
+  CHIPI_API_PUBLIC_KEY: z.string().min(1),
+  CHIPI_ENCRYPT_KEY: z.string().min(1),
+  STARKNET_RPC_URL: z.string().url().optional().default("https://starknet-mainnet.public.blastapi.io"),
+
 });
 
 export type env = z.infer<typeof envSchema>;
