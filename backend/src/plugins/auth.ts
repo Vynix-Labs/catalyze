@@ -3,7 +3,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "./db"
 import * as schema from "../db/schema"
-import { emailOTP } from 'better-auth/plugins';
+import { emailOTP, openAPI } from 'better-auth/plugins';
 import { sendOtp } from "../utils/email/otp";
 import fp from "fastify-plugin";
 import env from "../config/env";
@@ -64,7 +64,7 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24, // 1 day
   },
 
-  basePath: "/auth",
+  basePath: "/api/auth",
   trustedOrigins: ["http://localhost:3000", `${env.APP_URL}`],
 
   advanced: {
@@ -90,6 +90,7 @@ export const auth = betterAuth({
   },
   
   plugins: [
+    openAPI(),
     emailOTP({
       otpLength: 6,
       expiresIn: 60,

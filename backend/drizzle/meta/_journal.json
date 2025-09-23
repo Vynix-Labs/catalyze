@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1758107923482,
-      "tag": "0000_mature_agent_brand",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1758108102440,
-      "tag": "0001_new_arachne",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1758109740927,
-      "tag": "0002_flat_butterfly",
+      "when": 1758611966508,
+      "tag": "0000_narrow_luminals",
       "breakpoints": true
     }
   ]

@@ -3,6 +3,10 @@ import { verifyPinSchema, setPinSchema } from "./auth.schema";
 import { setUserPin, verifyUserPin } from "./auth.service";
 import { requireAuth } from "../../plugins/requireAuth";
 
+/**
+ * 
+ * @param fastify 
+ */
 const authRoutes: FastifyPluginAsync = async (fastify) => {
   // ------------------- SET PIN -------------------
   fastify.post(
@@ -10,7 +14,31 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     {
       preHandler: requireAuth(fastify),
       schema: {
+        description: 'Set a 4-digit PIN for the authenticated user',
+        tags: ['Authentication'],
+        security: [{ sessionCookie: [] }],
         body: setPinSchema,
+        response: {
+          201: {
+            type: 'object',
+            properties: {
+              success: { type: 'boolean' },
+              message: { type: 'string' }
+            }
+          },
+          400: {
+            type: 'object',
+            properties: {
+              error: { type: 'string' }
+            }
+          },
+          401: {
+            type: 'object',
+            properties: {
+              error: { type: 'string' }
+            }
+          }
+        }
       },
     },
     async (request, reply) => {
@@ -32,7 +60,31 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     {
       preHandler: requireAuth(fastify),
       schema: {
+        description: 'Verify a 4-digit PIN for the authenticated user',
+        tags: ['Authentication'],
+        security: [{ sessionCookie: [] }],
         body: verifyPinSchema,
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              success: { type: 'boolean' },
+              message: { type: 'string' }
+            }
+          },
+          400: {
+            type: 'object',
+            properties: {
+              error: { type: 'string' }
+            }
+          },
+          401: {
+            type: 'object',
+            properties: {
+              error: { type: 'string' }
+            }
+          }
+        }
       },
     },
     async (request, reply) => {
