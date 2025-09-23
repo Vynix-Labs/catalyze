@@ -6,6 +6,7 @@ function Button({
   classes,
   children,
   handleClick,
+  disabled,
 }: buttonProps) {
   const btnShape = () => {
     switch (variants) {
@@ -22,6 +23,7 @@ function Button({
     <button
       onClick={handleClick}
       className={`${btnShape()} ${classes} gap-2 h-12 max-w-[21.9rem] flex w-full rounded-full items-center justify-center cursor-pointer disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed`}
+      disabled={disabled}
     >
       {children ? children : text}
     </button>
