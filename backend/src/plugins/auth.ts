@@ -3,7 +3,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "./db"
 import * as schema from "../db/schema"
-import { emailOTP, openAPI } from 'better-auth/plugins';
+import { emailOTP, openAPI, jwt } from 'better-auth/plugins';
 import { sendOtp } from "../utils/email/otp";
 import fp from "fastify-plugin";
 import env from "../config/env";
@@ -91,6 +91,7 @@ export const auth = betterAuth({
   
   plugins: [
     openAPI(),
+    jwt(),
     emailOTP({
       otpLength: 6,
       expiresIn: 60,
