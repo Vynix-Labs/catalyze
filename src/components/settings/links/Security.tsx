@@ -1,6 +1,6 @@
 import { MagicWandIcon, VideoIcon } from "../../../assets/svg";
 import { RoutePath } from "../../../routes/routePath";
-import SettingsLink from "./link";
+import SettingsLink from "../links/Link";
 
 function Security() {
   return (
@@ -15,19 +15,33 @@ function Security() {
         />
         <SettingsLink
           icon={<VideoIcon />}
-          href="/settings/2fa"
-          name="Two-Factor Authentication (2FA)"
-          subtext="Enhance account security with 2FA"
+          name="Biometric Login"
+          subtext="Use fingerprint or Face ID"
+          element={
+            <div className="form-control relative">
+              <input
+                type="checkbox"
+                className="appearance-none h-8 w-13 bg-gray-400 checked:bg-[#34C759] !outline-none !ring-0 !rounded-full shadow-inner cursor-pointer transition-all duration-300 before:content-[''] before:absolute before:top-1 before:left-1 before:w-6 before:h-6 before:bg-white before:rounded-full before:shadow-md before:transform before:transition-transform before:duration-300 checked:before:translate-x-5 !border-0 "
+              />
+            </div>
+          }
+        />
+        <SettingsLink
+          icon={<VideoIcon />}
+          name="Two-Factor Authentication"
+          subtext="Extra protection for login and withdrawals"
+          element={
+            <div className="form-control relative">
+              <input
+                type="checkbox"
+                className="appearance-none h-8 w-13 bg-gray-400 checked:bg-[#34C759] !outline-none !ring-0 !rounded-full shadow-inner cursor-pointer transition-all duration-300 before:content-[''] before:absolute before:top-1 before:left-1 before:w-6 before:h-6 before:bg-white before:rounded-full before:shadow-md before:transform before:transition-transform before:duration-300 checked:before:translate-x-5 !border-0 "
+              />
+            </div>
+          }
         />
         <SettingsLink
           icon={<VideoIcon />}
           href="/settings/recent-activity"
-          name="Recent Activity"
-          subtext="Review recent login and account activity"
-        />
-        <SettingsLink
-          icon={<VideoIcon />}
-          href="/settings/login-alerts"
           name="Device Management"
           subtext="Manage active logins and devices"
         />

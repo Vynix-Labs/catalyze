@@ -1,6 +1,6 @@
 import { MagicWandIcon, VideoIcon } from "../../../assets/svg";
 import { RoutePath } from "../../../routes/routePath";
-import SettingsLink from "./link";
+import SettingsLink from "../links/Link";
 
 const links = [
   {
