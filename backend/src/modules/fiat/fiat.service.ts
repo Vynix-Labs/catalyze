@@ -7,6 +7,16 @@ import type { InitiateFiatDepositInput } from "./fiat.schema";
 
 const { MONNIFY_BASE_URL, MONNIFY_API_KEY, MONNIFY_SECRET_KEY, MONNIFY_CONTRACT_CODE } = env;
 
+// Monnify API response types (partial, only what's needed here)
+type MonnifyAuthResponse = {
+  requestSuccessful: boolean;
+  responseMessage?: string;
+  responseBody: {
+    accessToken: string;
+    expiresIn: number; // seconds
+  };
+};
+
 export class MonnifyClient {
   private cachedToken: string | null = null;
   private tokenExpiry = 0;
@@ -27,14 +37,14 @@ export class MonnifyClient {
       throw new Error(`Monnify auth failed: ${res.status} ${await res.text()}`);
     }
 
-    const json = await res.json();
+    const json = (await res.json()) as MonnifyAuthResponse;
     if (!json.requestSuccessful) {
       throw new Error(json.responseMessage || "Failed to authenticate with Monnify");
     }
 
     this.cachedToken = json.responseBody.accessToken;
     this.tokenExpiry = now + json.responseBody.expiresIn - 30;
-    return this.cachedToken;
+    return this.cachedToken!;
   }
 
   private async post<T = any>(endpoint: string, body: any): Promise<T> {
