@@ -1,7 +1,7 @@
 import { FastifyPluginAsync } from "fastify";
 import { requireAuth } from "../../plugins/requireAuth";
 import { initiateFiatDepositSchema } from "./fiat.schema";
-import { MonnifyClient } from "./fiat.service";
+import { MonnifyClient, handleMonnifyWebhook } from "./fiat.service";
 
 const monnify = new MonnifyClient();
 
@@ -30,6 +30,20 @@ const fiatRoutes: FastifyPluginAsync = async (fastify) => {
           providerRef: deposit.providerRef,
           paymentInstructions: deposit.paymentInstructions, // Monnify account details
         });
+      } catch (err: any) {
+        fastify.log.error(err);
+        return reply.code(400).send({ error: err.message });
+      }
+    }
+  );
+
+  // ------------------- CONFIRM FIAT DEPOSIT (WEBHOOK) -------------------
+  fastify.post(
+    "/deposit/confirm",
+    async (request, reply) => {
+      try {
+        await handleMonnifyWebhook(fastify, request, reply);
+        return reply.code(200).send({ success: true });
       } catch (err: any) {
         fastify.log.error(err);
         return reply.code(400).send({ error: err.message });

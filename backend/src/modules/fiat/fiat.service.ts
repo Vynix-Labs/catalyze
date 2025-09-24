@@ -1,9 +1,11 @@
-import { randomUUID } from "crypto";
-import { eq } from "drizzle-orm";
-import { depositIntents } from "../../db/schema";
+import { randomUUID, createHash } from "crypto";
+import { eq, and } from "drizzle-orm";
+import { depositIntents, balances, transactions } from "../../db/schema";
 import env from "../../config/env";
 import { Buffer } from "buffer";
 import { InitiateFiatDepositInput } from "./fiat.schema";
+import crypto from "crypto";
+
 
 const { MONNIFY_BASE_URL, MONNIFY_API_KEY, MONNIFY_SECRET_KEY, MONNIFY_CONTRACT_CODE } = env;
 
@@ -139,5 +141,144 @@ export class MonnifyClient {
       ...intent,
       paymentInstructions: bankResp.responseBody,
     };
+  }
+}
+
+
+
+/**
+ * handleMonnifyWebhook
+ * - Verifies signature
+ * - Processes only SUCCESSFUL_TRANSACTION events
+ * - Updates deposit_intents, credits user balance, creates transactions record
+ */
+export async function handleMonnifyWebhook(fastify: any, request: any) {
+  const rawBodyStr: string =
+    (request as any).rawBody?.toString("utf8") ??
+    (typeof request.body === "string" ? request.body : JSON.stringify(request.body));
+
+  fastify.log.info({ rawBodyStr }, "Raw body used for signature");
+
+  const signatureHeader =
+    (request.headers["monnify-signature"] as string) ||
+    (request.headers["x-monnify-signature"] as string);
+
+  if (!signatureHeader) {
+    throw new Error("Missing signature header");
+  }
+
+  const computed = createHash("sha512")
+    .update(rawBodyStr + (MONNIFY_SECRET_KEY ?? ""))
+    .digest("hex");
+
+  if (computed !== signatureHeader) {
+    fastify.log.warn({ computed, signatureHeader }, "Invalid Monnify webhook signature");
+    throw new Error("Invalid signature");
+  }
+
+  const { eventType, eventData } = request.body;
+
+  if (eventType !== "SUCCESSFUL_TRANSACTION" || !eventData) {
+    return { success: true, ignored: true };
+  }
+
+  const paymentReference = eventData.paymentReference;
+  const amountPaid = Number(eventData.amountPaid ?? 0);
+  const transactionReference = eventData.transactionReference ?? null;
+
+  if (!paymentReference) {
+    throw new Error("Missing paymentReference");
+  }
+
+  // Lookup deposit intent
+  const [deposit] = await fastify.db
+    .select()
+    .from(depositIntents)
+    .where(eq(depositIntents.providerRef, paymentReference));
+
+  if (!deposit) {
+    throw new Error("Deposit intent not found");
+  }
+
+  if (deposit.status === "completed") {
+    return { success: true, alreadyCompleted: true };
+  }
+
+  // Verify amounts
+  if (Number(deposit.amountFiat) !== amountPaid) {
+    fastify.log.warn(
+      { depositId: deposit.id, expected: deposit.amountFiat, got: amountPaid },
+      "Amount mismatch"
+    );
+  }
+
+  // Mark processing
+  await fastify.db
+    .update(depositIntents)
+    .set({ status: "processing", updatedAt: new Date() })
+    .where(eq(depositIntents.id, deposit.id));
+
+  try {
+    // Update balance
+    const [existingBalance] = await fastify.db
+      .select()
+      .from(balances)
+      .where(
+        and(
+          eq(balances.userId, deposit.userId),
+          eq(balances.tokenSymbol, deposit.tokenSymbol)
+        )
+      );
+
+    if (existingBalance) {
+      const newBalance = (
+        Number(existingBalance.balance) + Number(deposit.amountToken)
+      ).toString();
+      await fastify.db
+        .update(balances)
+        .set({ balance: newBalance, updatedAt: new Date() })
+        .where(eq(balances.id, existingBalance.id));
+    } else {
+      await fastify.db.insert(balances).values({
+        id: randomUUID(),
+        userId: deposit.userId,
+        tokenSymbol: deposit.tokenSymbol,
+        balance: deposit.amountToken,
+        updatedAt: new Date(),
+      });
+    }
+
+    // Insert into transactions ledger
+    await fastify.db.insert(transactions).values({
+      id: randomUUID(),
+      userId: deposit.userId,
+      type: "deposit",
+      subtype: "fiat",
+      tokenSymbol: deposit.tokenSymbol,
+      amountToken: deposit.amountToken,
+      amountFiat: deposit.amountFiat,
+      status: "completed",
+      reference: transactionReference ?? paymentReference,
+      txHash: null,
+      metadata: JSON.stringify({ monnify: eventData }),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    // Mark deposit intent completed
+    await fastify.db
+      .update(depositIntents)
+      .set({ status: "completed", updatedAt: new Date() })
+      .where(eq(depositIntents.id, deposit.id));
+
+    return { success: true };
+  } catch (err: any) {
+    await fastify.db
+      .update(depositIntents)
+      .set({ status: "failed", updatedAt: new Date() })
+      .where(eq(depositIntents.id, deposit.id));
+
+    fastify.log.error(err, "Error processing Monnify webhook");
+    throw new Error("processing error");
   }
 }
