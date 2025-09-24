@@ -7,6 +7,7 @@ export const redis = new Redis({
   password: env.REDIS_PASSWORD || undefined,
   db: env.REDIS_DB,
   lazyConnect: true,
+  maxRetriesPerRequest: null,
 });
 
 // Redis connection event handlers
