@@ -20,7 +20,7 @@ export const buildApp = async () => {
   fastify.setValidatorCompiler(validatorCompiler);
   fastify.setSerializerCompiler(serializerCompiler);
 
-  // ✅ Add raw body parser for JSON
+  // Add raw body parser for JSON
   fastify.addContentTypeParser(
     "application/json",
     { parseAs: "string" },
