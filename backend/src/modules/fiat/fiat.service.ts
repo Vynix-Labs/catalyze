@@ -3,9 +3,7 @@ import { eq, and } from "drizzle-orm";
 import { depositIntents, balances, transactions } from "../../db/schema";
 import env from "../../config/env";
 import { Buffer } from "buffer";
-import { InitiateFiatDepositInput } from "./fiat.schema";
-import crypto from "crypto";
-
+import type { InitiateFiatDepositInput } from "./fiat.schema";
 
 const { MONNIFY_BASE_URL, MONNIFY_API_KEY, MONNIFY_SECRET_KEY, MONNIFY_CONTRACT_CODE } = env;
 
@@ -154,7 +152,7 @@ export class MonnifyClient {
  */
 export async function handleMonnifyWebhook(fastify: any, request: any) {
   const rawBodyStr: string =
-    (request as any).rawBody?.toString("utf8") ??
+    request.rawBody?.toString("utf8") ??
     (typeof request.body === "string" ? request.body : JSON.stringify(request.body));
 
   fastify.log.info({ rawBodyStr }, "Raw body used for signature");
@@ -272,7 +270,7 @@ export async function handleMonnifyWebhook(fastify: any, request: any) {
       .where(eq(depositIntents.id, deposit.id));
 
     return { success: true };
-  } catch (err: any) {
+  } catch (err) {
     await fastify.db
       .update(depositIntents)
       .set({ status: "failed", updatedAt: new Date() })
