@@ -29,6 +29,12 @@ const envSchema = z.object({
   CHIPI_ENCRYPT_KEY: z.string().min(1),
   STARKNET_RPC_URL: z.string().url().optional().default("https://starknet-mainnet.public.blastapi.io"),
 
+  // Redis Configuration
+  REDIS_HOST: z.string().optional().default("localhost"),
+  REDIS_PORT: z.coerce.number().optional().default(6379),
+  REDIS_PASSWORD: z.string().optional(),
+  REDIS_DB: z.coerce.number().optional().default(0),
+
 });
 
 export type env = z.infer<typeof envSchema>;

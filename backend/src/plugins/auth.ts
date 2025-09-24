@@ -8,6 +8,7 @@ import { sendOtp } from "../utils/email/otp";
 import fp from "fastify-plugin";
 import env from "../config/env";
 import { sendEmail } from "../utils/email/resend";
+import { RedisSecondaryStorage } from "./redisSecondaryStorage";
 
 export const auth = betterAuth({
   secret: env.JWT_SECRET!,
@@ -26,6 +27,8 @@ export const auth = betterAuth({
       },
     },
   },
+
+  secondaryStorage: new RedisSecondaryStorage(),
 
   emailAndPassword: {
     enabled: true,

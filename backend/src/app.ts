@@ -3,6 +3,8 @@ import swaggerUi from '@fastify/swagger-ui';
 import Fastify from "fastify";
 import dbPlugin from "./plugins/db";
 import authPlugin from "./plugins/auth";
+import redisPlugin from "./plugins/redis";
+import queuePlugin from "./plugins/queue";
 import betterAuthHandler from "./plugins/betterAuthHandler";
 import routes from "./routes";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
@@ -74,6 +76,8 @@ export const buildApp = async () => {
 
   // Register plugins
   await fastify.register(dbPlugin);
+  await fastify.register(redisPlugin);
+  await fastify.register(queuePlugin);
   await fastify.register(authPlugin);
 
   fastify.get("/api/debug-auth", async () => {
