@@ -1,3 +1,5 @@
+import { currencyIcons } from "../utils";
+
 export interface Asset {
   id: string;
   symbol: string;
@@ -16,12 +18,6 @@ interface AssetsProps {
   selectedAsset?: Asset | null; // Track selected asset
 }
 
-// Currency icon mapping - using proper image paths
-const currencyIcons = {
-  USDT: "/images/usdt.png",
-  USDC: "/images/usdc.png",
-  STRK: "/images/strk.png",
-};
 
 // Fallback component for unknown currencies
 const FallbackIcon = ({ symbol }: { symbol: string }) => (
