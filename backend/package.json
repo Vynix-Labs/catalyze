@@ -11,8 +11,8 @@
   },
   "scripts": {
     "dev": "bun run index.ts",
-    "build": "bun build --minify --target=bun --sourcemap index.ts --outdir=dist",
-    "start": "bun run dist/index.js",
+    "build": "tsc",
+    "start": "bun run index.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
