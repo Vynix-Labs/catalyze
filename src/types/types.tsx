@@ -14,6 +14,7 @@ export interface buttonProps {
   text?: string;
   handleClick?: () => void;
   disabled?: boolean; // <-- add type here
+  fullWidth?: boolean; // Add this prop
 }
 
 export interface AuthHeaderProps {

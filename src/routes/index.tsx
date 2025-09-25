@@ -20,6 +20,7 @@ import Layout from "../layout";
 import UpdatePassword from "../pages/settings/updatePassword";
 import PersonalInfo from "../pages/settings/personalInfo";
 import SetPin from "../pages/settings/setPin";
+import EnterAmountPage from "../pages/more/enterAmount";
 
 export const routes = createBrowserRouter([
   {
@@ -39,15 +40,15 @@ export const routes = createBrowserRouter([
       { path: RoutePath.INVESTMENT, element: <InvestmentPage /> },
       { path: RoutePath.REWARD, element: <RewardPage /> },
       { path: RoutePath.STAKING, element: <StakingPage /> },
+      { path: RoutePath.ENTERAMOUNT, element: <EnterAmountPage /> },
       { path: RoutePath.TRANSFER, element: <CryptoTransferFlow /> },
       { path: RoutePath.SETTINGS, element: <Settings /> },
     ],
   },
 
-
   // Nested route under settings
   { path: RoutePath.PERSONAL_INFO, element: <PersonalInfo /> },
-  
+
   {
     path: RoutePath.TRANSACTION_PIN,
     element: <SetPin />,
