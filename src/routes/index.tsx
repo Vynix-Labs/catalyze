@@ -20,7 +20,7 @@ import Layout from "../layout";
 import UpdatePassword from "../pages/settings/updatePassword";
 import PersonalInfo from "../pages/settings/personalInfo";
 import SetPin from "../pages/settings/setPin";
-import EnterAmountPage from "../pages/more/enterAmount";
+import EnterAmountPageWrapper from "../components/EnterAmountPageWrapper";
 
 export const routes = createBrowserRouter([
   {
@@ -40,7 +40,10 @@ export const routes = createBrowserRouter([
       { path: RoutePath.INVESTMENT, element: <InvestmentPage /> },
       { path: RoutePath.REWARD, element: <RewardPage /> },
       { path: RoutePath.STAKING, element: <StakingPage /> },
-      { path: RoutePath.ENTERAMOUNT, element: <EnterAmountPage /> },
+      {
+        path: RoutePath.ENTERAMOUNTPAGE,
+        element: <EnterAmountPageWrapper />, // Use the wrapper instead of direct component
+      },
       { path: RoutePath.TRANSFER, element: <CryptoTransferFlow /> },
       { path: RoutePath.SETTINGS, element: <Settings /> },
     ],

@@ -3,14 +3,16 @@ import { ArrowLeft } from "lucide-react";
 import Button from "../../common/ui/button";
 import { SuccessIcon } from "../../assets/svg";
 
-// Constants
-const CONSTANTS = {
-  AVAILABLE_BALANCE: 5000,
-  APY: 8,
-  MIN_STAKE: 1,
-  LOCK_PERIOD: "7 days",
-  NEXT_REWARD: "24 hrs",
-} as const;
+interface EnterAmountPageProps {
+  pool: {
+    id: number;
+    name: string;
+    fullName: string;
+    apy: number;
+    lockPeriod: string;
+  };
+  onBack: () => void;
+}
 
 // Reusable Components
 const Header = ({ title, onBack }: { title: string; onBack: () => void }) => (
@@ -23,40 +25,67 @@ const Header = ({ title, onBack }: { title: string; onBack: () => void }) => (
   </div>
 );
 
-const CurrencyInfo = () => (
-  <div className="flex items-center justify-between mb-6">
-    <div className="flex items-center space-x-3">
-      <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-        <span className="text-white font-bold text-sm">$</span>
+const CurrencyInfo = ({ pool }: { pool: EnterAmountPageProps["pool"] }) => {
+  const currencyIcons = {
+    USDT: "/images/usdt.png",
+    USDC: "/images/usdc.png",
+    STRK: "/images/strk.png",
+    UNKNOWN: "/images/default-currency.png",
+  };
+
+  const CurrencyIcon = ({ currencyType }: { currencyType: string }) => {
+    const iconPath = currencyIcons[currencyType as keyof typeof currencyIcons];
+
+    return (
+      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+        {iconPath ? (
+          <img
+            src={iconPath}
+            alt={`${currencyType} logo`}
+            className="w-8 h-8 object-contain"
+          />
+        ) : (
+          <span className="text-white font-bold text-sm">$</span>
+        )}
       </div>
-      <div>
-        <h2 className="font-semibold text-lg">USDC</h2>
-        <p className="text-sm text-gray-500">
-          Available: {CONSTANTS.AVAILABLE_BALANCE} USDC
-        </p>
+    );
+  };
+
+  return (
+    <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center space-x-3">
+        <CurrencyIcon currencyType={pool.name} />
+        <div>
+          <h2 className="font-semibold text-lg">{pool.name}</h2>
+          <p className="text-sm text-gray-500">{pool.fullName}</p>
+        </div>
+      </div>
+      <div className="text-right">
+        <span className="text-green-500 font-black text-sm">
+          {pool.apy}% APY
+        </span>
       </div>
     </div>
-    <div className="text-right">
-      <span className="text-green-500 font-black text-sm">
-        {CONSTANTS.APY}% APY
-      </span>
-    </div>
-  </div>
-);
+  );
+};
 
 const AmountInput = ({
   amount,
   onChange,
+  pool,
 }: {
   amount: string;
   onChange: (value: string) => void;
+  pool: EnterAmountPageProps["pool"];
 }) => {
+  const AVAILABLE_BALANCE = 5000;
+  const MIN_STAKE = 1;
+
   const handleAmountChange = (value: string) => {
     const numValue = parseFloat(value);
     if (
       value === "" ||
-      (numValue >= CONSTANTS.MIN_STAKE &&
-        numValue <= CONSTANTS.AVAILABLE_BALANCE)
+      (numValue >= MIN_STAKE && numValue <= AVAILABLE_BALANCE)
     ) {
       onChange(value);
     }
@@ -72,22 +101,30 @@ const AmountInput = ({
         onChange={(e) => handleAmountChange(e.target.value)}
         placeholder="0.00"
         className="w-full p-3 font-semibold border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        min={CONSTANTS.MIN_STAKE}
-        max={CONSTANTS.AVAILABLE_BALANCE}
+        min={MIN_STAKE}
+        max={AVAILABLE_BALANCE}
         step="0.01"
       />
       <div className="flex justify-between items-center mt-2 text-sm text-gray-500">
-        <span>Min: {CONSTANTS.MIN_STAKE} USDT</span>
+        <span>
+          Min: {MIN_STAKE} {pool.name}
+        </span>
         <span>Max: 100% of your balance</span>
       </div>
     </div>
   );
 };
 
-const RewardsPreview = ({ amount }: { amount: string }) => {
+const RewardsPreview = ({
+  amount,
+  pool,
+}: {
+  amount: string;
+  pool: EnterAmountPageProps["pool"];
+}) => {
   const calculateMonthlyRewards = (stakeAmount: string) => {
     if (!stakeAmount) return "0.00";
-    return ((parseFloat(stakeAmount) * CONSTANTS.APY) / 100 / 12).toFixed(2);
+    return ((parseFloat(stakeAmount) * pool.apy) / 100 / 12).toFixed(2);
   };
 
   const monthlyRewards = calculateMonthlyRewards(amount);
@@ -116,19 +153,25 @@ const LoadingSpinner = () => (
   </div>
 );
 
-const StakeDetails = ({ amount }: { amount: string }) => (
+const StakeDetails = ({
+  amount,
+  pool,
+}: {
+  amount: string;
+  pool: EnterAmountPageProps["pool"];
+}) => (
   <div className="bg-white rounded-lg p-6 text-left">
     <h3 className="font-semibold text-lg">Stake Details</h3>
     <div className="space-y-4 mt-4">
       {[
-        { label: "Staked", value: `${amount} USDT` },
+        { label: "Staked", value: `${amount} ${pool.name}` },
         {
           label: "APY",
-          value: `${CONSTANTS.APY}%`,
+          value: `${pool.apy}%`,
           className: "text-green-500",
         },
-        { label: "Lock Period", value: CONSTANTS.LOCK_PERIOD },
-        { label: "Next Reward", value: CONSTANTS.NEXT_REWARD },
+        { label: "Lock Period", value: pool.lockPeriod },
+        { label: "Next Reward", value: "24 hrs" },
       ].map((item, index) => (
         <div key={index} className="flex justify-between items-center py-2">
           <span className="text-gray-600 text-xs">{item.label}</span>
@@ -142,10 +185,12 @@ const StakeDetails = ({ amount }: { amount: string }) => (
 );
 
 // Main Component
-const EnterAmountPage = () => {
+const EnterAmountPage = ({ pool, onBack }: EnterAmountPageProps) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [amount, setAmount] = useState("");
   const [isConfirming, setIsConfirming] = useState(false);
+
+  const MIN_STAKE = 1;
 
   const handleConfirmStake = () => {
     setIsConfirming(true);
@@ -155,10 +200,18 @@ const EnterAmountPage = () => {
     }, 2000);
   };
 
-  const goBack = () => currentStep > 1 && setCurrentStep(currentStep - 1);
+  const goBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    } else {
+      onBack(); // Go back to pools list when on first step
+    }
+  };
+
   const goHome = () => {
     setCurrentStep(1);
     setAmount("");
+    onBack(); // Return to pools list
   };
 
   // Step 1: Enter Amount
@@ -167,13 +220,13 @@ const EnterAmountPage = () => {
       <div className="max-w-md mx-auto bg-white min-h-screen">
         <Header title="Enter Amount" onBack={goBack} />
         <div className="p-6 w-full">
-          <CurrencyInfo />
-          <AmountInput amount={amount} onChange={setAmount} />
+          <CurrencyInfo pool={pool} />
+          <AmountInput amount={amount} onChange={setAmount} pool={pool} />
           <Button
             fullWidth
             variants="primary"
             handleClick={() => setCurrentStep(2)}
-            disabled={!amount || parseFloat(amount) < CONSTANTS.MIN_STAKE}
+            disabled={!amount || parseFloat(amount) < MIN_STAKE}
           >
             Confirm Stake
           </Button>
@@ -188,9 +241,9 @@ const EnterAmountPage = () => {
       <div className="max-w-md mx-auto bg-white min-h-screen">
         <Header title="Enter Amount" onBack={goBack} />
         <div className="p-6 space-y-4">
-          <CurrencyInfo />
-          <AmountInput amount={amount} onChange={setAmount} />
-          <RewardsPreview amount={amount} />
+          <CurrencyInfo pool={pool} />
+          <AmountInput amount={amount} onChange={setAmount} pool={pool} />
+          <RewardsPreview amount={amount} pool={pool} />
           <Button
             fullWidth
             variants="primary"
@@ -206,7 +259,7 @@ const EnterAmountPage = () => {
 
   // Step 3: Success Screen
   return (
-    <div className="max-w-md mx-auto bg-neutral-50">
+    <div className="max-w-md mx-auto bg-neutral-50 min-h-screen">
       <Header title="Confirm Stake" onBack={goHome} />
       <div className="p-6 text-center space-y-6">
         <div className="space-y-4 py-2">
@@ -224,7 +277,7 @@ const EnterAmountPage = () => {
             </p>
           </div>
         </div>
-        <StakeDetails amount={amount} />
+        <StakeDetails amount={amount} pool={pool} />
         <Button variants="primary" handleClick={goHome} fullWidth>
           Home
         </Button>
