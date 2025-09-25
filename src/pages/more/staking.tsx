@@ -180,7 +180,7 @@ const StakingPage = () => {
               return (
                 <div
                   key={pool.id}
-                  className={`bg-white rounded-xl overflow-hidden border-2 transition-all duration-200 cursor-pointer ${
+                  className={`bg-white rounded-xl overflow-hidden border-2  cursor-pointer ${
                     isHighlighted
                       ? "border-blue-500 shadow-lg"
                       : "border-transparent hover:border-gray-200"
@@ -231,7 +231,7 @@ const StakingPage = () => {
               return (
                 <div
                   key={stake.id}
-                  className="bg-white rounded-lg p-4 space-y-4"
+                  className="bg-white rounded-lg p-4 space-y-4 transition-all duration-700 delay-150 ease-in-out"
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-2">
@@ -283,12 +283,12 @@ const StakingPage = () => {
                   </div>
 
                   <div className="flex gap-2 w-full pt-2">
-                    <button className="px-3 w-full flex items-center justify-center gap-2 py-2 text-sm border border-blue-600 text-blue-600 rounded-full hover:bg-blue-50 transition-colors">
+                    <button className="px-3 w-full flex items-center cursor-pointer justify-center gap-2 py-2 text-sm border border-blue-600 text-blue-600 rounded-full hover:bg-blue-50 transition-colors">
                       <MinusIcon className="w-4 h-4" />
                       <span>Unstake</span>
                     </button>
 
-                    <button className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors">
+                    <button className="w-full flex items-center justify-center cursor-pointer gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors">
                       <MedalIcon className="w-4 h-4" />
                       <span>Claim</span>
                     </button>
