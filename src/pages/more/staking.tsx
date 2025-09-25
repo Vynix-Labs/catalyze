@@ -6,17 +6,8 @@ import {
   MinusIcon,
 } from "../../assets/svg";
 import Button from "../../common/ui/button";
-import { useNavigate } from "react-router-dom";
-import { RoutePath } from "../../routes/routePath";
-
-interface Pool {
-  id: number;
-  name: string;
-  fullName: string;
-  apy: number;
-  lockPeriod: string;
-}
-
+import EnterAmountPage from "./enterAmount";
+import GlobalModal from "../../common/ui/modal/GlobalModal";
 
 // Currency detection function
 const detectCurrencyType = (title: string): string => {
@@ -45,9 +36,11 @@ interface Pool {
 
 const PoolSelectionModal = ({
   pool,
+  isOpen,
   onConfirm,
   onClose,
 }: {
+  isOpen: boolean;
   pool: Pool;
   onConfirm: () => void;
   onClose: () => void;
@@ -79,13 +72,17 @@ const PoolSelectionModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl max-w-md w-full p-6">
-        <h3 className="text-lg font-bold text-gray-800 mb-4">
-          Confirm Pool Selection
-        </h3>
-
-        <div className="flex items-center space-x-3 mb-4 p-3 bg-blue-50 rounded-lg">
+    <GlobalModal
+      onClose={onClose}
+      open={isOpen}
+      setOpen={(open) => !open && onClose()}
+      headingText="Confirm Pool Selection"
+      btnText="Proceed to Stake"
+      onProceed={onConfirm}
+      isProceedDisabled={false}
+    >
+      <div className="bg-white rounded-xl max-w-md w-full pt-4">
+        <div className="flex items-center space-x-3 mb-4 p-3 bg-neutral-100 rounded-lg">
           <CurrencyIcon currencyType={currencyType} />
           <div>
             <h4 className="font-semibold text-gray-800">{pool.name}</h4>
@@ -93,40 +90,39 @@ const PoolSelectionModal = ({
           </div>
         </div>
 
-        <div className="space-y-3 mb-6">
-          <div className="flex justify-between">
+        <div className="space-y-3 text-sm bg-neutral-100 p-3 rounded-lg">
+          <div className="flex justify-between pb-2">
             <span className="text-gray-600">APY</span>
             <span className="font-semibold text-green-500">{pool.apy}%</span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between pb-2">
             <span className="text-gray-600">Lock Period</span>
             <span className="font-semibold">{pool.lockPeriod}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between pb-2">
             <span className="text-gray-600">Minimum Stake</span>
             <span className="font-semibold">1 {pool.name}</span>
           </div>
         </div>
-
-        <div className="flex gap-3">
-          <Button variants="secondary" handleClick={onClose} classes="flex-1">
-            Cancel
-          </Button>
-          <Button variants="primary" handleClick={onConfirm} classes="flex-1">
-            Proceed to Stake
-          </Button>
-        </div>
       </div>
-    </div>
+    </GlobalModal>
   );
 };
 
 const StakingPage = () => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"pools" | "stakes">("pools");
   const [hasStakes] = useState(true);
-  const [selectedPool, setSelectedPool] = useState<Pool>();
+  interface Pool {
+    id: number;
+    name: string;
+    fullName: string;
+    apy: number;
+    lockPeriod: string;
+  }
+
+  const [selectedPool, setSelectedPool] = useState<Pool | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showAmountPage, setShowAmountPage] = useState(false);
   const [highlightedPool, setHighlightedPool] = useState<number | null>(null);
 
   // Sample staking pools data
@@ -222,59 +218,38 @@ const StakingPage = () => {
   };
 
   // Handle pool selection with highlight effect
-  // const handlePoolClick = (pool: Pool) => {
-  //   setHighlightedPool(pool.id);
-  //   setSelectedPool(pool);
-  //   setShowModal(true);
-  // };
-
-  // // Handle modal confirmation
-  // const handleModalConfirm = () => {
-  //   setShowModal(false);
-  //   setShowAmountPage(true);
-  // };
-
-  // // Handle modal close
-  // const handleModalClose = () => {
-  //   setShowModal(false);
-  //   setHighlightedPool(null);
-  //   setSelectedPool(null);
-  // };
-
-  // Handle pool selection with highlight effect
   const handlePoolClick = (pool: Pool) => {
     setHighlightedPool(pool.id);
     setSelectedPool(pool);
     setShowModal(true);
   };
 
-  // Handle modal confirmation - NAVIGATE TO ENTER AMOUNT PAGE
+  // Handle modal confirmation
   const handleModalConfirm = () => {
     setShowModal(false);
-    // Navigate to enter amount page with pool data
-    navigate(RoutePath.ENTERAMOUNTPAGE, { state: { pool: selectedPool } });
+    setShowAmountPage(true);
   };
 
   // Handle modal close
   const handleModalClose = () => {
     setShowModal(false);
     setHighlightedPool(null);
-    setSelectedPool(undefined);
+    setSelectedPool(null);
   };
 
-  // // Handle back from amount page
-  // const handleBackFromAmountPage = () => {
-  //   setShowAmountPage(false);
-  //   setSelectedPool(null);
-  //   setHighlightedPool(null);
-  // };
+  // Handle back from amount page
+  const handleBackFromAmountPage = () => {
+    setShowAmountPage(false);
+    setSelectedPool(null);
+    setHighlightedPool(null);
+  };
 
-  // // If amount page should be shown, render it
-  // if (showAmountPage && selectedPool) {
-  //   return (
-  //     <EnterAmountPage pool={selectedPool} onBack={handleBackFromAmountPage} />
-  //   );
-  // }
+  // If amount page should be shown, render it
+  if (showAmountPage && selectedPool) {
+    return (
+      <EnterAmountPage pool={selectedPool} onBack={handleBackFromAmountPage} />
+    );
+  }
 
   return (
     <>
@@ -484,6 +459,7 @@ const StakingPage = () => {
       {/* Pool Selection Modal */}
       {showModal && selectedPool && (
         <PoolSelectionModal
+          isOpen={true}
           pool={selectedPool}
           onConfirm={handleModalConfirm}
           onClose={handleModalClose}
