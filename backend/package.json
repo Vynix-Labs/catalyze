@@ -6,12 +6,13 @@
   "devDependencies": {
     "@types/argon2": "^0.15.4",
     "@types/bun": "latest",
+    "tsc-alias": "^1.8.16",
     "@types/nodemailer": "^7.0.1"
   },
   "scripts": {
     "dev": "bun run index.ts",
     "build": "tsc",
-    "start": "node dist/app.js",
+    "start": "bun run index.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
