@@ -7,6 +7,13 @@ export interface CurrencyDetailPageProps {
   transactions?: Transaction[];
   onBack?: () => void;
 }
+
+export const detectCurrencyType = (title: string): string => {
+  if (title.includes("USDT")) return "USDT";
+  if (title.includes("USDC")) return "USDC";
+  if (title.includes("STRK")) return "STRK";
+  return "UNKNOWN";
+};
 export interface buttonProps {
   variants: "primary" | "secondary";
   classes?: string;

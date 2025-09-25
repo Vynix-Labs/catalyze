@@ -41,7 +41,7 @@ const Assets: React.FC<AssetsProps> = ({
   const displayAssets = assets.slice(0, maxDisplayItems);
 
   return (
-    <div className="mb-6 rounded-lg bg-white p-3">
+    <div className=" rounded-lg bg-white pt-4">
       <div className="space-y-4">
         {displayAssets.map((asset) => {
           const iconPath =
