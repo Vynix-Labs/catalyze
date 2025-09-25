@@ -30,6 +30,7 @@ const envSchema = z.object({
   STARKNET_RPC_URL: z.string().url().optional().default("https://starknet-mainnet.public.blastapi.io"),
 
   // Redis Configuration
+  REDIS_URL: z.string().optional(),
   REDIS_HOST: z.string().optional().default("localhost"),
   REDIS_PORT: z.coerce.number().optional().default(6379),
   REDIS_PASSWORD: z.string().optional(),
