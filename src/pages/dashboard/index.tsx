@@ -262,9 +262,9 @@ const Home: React.FC = () => {
                       Total Balance
                     </p>
 
-                    <div className="flex items-center mt-2">
-                      <p className="text-4xl font-bold min-w-[125px]">
-                        {isBalanceVisible ? "₦40,000" : "*******"}
+                    <div className="flex items-center mt-2 justify-center">
+                      <p className="text-4xl font-bold min-w-36 max-w-36 truncate ">
+                        {isBalanceVisible ? "₦40,0000000000000" : "*********"}
                       </p>
                       <button
                         onClick={toggleBalanceVisibility}
