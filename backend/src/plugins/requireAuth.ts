@@ -25,6 +25,5 @@ declare module "fastify" {
   interface FastifyRequest {
     currentUserId?: string;
     currentUser?: User;
-    rawBody?: string | Buffer<ArrayBufferLike>;
   }
 }

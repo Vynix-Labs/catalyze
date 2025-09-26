@@ -4,11 +4,10 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "./db"
 import * as schema from "../db/schema"
 import { emailOTP, openAPI, jwt } from 'better-auth/plugins';
-// import { sendOtp } from "../utils/email/otp";
+import { sendOtp } from "../utils/email/otp";
 import fp from "fastify-plugin";
 import env from "../config/env";
 import { sendEmail } from "../utils/email/resend";
-import { RedisSecondaryStorage } from "./redisSecondaryStorage";
 
 export const auth = betterAuth({
   secret: env.JWT_SECRET!,
@@ -19,12 +18,6 @@ export const auth = betterAuth({
 
   user: {
     additionalFields: {
-      name: {
-        type: "string",
-        required: false,
-        input: true,
-      },
-      
       role: {
         type: "string",
         required: false,
@@ -33,8 +26,6 @@ export const auth = betterAuth({
       },
     },
   },
-
-  secondaryStorage: new RedisSecondaryStorage(),
 
   emailAndPassword: {
     enabled: true,
@@ -74,12 +65,7 @@ export const auth = betterAuth({
   },
 
   basePath: "/api/auth",
-  trustedOrigins: [
-    "http://localhost:3000",
-    `${env.APP_URL}`,
-    "http://localhost:5173",
-    "http://localhost:5174",
-  ],
+  trustedOrigins: ["http://localhost:3000", `${env.APP_URL}`],
 
   advanced: {
     cookies: {
@@ -113,18 +99,7 @@ export const auth = betterAuth({
       overrideDefaultEmailVerification: true,
       async sendVerificationOTP({ email, otp }) {
         console.log('Sending verification OTP to', email, otp);
-        // await sendOtp(email, otp);
-        await sendEmail(email, "Verification OTP", `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2>Verification OTP</h2>
-            <p>Hi ${email},</p>
-            <p>Your verification OTP is: ${otp}</p>
-            <p>This OTP will expire in 1 hour.</p>
-            <p>If you didn't request a verification OTP, you can safely ignore this email.</p>
-            <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
-            <p style="color: #666; font-size: 12px;">
-              This email was sent from Catalyze. Please do not reply to this email.
-            </p>
-          </div>`);
+        await sendOtp(email, otp);
       },
     }),
   ],

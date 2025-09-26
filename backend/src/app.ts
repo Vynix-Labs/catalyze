@@ -1,11 +1,8 @@
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
-import cors from '@fastify/cors';
 import Fastify from "fastify";
 import dbPlugin from "./plugins/db";
 import authPlugin from "./plugins/auth";
-import redisPlugin from "./plugins/redis";
-import queuePlugin from "./plugins/queue";
 import betterAuthHandler from "./plugins/betterAuthHandler";
 import routes from "./routes";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
@@ -17,32 +14,9 @@ import {
 export const buildApp = async () => {
   const fastify = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 
-  // Register CORS
-  await fastify.register(cors, {
-    origin: true, // Allow all origins in development
-    credentials: true, // Allow credentials (cookies, authorization headers)
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-  });
-
   // Hook in Zod validator & serializer
   fastify.setValidatorCompiler(validatorCompiler);
   fastify.setSerializerCompiler(serializerCompiler);
-
-  // Add raw body parser for JSON
-  fastify.addContentTypeParser(
-    "application/json",
-    { parseAs: "string" },
-    function (req, body, done) {
-      try {
-        const json = JSON.parse(body as string);
-        req.rawBody = body; // attach raw JSON string
-        done(null, json);
-      } catch (err) {
-        done(err as Error, undefined);
-      }
-    }
-  );
 
   // Register Swagger plugins
   await fastify.register(swagger, {
@@ -92,6 +66,7 @@ export const buildApp = async () => {
       deepLinking: false,
       persistAuthorization: true,
       displayRequestDuration: true,
+      layout: 'modern',
     },
     staticCSP: "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'; connect-src 'self'; font-src 'self' data:",
     transformStaticCSP: (header) => header
@@ -99,8 +74,6 @@ export const buildApp = async () => {
 
   // Register plugins
   await fastify.register(dbPlugin);
-  await fastify.register(redisPlugin);
-  await fastify.register(queuePlugin);
   await fastify.register(authPlugin);
 
   fastify.get("/api/debug-auth", async () => {
@@ -108,6 +81,7 @@ export const buildApp = async () => {
     const sessionFunc = hasAuth && typeof fastify.auth?.api?.getSession === "function";
     return { hasAuth, sessionFunc };
   });
+
 
   // Register Better Auth handler
   await fastify.register(betterAuthHandler, { prefix: '/api' });

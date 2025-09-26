@@ -3,9 +3,9 @@ export const RoutePath = {
 
   // app routes (children of Layout)
   DASHBOARD: "/dashboard",
-  INVESTMENT: "/dashboard/investment",
-  REWARD: "/dashboard/reward",
-  MORE: "/dashboard/more",
+  INVESTMENT: "investment",
+  REWARD: "reward",
+  MORE: "more",
 
   // nested
   TRANSFER: "/dashboard/transfer",

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { HomeIcon, MoreIcon, RewardsIcon, InvestmentIcon } from "../assets/svg";
 import { RoutePath } from "../routes/routePath";
 
@@ -8,6 +8,8 @@ interface BottomNavProps {
 }
 
 const BottomNav: React.FC<BottomNavProps> = ({ activeTab = "home" }) => {
+  const navigate = useNavigate();
+
   const navItems = [
     {
       id: "home",
@@ -54,6 +56,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab = "home" }) => {
                 className={`flex flex-col items-center justify-center w-16 ${
                   activeTab === item.id ? "text-primary-100" : "text-gray-400"
                 }`}
+                onClick={() => navigate(item.path)}
               >
                 <div
                   className={`w-8 h-8 flex items-center justify-center ${

@@ -69,7 +69,6 @@ export const user = createTable("user", {
   role: text("role").default("user"),
   email: varchar("email", { length: 255 }).notNull().unique(),
   emailVerified: boolean("email_verified").notNull().default(false),
-  name: varchar("name", { length: 255 }),
   phone: varchar("phone", { length: 20 }),
   betterAuthId: varchar("better_auth_id", { length: 255 }),
   walletAddress: varchar("wallet_address", { length: 255 }),

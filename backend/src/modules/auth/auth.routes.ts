@@ -43,7 +43,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const userId = request.currentUserId!;
+        const userId = request.currentUserId as string;
         const { pin } = setPinSchema.parse(request.body);
         await setUserPin(fastify, userId, pin);
         return reply.code(201).send({ success: true, message: "PIN set successfully" });
