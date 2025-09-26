@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { user } from "../../db/schema";
 import { hashPin, verifyPinHash } from "../../utils/hash";
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 
 export async function setUserPin(fastify: FastifyInstance, userId: string, pin: string) {
   const { hash, salt } = await hashPin(pin);
@@ -42,7 +42,7 @@ export async function verifyUserPin(
   }
 
   // Verify PIN
-  const isValid = await verifyPinHash(pin, existing.pinHash, existing.pinSalt);
+  const isValid = await verifyPinHash(pin, existing.pinHash, existing.pinSalt!);
 
   if (!isValid) {
     // Increment failed attempts and  lock

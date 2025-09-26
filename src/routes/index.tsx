@@ -27,12 +27,13 @@ export const routes = createBrowserRouter([
     errorElement: <NotFound />,
     index: true,
   },
+
   {
     path: "/dashboard",
     element: <Layout />,
     errorElement: <NotFound />,
     children: [
-      { path: RoutePath.DASHBOARD, element: <Home />, index: true },
+      { index: true, element: <Home /> }, // index route
       { path: RoutePath.MORE, element: <MorePage /> },
       { path: RoutePath.INVESTMENT, element: <InvestmentPage /> },
       { path: RoutePath.REWARD, element: <RewardPage /> },
@@ -47,6 +48,7 @@ export const routes = createBrowserRouter([
     path: RoutePath.TRANSACTION_PIN,
     element: <SetPin />,
   },
+
   { path: RoutePath.UPDATE_PASSWORD, element: <UpdatePassword /> },
 
   {

@@ -66,6 +66,7 @@ export const withdrawStatusEnum = pgEnum('withdraw_status', [
 // ----------------- USERS -----------------
 export const user = createTable("user", {
   id: text('id').primaryKey(),
+  role: text("role").default("user"),
   email: varchar("email", { length: 255 }).notNull().unique(),
   emailVerified: boolean("email_verified").notNull().default(false),
   phone: varchar("phone", { length: 20 }),
@@ -75,6 +76,15 @@ export const user = createTable("user", {
   pinSalt: varchar("pin_salt", { length: 255 }),
   pinFailedAttempts: integer("pin_failed_attempts").default(0),
   pinLockedUntil: timestamp("pin_locked_until", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+export const wallet = createTable("wallet", {
+  id: text('id').primaryKey(),
+  userId: text('user_id').references(() => user.id).notNull(),
+  walletAddress: varchar("wallet_address", { length: 255 }).notNull(),
+  
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
@@ -240,4 +250,11 @@ export const priceFeeds = createTable('price_feeds', {
   priceNgn: decimal('price_ngn', { precision: 38, scale: 2 }).notNull(),
   source: varchar('source', { length: 255 }),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+});
+
+export const jwks = createTable("jwks", {
+  id: text("id").primaryKey(),
+  publicKey: text("public_key").notNull(),
+  privateKey: text("private_key").notNull(),
+  createdAt: timestamp("created_at").notNull(),
 });
