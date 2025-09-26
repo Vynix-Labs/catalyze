@@ -16,8 +16,8 @@ import StakingPage from "../pages/more/staking";
 import CryptoTransferFlow from "../pages/dashboard/CryptoTransferFlow";
 import Settings from "../pages/settings/settings";
 import Layout from "../layout";
-import PersonalInfo from "../pages/settings/PersonalInfo";
-import SetPin from "../pages/settings/SetPin";
+import PersonalInfo from "../pages/settings/personalInfo";
+import SetPin from "../pages/settings/setPin";
 import UpdatePassword from "../pages/settings/updatePassword";
 
 export const routes = createBrowserRouter([
