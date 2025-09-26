@@ -150,7 +150,7 @@ const RewardsPreview = ({
 //   <div className="flex items-center flex-row-reverse justify-center space-x-4">
 //     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
 //     <span className="pr-2">Confirming...</span>
-//   </div>
+//   </div>?continue=https%3A%2F%2Fapply.ycombinator.com%2F
 // );
 
 const StakeDetails = ({
