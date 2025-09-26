@@ -1,5 +1,6 @@
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
+import cors from '@fastify/cors';
 import Fastify from "fastify";
 import dbPlugin from "./plugins/db";
 import authPlugin from "./plugins/auth";
@@ -16,6 +17,14 @@ import {
 export const buildApp = async () => {
   const fastify = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 
+  // Register CORS
+  await fastify.register(cors, {
+    origin: true, // Allow all origins in development
+    credentials: true, // Allow credentials (cookies, authorization headers)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  });
+
   // Hook in Zod validator & serializer
   fastify.setValidatorCompiler(validatorCompiler);
   fastify.setSerializerCompiler(serializerCompiler);
@@ -27,7 +36,7 @@ export const buildApp = async () => {
     function (req, body, done) {
       try {
         const json = JSON.parse(body as string);
-        (req as any).rawBody = body; // attach raw JSON string
+        req.rawBody = body; // attach raw JSON string
         done(null, json);
       } catch (err) {
         done(err as Error, undefined);
