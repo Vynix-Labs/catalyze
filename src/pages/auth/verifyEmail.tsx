@@ -6,6 +6,8 @@ import Button from "../../common/ui/button";
 import AuthHeader from "../../components/auth/header";
 import { authClient } from "../../lib/auth-client";
 import { RoutePath } from "../../routes/routePath";
+import { useAtom } from "jotai";
+import { otpAtom } from "../../store/jotai";
 
 function VerifyEmail() {
   const [otp, setOtp] = useState("");
@@ -13,6 +15,7 @@ function VerifyEmail() {
   const { email } = useParams<{ email: string }>();
   const otpInputRef = useRef<OtpInputRef>(null);
   const canSubmit = otp.length === 6;
+  const [, setOtpAtom] = useAtom(otpAtom);
 
   const handleProceed = () => {
     if (!canSubmit) return;
@@ -25,6 +28,7 @@ function VerifyEmail() {
       {
         onSuccess: () => {
           toast.success("Email verified successfully");
+          setOtpAtom(otp);
           navigate(
             RoutePath.CREATE_PASSWORD.replace(
               ":email",

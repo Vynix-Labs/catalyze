@@ -31,7 +31,7 @@ function SignUp() {
     }
 
     const payload = {
-      // name: data.email.split("@")[0],
+      name: data.email.split("@")[0],
       email: data.email,
       password: data.password,
     };

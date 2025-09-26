@@ -1,5 +1,4 @@
 import { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Button from "../../common/ui/button";
 import AuthHeader from "../../components/auth/header";
 import TransactionPinForm from "../../components/auth/signup/TransactionPinForm";
@@ -11,7 +10,6 @@ interface TransactionPinFormData {
 
 function CreatePin() {
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleFormSubmit = async (data: TransactionPinFormData) => {
