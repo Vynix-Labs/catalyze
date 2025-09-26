@@ -146,12 +146,12 @@ const RewardsPreview = ({
   );
 };
 
-const LoadingSpinner = () => (
-  <div className="flex items-center flex-row-reverse justify-center space-x-4">
-    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-    <span className="pr-2">Confirming...</span>
-  </div>
-);
+// const LoadingSpinner = () => (
+//   <div className="flex items-center flex-row-reverse justify-center space-x-4">
+//     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+//     <span className="pr-2">Confirming...</span>
+//   </div>
+// );
 
 const StakeDetails = ({
   amount,
@@ -250,7 +250,7 @@ const EnterAmountPage = ({ pool, onBack }: EnterAmountPageProps) => {
             handleClick={handleConfirmStake}
             disabled={isConfirming}
           >
-            {"Confirm Stake"}
+            "Confirm Stake"
           </Button>
         </div>
       </div>
