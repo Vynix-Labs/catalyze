@@ -195,7 +195,7 @@ export class MonnifyClient {
           userId,
           tokenSymbol,
           amountFiat: amountFiat.toFixed(2),
-          amountToken: amountFiat.toString(), // conversion logic can go here
+          amountToken: amountFiat.toString(), // TODO: conversion logic can go here
           bankName,
           accountNumber,
           status: "pending",
@@ -221,7 +221,7 @@ export class MonnifyClient {
       });
     });
 
-    // 🔹 Call Monnify after DB commit
+    // Call Monnify after DB commit
     const resp = await this.initiateDisbursement({
       amount: amountFiat,
       reference,
@@ -306,10 +306,10 @@ export async function syncTransferStatus(fastify: any, reference: string) {
   }
 
   const body = resp.responseBody;
-  const status = body.status; // e.g. SUCCESS, FAILED, PROCESSING
+  const status = body.status;
   const mappedStatus = mapMonnifyStatus(body.status);
 
-  // 🔹 Transaction block for consistency
+  // Transaction block for consistency
   await fastify.db.transaction(async (tx) => {
     // Update withdraw_requests
     await tx
