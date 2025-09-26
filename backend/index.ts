@@ -4,7 +4,7 @@ const start = async () => {
   const fastify = await buildApp()
 
   try {
-    await fastify.listen({ port: 3000 })
+    await fastify.listen({ port: Number(process.env.PORT) || 3000, host: '0.0.0.0' })
     console.log('Server running at http://localhost:3000')
   } catch (err) {
     fastify.log.error(err)
