@@ -1,10 +1,9 @@
 import { FastifyPluginAsync } from "fastify";
 import { z } from "zod";
 import { requireAuth } from "../../plugins/requireAuth";
-import { initiateFiatDepositSchema, FiatDepositResponse, SuccessResponse, ErrorResponse } from "./fiat.schema";
-import { MonnifyClient, handleMonnifyWebhook } from "./fiat.service";
-
-const monnify = new MonnifyClient();
+import { initiateFiatDepositSchema, FiatDepositResponse, SuccessResponse, ErrorResponse, initiateFiatTransferSchema, FiatTransferResponse, TransferStatusResponse } from "./fiat.schema";
+import { MonnifyClient, handleMonnifyWebhook, syncTransferStatus } from "./fiat.service";
+import { monnify } from "./fiat.service";
 
 const fiatRoutes: FastifyPluginAsync = async (fastify) => {
   // ------------------- INITIATE FIAT DEPOSIT -------------------
@@ -59,6 +58,60 @@ const fiatRoutes: FastifyPluginAsync = async (fastify) => {
       } catch (err: any) {
         fastify.log.error(err);
         return reply.code(400).send(ErrorResponse.parse({ error: err.message }));
+      }
+    }
+  );
+
+  fastify.post(
+    "/transfer/initiate",
+    {
+      preHandler: requireAuth(fastify),
+      schema: {
+        description: "Initiate fiat withdrawal",
+        tags: ["Fiat"],
+        body: initiateFiatTransferSchema,
+        response: {
+          201: FiatTransferResponse,
+          400: ErrorResponse,
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const userId = req.currentUserId as string;
+        const input = initiateFiatTransferSchema.parse(req.body);
+        const result = await monnify.createTransferIntent(fastify, userId, input);
+        return reply.code(201).send(FiatTransferResponse.parse(result));
+      } catch (err: any) {
+        fastify.log.error(err);
+        return reply.code(400).send({ error: err.message });
+      }
+    }
+  );
+
+
+  // ---------------- GET TRANSFER STATUS ----------------
+  fastify.get(
+    "/transfer/:reference/status",
+    {
+      preHandler: requireAuth(fastify),
+      schema: {
+        description: "Get (and refresh) Monnify transfer status",
+        tags: ["Fiat"],
+        params: z.object({ reference: z.string() }),
+        response: {
+          200: TransferStatusResponse,
+          400: ErrorResponse,
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const { reference } = req.params as { reference: string };
+        const result = await syncTransferStatus(fastify, reference);
+        return reply.code(200).send(result);
+      } catch (err: any) {
+        return reply.code(400).send({ error: err.message });
       }
     }
   );
