@@ -250,7 +250,7 @@ const EnterAmountPage = ({ pool, onBack }: EnterAmountPageProps) => {
             handleClick={handleConfirmStake}
             disabled={isConfirming}
           >
-            {isConfirming ? <LoadingSpinner /> : "Confirm Stake"}
+            {"Confirm Stake"}
           </Button>
         </div>
       </div>
