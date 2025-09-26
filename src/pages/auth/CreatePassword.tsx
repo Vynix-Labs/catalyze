@@ -6,6 +6,8 @@ import CreateNewPasswordForm from "../../components/auth/forget-password/CreateN
 import AuthHeader from "../../components/auth/header";
 import { authClient } from "../../lib/auth-client";
 import { RoutePath } from "../../routes/routePath";
+import { useAtom } from "jotai";
+import { otpAtom } from "../../store/jotai";
 
 interface CreateNewPasswordFormData {
   password: string;
@@ -17,18 +19,25 @@ function CreatePassword() {
   const navigate = useNavigate();
   const formRef = useRef<HTMLFormElement>(null);
   const { email } = useParams<{ email: string }>();
+  const [otp, setOtp] = useAtom(otpAtom);
 
   const handleFormSubmit = async (data: CreateNewPasswordFormData) => {
     setIsLoading(true);
     try {
-      await authClient.emailOtp.resetPassword({
-        password: data.password,
-        otp: "693807",
-        email: decodeURIComponent(email || ""),
-      });
-
-      toast.success("Password updated successfully");
-      navigate(RoutePath.SIGNIN);
+      await authClient.emailOtp.resetPassword(
+        {
+          password: data.password,
+          otp: otp,
+          email: decodeURIComponent(email || ""),
+        },
+        {
+          onSuccess: () => {
+            toast.success("Password updated successfully");
+            setOtp("");
+            navigate(RoutePath.SIGNIN);
+          },
+        }
+      );
     } catch (error) {
       console.error("Reset password error:", error);
       toast.error("Failed to update password. Please try again.");
