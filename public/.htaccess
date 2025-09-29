@@ -1,0 +1,59 @@
+# Use index.html as the default
+DirectoryIndex index.html
+
+# --- SPA routing: send non-file/dir requests to index.html ---
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Don't rewrite existing files or directories
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Allow ACME/Let's Encrypt challenges to pass through
+  RewriteRule ^\.well-known/ - [L]
+
+  # Everything else goes to the SPA entry
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# --- Caching ---
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # Long cache for static assets (hashed filenames are safe)
+  ExpiresByType text/css                      "access plus 1 year"
+  ExpiresByType application/javascript        "access plus 1 year"
+  ExpiresByType text/javascript               "access plus 1 year"
+  ExpiresByType image/png                     "access plus 1 year"
+  ExpiresByType image/jpeg                    "access plus 1 year"
+  ExpiresByType image/webp                    "access plus 1 year"
+  ExpiresByType image/svg+xml                 "access plus 1 year"
+  ExpiresByType image/gif                     "access plus 1 year"
+  ExpiresByType image/x-icon                  "access plus 1 year"
+  ExpiresByType font/woff2                    "access plus 1 year"
+
+  # No cache for HTML entry
+  ExpiresByType text/html                     "access plus 0 seconds"
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Strong caching for static assets
+  <FilesMatch "\.(?:js|css|png|jpe?g|webp|gif|svg|ico|woff2)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # No cache for HTML
+  <FilesMatch "\.html?$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+</IfModule>
+
+# Optional: force HTTPS (uncomment if needed)
+# <IfModule mod_rewrite.c>
+#   RewriteCond %{HTTPS} !=on
+#   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>

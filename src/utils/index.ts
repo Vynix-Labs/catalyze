@@ -4,6 +4,7 @@ export const currencyIcons = {
   USDT: "/images/usdt.png",
   USDC: "/images/usdc.png",
   STRK: "/images/strk.png",
+  UNKNOWN: "/images/default-currency.png",
 };
 
 export const getNetworkName = (network: string) => {

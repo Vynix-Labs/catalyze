@@ -1,7 +1,23 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { PinIcon } from "../../assets/svg";
 
-function OtpInput({ onComplete }: { onComplete?: (otp: string) => void }) {
+export interface OtpInputRef {
+  resetCountdown: () => void;
+}
+
+const OtpInput = forwardRef<
+  OtpInputRef,
+  {
+    onComplete?: (otp: string) => void;
+    onResend?: () => void;
+  }
+>(({ onComplete, onResend }, ref) => {
   const otpLength = 6;
   const [otp, setOtp] = useState(Array(otpLength).fill(""));
   const [mask, setMask] = useState(Array(otpLength).fill(false));
@@ -9,21 +25,32 @@ function OtpInput({ onComplete }: { onComplete?: (otp: string) => void }) {
   const [isResendDisabled, setIsResendDisabled] = useState(true);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [touched, setTouched] = useState(false);
+  const timerRef = useRef<number | null>(null);
+
+  const resetCountdown = () => {
+    setCountdown(300);
+    setIsResendDisabled(true);
+    if (timerRef.current) clearInterval(timerRef.current);
+  };
+
+  useImperativeHandle(ref, () => ({ resetCountdown }));
 
   // Resend timer
   useEffect(() => {
-    const resendTimer = setInterval(() => {
+    timerRef.current = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
           setIsResendDisabled(false);
-          clearInterval(resendTimer);
+          if (timerRef.current) clearInterval(timerRef.current);
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
 
-    return () => clearInterval(resendTimer);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
   }, []);
 
   // Handle change of single input
@@ -140,6 +167,7 @@ function OtpInput({ onComplete }: { onComplete?: (otp: string) => void }) {
         <button
           type="button"
           disabled={isResendDisabled}
+          onClick={onResend}
           className="text-sm font-bold transition duration-300 ease-in-out cursor-pointer text-primary-100  hover:text-primary-100/90 disabled:text-gray-200 dark:disabled:text-gray-300"
         >
           Resend code{" "}
@@ -152,6 +180,8 @@ function OtpInput({ onComplete }: { onComplete?: (otp: string) => void }) {
       </div>
     </div>
   );
-}
+});
+
+OtpInput.displayName = "OtpInput";
 
 export default OtpInput;

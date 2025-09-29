@@ -1,5 +1,7 @@
 import type { Transaction } from "../../components/Transactions";
 import { ChevronLeftIcon } from "../../assets/svg";
+import { detectCurrencyType } from "../../types/types";
+import CurrencyIcon from "../../components/CurrencyIcon";
 
 interface TransactionDetailsPageProps {
   transactions: Transaction[];
@@ -7,51 +9,14 @@ interface TransactionDetailsPageProps {
 }
 
 // Currency icon mapping - using proper image paths
-const currencyIcons = {
-  USDT: "/images/usdt.png",
-  USDC: "/images/usdc.png",
-  STRK: "/images/strk.png",
-};
 
-// Fallback component for unknown currencies
-const FallbackIcon = ({ currencyType }: { currencyType: string }) => (
-  <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center">
-    <span className="text-xs font-bold text-white">
-      {currencyType.charAt(0)}
-    </span>
-  </div>
-);
 
-// Currency Icon Component using images
-const CurrencyIcon = ({ currencyType }: { currencyType: string }) => {
-  const iconPath = currencyIcons[currencyType as keyof typeof currencyIcons];
-
-  if (iconPath) {
-    return (
-      <div className=" rounded-full flex items-center justify-center">
-        <img
-          src={iconPath}
-          alt={`${currencyType} logo`}
-          className="object-contain "
-        />
-      </div>
-    );
-  }
-
-  return <FallbackIcon currencyType={currencyType} />;
-};
 
 const TransactionDetailsPage: React.FC<TransactionDetailsPageProps> = ({
   transactions,
   onBack,
 }) => {
-  // Function to detect currency type from title
-  const detectCurrencyType = (title: string): string => {
-    if (title.includes("USDT")) return "USDT";
-    if (title.includes("USDC")) return "USDC";
-    if (title.includes("STRK")) return "STRK";
-    return "UNKNOWN";
-  };
+  
 
   // Group transactions by date
   const groupedTransactions = transactions.reduce((acc, transaction) => {

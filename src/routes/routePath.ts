@@ -3,13 +3,14 @@ export const RoutePath = {
 
   // app routes (children of Layout)
   DASHBOARD: "/dashboard",
-  INVESTMENT: "investment",
-  REWARD: "reward",
-  MORE: "more",
+  INVESTMENT: "/dashboard/investment",
+  REWARD: "/dashboard/reward",
+  MORE: "/dashboard/more",
 
   // nested
   TRANSFER: "/dashboard/transfer",
   STAKING: "/dashboard/more/staking",
+  ENTERAMOUNTPAGE: "/dashboard/more/enter-amount",
   SETTINGS: "/dashboard/more/settings",
 
   // nested under settings
@@ -23,6 +24,6 @@ export const RoutePath = {
   SIGNIN: "/auth/signin",
   RESET_PASSWORD: "/auth/reset-password",
   FORGOT_PASSWORD: "/auth/forgot-password",
-  RESET_OTP: "/auth/reset-otp",
-  CREATE_PASSWORD: "/auth/create-password",
+  RESET_OTP: "/auth/reset-otp/:email",
+  CREATE_PASSWORD: "/auth/create-password/:email",
 };

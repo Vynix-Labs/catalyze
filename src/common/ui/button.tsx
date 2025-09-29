@@ -7,6 +7,7 @@ function Button({
   children,
   handleClick,
   disabled,
+  fullWidth = false, // Add this prop
 }: buttonProps) {
   const btnShape = () => {
     switch (variants) {
@@ -22,7 +23,9 @@ function Button({
   return (
     <button
       onClick={handleClick}
-      className={`${btnShape()} ${classes} gap-2 h-12 max-w-[21.9rem] flex w-full rounded-full items-center justify-center cursor-pointer disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed`}
+      className={`${btnShape()} ${classes} gap-2 h-12 flex ${
+        fullWidth ? "w-full" : "max-w-[21.9rem] w-full"
+      } rounded-full items-center justify-center cursor-pointer disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed`}
       disabled={disabled}
     >
       {children ? children : text}
