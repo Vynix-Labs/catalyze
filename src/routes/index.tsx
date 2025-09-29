@@ -16,9 +16,10 @@ import StakingPage from "../pages/more/staking";
 import CryptoTransferFlow from "../pages/dashboard/CryptoTransferFlow";
 import Settings from "../pages/settings/settings";
 import Layout from "../layout";
-import PersonalInfo from "../pages/settings/PersonalInfo";
-import SetPin from "../pages/settings/SetPin";
+import PersonalInfo from "../pages/settings/personalInfo";
+import SetPin from "../pages/settings/setPin";
 import UpdatePassword from "../pages/settings/updatePassword";
+import EnterAmountPageWrapper from "../components/EnterAmountPageWrapper";
 
 export const routes = createBrowserRouter([
   {
@@ -27,16 +28,21 @@ export const routes = createBrowserRouter([
     errorElement: <NotFound />,
     index: true,
   },
+
   {
     path: "/dashboard",
     element: <Layout />,
     errorElement: <NotFound />,
     children: [
-      { path: RoutePath.DASHBOARD, element: <Home />, index: true },
+      { index: true, element: <Home /> }, // index route
       { path: RoutePath.MORE, element: <MorePage /> },
       { path: RoutePath.INVESTMENT, element: <InvestmentPage /> },
       { path: RoutePath.REWARD, element: <RewardPage /> },
       { path: RoutePath.STAKING, element: <StakingPage /> },
+      {
+        path: RoutePath.ENTERAMOUNTPAGE,
+        element: <EnterAmountPageWrapper />, // Use the wrapper instead of direct component
+      },
       { path: RoutePath.TRANSFER, element: <CryptoTransferFlow /> },
       { path: RoutePath.SETTINGS, element: <Settings /> },
     ],
@@ -47,6 +53,7 @@ export const routes = createBrowserRouter([
     path: RoutePath.TRANSACTION_PIN,
     element: <SetPin />,
   },
+
   { path: RoutePath.UPDATE_PASSWORD, element: <UpdatePassword /> },
 
   {
