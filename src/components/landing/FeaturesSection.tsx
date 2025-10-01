@@ -1,6 +1,6 @@
 import { Check } from "lucide-react";
-import iphone_top from "../../../public/images/iphone 15.png";
-import iphone_bottom from "../../../public/images/iphone_bottom.png";
+import iphone_top from "../../assets/images/iphone 15.png";
+import iphone_bottom from "../../assets/images/iphone_bottom.png";
 import Button from "../../common/ui/button";
 function FeaturesSection() {
   return (

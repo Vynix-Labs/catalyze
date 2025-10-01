@@ -1,9 +1,9 @@
-import bg from "../../../public/images/landing_hero_bg.png";
-import iphone from "../../../public/images/iphone 15.png";
-import solana from "../../../public/images/solana.png";
-import tether from "../../../public/images/tether.png";
-import bitcoin from "../../../public/images/bitcoin.png";
-import ethereum from "../../../public/images/ethereum.png";
+import bg from "../../assets/images/landing_hero_bg.png";
+import iphone from "../../assets/images/iphone 15.png";
+import solana from "../../assets/images/solana.png";
+import tether from "../../assets/images/tether.png";
+import bitcoin from "../../assets/images/bitcoin.png";
+import ethereum from "../../assets/images/ethereum.png";
 import Button from "../../common/ui/button";
 import { motion } from "framer-motion";
 function Hero() {

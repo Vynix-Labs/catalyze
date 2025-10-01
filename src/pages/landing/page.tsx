@@ -8,10 +8,10 @@ function LandingPage() {
   return (
     <div className="manrope bg-white w-screen">
       <Nav />
-      <Hero />
+      {/* <Hero />
       <Impact />
       <Requirement />
-      <FeaturesSection />
+      <FeaturesSection /> */}
     </div>
   );
 }

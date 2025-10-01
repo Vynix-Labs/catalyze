@@ -3,11 +3,13 @@ import { LogoIcon } from "../../assets/svg";
 import Button from "../../common/ui/button";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 
 function Nav() {
   const [showHeader, setShowHeader] = useState(true);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [desktopDropdownOpen, setDesktopDropdownOpen] = useState(false);
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const lastScrollY = useRef(window.scrollY);
   const dropDownRef = useRef<HTMLLIElement | null>(null);
 
@@ -28,79 +30,86 @@ function Nav() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close dropdown when clicking outside
+  // Auto-close dropdown when mobileMenuOpen closes
+  useEffect(() => {
+    if (!mobileMenuOpen) {
+      setMobileDropdownOpen(false);
+    }
+  }, [mobileMenuOpen]);
+
+  // Close desktop dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
         dropDownRef.current &&
         !dropDownRef.current.contains(e.target as Node)
       ) {
-        setDropdownOpen(false);
+        setDesktopDropdownOpen(false);
       }
     };
 
-    if (dropdownOpen) {
+    if (desktopDropdownOpen) {
       window.addEventListener("click", handleClickOutside);
     }
 
     return () => {
       window.removeEventListener("click", handleClickOutside);
     };
-  }, [dropdownOpen]);
+  }, [desktopDropdownOpen]);
 
   return (
     <motion.header
-      className="fixed left-0 w-full z-50 top-11 px-4"
+      className="fixed left-0 w-full z-50 md:top-11 top-2 px-4"
       initial={{ y: 0 }}
       animate={{ y: showHeader ? 0 : "-30vh" }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
     >
-      <nav className="max-w-4xl w-full bg-white p-3 rounded-4xl mx-auto ">
-        <div className="flex items-center w-full">
+      <nav className="max-w-4xl w-full mx-auto">
+        <div className="flex items-center w-full bg-white p-3 rounded-4xl">
           {/* Logo */}
           <div className="flex gap-2 items-center flex-1">
             <LogoIcon />
             <p className="text-2xl font-bold text-black">catalyze</p>
           </div>
 
-          {/* Links & Button */}
-          <div className="flex-1 flex gap-6 items-center justify-between">
+          {/* Desktop Links */}
+          <div className="hidden md:flex flex-1 gap-6 items-center justify-between">
             <ul className="flex gap-6 items-center text-gray-700 text-base font-bold capitalize relative">
               {/* Dropdown */}
               <li className="relative" ref={dropDownRef}>
                 <button
-                  onClick={() => setDropdownOpen((prev) => !prev)}
+                  onClick={() => setDesktopDropdownOpen((prev) => !prev)}
                   className="flex gap-1 items-center"
                 >
                   <span>company</span>
                   <ChevronDown
                     size={16}
                     className={`transition-transform duration-200 ${
-                      dropdownOpen ? "rotate-180" : ""
+                      desktopDropdownOpen ? "rotate-180" : ""
                     }`}
                   />
                 </button>
 
                 <AnimatePresence>
-                  {dropdownOpen && (
+                  {desktopDropdownOpen && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute top-full mt-2 left-0 w-40 bg-white shadow-lg rounded-lg p-2"
+                      className="absolute top-full mt-5 left-0 w-40 bg-white shadow-lg rounded-lg p-2 z-50"
                     >
-                      <ul className="flex flex-col gap-2 text-sm font-medium text-gray-700">
-                        <li>
+                      <ul className="flex flex-col text-sm font-medium text-gray-700">
+                        <li className="hover:bg-slate-200 p-2">
                           <Link to="/about">About Us</Link>
                         </li>
-                        <li>
+                        <li className="hover:bg-slate-200 p-2">
                           <Link to="/careers">Careers</Link>
                         </li>
-                        <li>
+                        <li className="hover:bg-slate-200 p-2">
                           <Link to="/team">Our Team</Link>
                         </li>
-                        <li>
+                        <li className="hover:bg-slate-200 p-2">
                           <Link to="/contact">Contact</Link>
                         </li>
                       </ul>
@@ -126,7 +135,137 @@ function Nav() {
               </Button>
             </div>
           </div>
+
+          {/* Mobile Toggle */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-lg shadow hover:bg-neutral-50"
+            >
+              {mobileMenuOpen ? (
+                <X size={22} className="text-gray-700" />
+              ) : (
+                <Menu size={22} className="text-gray-700" />
+              )}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 z-50 bg-black/40 md:hidden"
+              onClick={() => setMobileMenuOpen(false)} // backdrop closes menu
+            >
+              {/* Drawer */}
+              <motion.div
+                initial={{ x: "100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "100%" }}
+                transition={{ duration: 0.3 }}
+                className="absolute right-0 top-0 h-full w-4/5 bg-white rounded-l-3xl px-4 py-2 flex flex-col justify-between shadow-lg"
+                onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
+              >
+                {/* Top Bar with Close Button */}
+                <div className="flex justify-end pt-2">
+                  <button
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="p-2 rounded-lg hover:bg-neutral-50 shadow"
+                  >
+                    <X size={22} className="text-gray-700" />
+                  </button>
+                </div>
+
+                {/* Nav Links */}
+                <ul className="flex flex-col gap-6 mt-6 text-gray-700 text-sm font-bold capitalize flex-1">
+                  <li>
+                    <button
+                      onClick={() => setMobileDropdownOpen((prev) => !prev)}
+                      className="flex items-center justify-between w-full"
+                    >
+                      <span>company</span>
+                      <ChevronDown
+                        size={16}
+                        className={`transition-transform duration-200 ${
+                          mobileDropdownOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+                    <AnimatePresence>
+                      {mobileDropdownOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="mt-2 pl-2 flex flex-col gap-4 text-sm font-medium text-gray-700"
+                        >
+                          <Link
+                            to="/about"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            About Us
+                          </Link>
+                          <Link
+                            to="/careers"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            Careers
+                          </Link>
+                          <Link
+                            to="/team"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            Our Team
+                          </Link>
+                          <Link
+                            to="/contact"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            Contact
+                          </Link>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </li>
+
+                  <li>
+                    <Link
+                      to="/features"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      features
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/pricing"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      pricing
+                    </Link>
+                  </li>
+                </ul>
+
+                {/* Button pinned at bottom */}
+                <div className="pt-6">
+                  <Button
+                    variants="primary"
+                    classes="w-full text-sm py-3 font-bold shadow-[inset_4px_4px_16px_#0647DF]"
+                    handleClick={() => setMobileMenuOpen(false)}
+                  >
+                    Join waitlist
+                  </Button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
     </motion.header>
   );

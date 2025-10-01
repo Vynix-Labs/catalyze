@@ -1,5 +1,5 @@
-import bg from "../../../public/images/reqiure_bg.png";
-import coins from "../../../public/images/coins.png";
+import bg from "../../assets/images/reqiure_bg.png";
+import coins from "../../assets/images/coins.png";
 import { useState } from "react";
 import { motion } from "framer-motion";
 
