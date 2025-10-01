@@ -9,6 +9,8 @@ import {
   text,
   jsonb,
   pgEnum,
+  unique,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 
 // Prefix all tables with catalyze
@@ -139,7 +141,9 @@ export const balances = createTable('balances', {
   tokenSymbol: varchar('token_symbol', { length: 10 }).notNull(),
   balance: decimal('balance', { precision: 38, scale: 18 }).default('0'),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
-});
+}, (t) => [
+  uniqueIndex("user_token_unique").on(t.userId, t.tokenSymbol)
+]);
 
 // ----------------- TRANSACTIONS -----------------
 export const transactions = createTable('transactions', {
@@ -251,7 +255,9 @@ export const priceFeeds = createTable('price_feeds', {
   priceNgn: decimal('price_ngn', { precision: 38, scale: 2 }).notNull(),
   source: varchar('source', { length: 255 }),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
-});
+}, (t) => [
+  uniqueIndex("token_unique").on(t.tokenSymbol)
+]);
 
 export const jwks = createTable("jwks", {
   id: text("id").primaryKey(),
