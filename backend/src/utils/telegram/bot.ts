@@ -30,7 +30,7 @@ bot.onText(/\/otp (\S+) (\d+)/, async (msg, match) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer <admin-api-token>", // You can use a service token here
+        Authorization: "Bearer <admin-api-token>"
       },
       body: JSON.stringify({ reference, authorizationCode: otp }),
     });
