@@ -28,7 +28,7 @@ function Requirement() {
     <section className="md:py-13 px-4 md:px-0">
       <div
         style={{ backgroundImage: `url(${bg})` }}
-        className="md:max-w-7xl mx-auto bg-cover bg-center bg-no-repeat md:py-20 border border-[#EEEEEE] rounded-lg space-y-14"
+        className="md:max-w-7xl mx-auto bg-cover bg-center bg-no-repeat md:py-20 pt-10 border border-[#EEEEEE] rounded-lg space-y-14"
       >
         <div className="md:max-w-[35.5rem] mx-auto space-y-3 text-center">
           <h2 className="text-2xl md:text-5xl font-black text-black">
