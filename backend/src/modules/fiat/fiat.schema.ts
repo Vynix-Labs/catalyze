@@ -51,5 +51,6 @@ export const TransferStatusResponse = z.object({
   monnifyResponse: z.object({}).passthrough(),
 });
 
+
 export type InitiateFiatTransferInput = z.infer<typeof initiateFiatTransferSchema>;
 export type AuthorizeTransferInput = z.infer<typeof AuthorizeTransferSchema>;

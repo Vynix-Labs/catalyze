@@ -147,6 +147,13 @@ export class MonnifyClient {
     return this.post("/api/v2/disbursements/single", payload);
   }
 
+  async authorizeDisbursement(reference: string, authorizationCode: string) {
+    return this.post("/api/v2/disbursements/single/validate-otp", {
+      reference,
+      authorizationCode,
+    });
+  }
+
   async getDisbursementStatus(reference: string) {
     const token = await this.getToken();
     const res = await fetch(
