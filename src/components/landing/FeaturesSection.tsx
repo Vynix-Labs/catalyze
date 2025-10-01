@@ -61,7 +61,7 @@ function FeaturesSection() {
         </div>
       </div>
       <div className="max-w-6xl flex flex-row-reverse gap-16 justify-between mx-auto">
-        <div className="bg-white pt-15 px-11 w-fit border border-[#EEEEEE]">
+        <div className="bg-white  px-11 w-fit border border-[#EEEEEE]">
           <img
             src={iphone_bottom}
             alt="illustration of the Catalyze app on mobile"
@@ -72,13 +72,14 @@ function FeaturesSection() {
           <div className="space-y-6">
             <div className="space-y-3">
               <h3 className="text-4xl leading-[44px] font-black tracking-[-3%]">
-                Investment Opportunities for the General Population
+                Limited Availability of Financial Tools and Educational
+                Resources{" "}
               </h3>
               <p className="text-base font-semibold text-gray-100 leading-[30px]">
-                For many people — especially in emerging markets — investing
-                feels like an exclusive club. Traditional platforms require
-                large sums of money, are packed with confusing financial jargon,
-                and are built for those who already understand the game.
+                in underserved communities, access to trustworthy financial
+                knowledge is scarce or non-existent. People are eager to learn,
+                but the right tools aren’t available — and most educational
+                content is too complex, too foreign, or too inaccessible.
               </p>
             </div>
             <ul className="space-y-6">
@@ -86,20 +87,20 @@ function FeaturesSection() {
                 <span className="size-6 rounded-full flex items-center justify-center bg-primary-100">
                   <Check className="text-white" size={20} />
                 </span>
-                High entry barriers keep first-time investors out.
+                Little or no guidance on how to begin investing.
               </li>
               <li className="flex items-center gap-3">
                 <span className="size-6 rounded-full flex items-center justify-center bg-primary-100">
                   <Check className="text-white" size={20} />
                 </span>
-                Complex platforms intimidate rather than invite.{" "}
+                Overly technical content that doesn’t match users’ literacy or
+                language levels.
               </li>
               <li className="flex items-center gap-3">
                 <span className="size-6 rounded-full flex items-center justify-center bg-primary-100">
                   <Check className="text-white" size={20} />
                 </span>
-                Minimum deposit requirements are often higher than people can
-                afford.{" "}
+                No tools designed for low-end devices or unstable internet.
               </li>
             </ul>
           </div>
