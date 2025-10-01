@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap");
 @import "tailwindcss";
 @config "../tailwind.config.ts";
 
@@ -11,11 +12,16 @@ body {
   min-height: 100vh;
 }
 
-#root {
+/* #root {
   width: 100%;
-  max-width: 420px; /* lock app size on desktop */
+  max-width: 420px; 
   min-height: 100vh;
-  background: #fff; /* app background */
+  background: #fff;} */
+
+.manrope {
+  font-family: "Manrope", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
 }
 
 @layer utilities {
