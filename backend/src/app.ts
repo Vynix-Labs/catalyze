@@ -13,6 +13,7 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-type-provider-zod";
+import { addBackgroundTaskJob } from './utils/queue';
 
 export const buildApp = async () => {
   const fastify = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
@@ -114,6 +115,15 @@ export const buildApp = async () => {
 
   // register all other routes
   fastify.register(routes, { prefix: "/api" });
+
+  // Start recurring background task after plugins/routes are ready
+  setInterval(() => {
+    addBackgroundTaskJob({
+      taskName: 'update_price_feeds',
+      payload: {},       // optional extra data
+      priority: 'medium' // optional
+    }).catch(err => fastify.log.error('Failed to enqueue background task:', err));
+  }, 30_000); // every 30 seconds
 
   return fastify;
 };
