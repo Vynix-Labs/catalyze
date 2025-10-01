@@ -20,6 +20,7 @@ import PersonalInfo from "../pages/settings/personalInfo";
 import SetPin from "../pages/settings/setPin";
 import UpdatePassword from "../pages/settings/updatePassword";
 import EnterAmountPageWrapper from "../components/EnterAmountPageWrapper";
+import LandingPage from "../pages/landing/page";
 
 export const routes = createBrowserRouter([
   {
@@ -28,6 +29,7 @@ export const routes = createBrowserRouter([
     errorElement: <NotFound />,
     index: true,
   },
+  { path: RoutePath.LANDING, element: <LandingPage /> },
 
   {
     path: "/dashboard",

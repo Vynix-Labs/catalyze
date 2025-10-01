@@ -1,6 +1,6 @@
 export const RoutePath = {
   ROOT: "/",
-
+  LANDING: "/landing",
   // app routes (children of Layout)
   DASHBOARD: "/dashboard",
   INVESTMENT: "/dashboard/investment",
