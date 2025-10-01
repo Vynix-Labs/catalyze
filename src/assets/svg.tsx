@@ -944,10 +944,11 @@ export const CheckIcon = () => (
   </svg>
 );
 
-export const LogoIcon = () => (
+export const LogoIcon = ({ className }: { className?: string }) => (
   <svg
     width={30}
     height={30}
+    className={className}
     viewBox="0 0 30 30"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"

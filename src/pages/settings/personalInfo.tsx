@@ -27,10 +27,10 @@ function PersonalInfo() {
   useEffect(() => {
     console.log(firstName, lastName, email, phone, profilePicture);
 
-    if (firstName || lastName || email || phone) {
+    if (firstName || lastName || email || phone || profilePicture) {
       setIsFormValid(true);
     }
-  }, [firstName, lastName, email, phone]);
+  }, [firstName, lastName, email, phone, profilePicture]);
   return (
     <div className="flex flex-col h-screen ">
       <div>

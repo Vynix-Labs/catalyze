@@ -20,10 +20,10 @@ function Accordion({
         role="button"
         className={`px-6 bg-[#FAFAFA] rounded-sm py-8 `}
       >
-        <div className="flex items-center justify-between gap-2  font-semibold  cursor-pointer">
-          <div className="flex gap-11.5 items-center">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-2  font-semibold  cursor-pointer">
+          <div className="flex md:gap-11.5 gap-4 items-center">
             <p
-              className={`text-black font-bold text-xl leading-auto truncate `}
+              className={`text-black font-bold text-xs md:text-xl leading-auto truncate `}
             >
               {title}
             </p>
@@ -36,6 +36,7 @@ function Accordion({
             <ChevronDown />
           </motion.span>
         </div>
+
         <motion.div
           key="accordion-content"
           initial={{ opacity: 0, height: "0", visibility: "hidden" }}

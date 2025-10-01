@@ -2,17 +2,10 @@ import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import Button from "../../common/ui/button";
 import { SuccessIcon } from "../../assets/svg";
+import { currencyIcons } from "../../utils";
+import type { EnterAmountPageProps } from "../../types/types";
 
-interface EnterAmountPageProps {
-  pool: {
-    id: number;
-    name: string;
-    fullName: string;
-    apy: number;
-    lockPeriod: string;
-  };
-  onBack: () => void;
-}
+
 
 // Reusable Components
 const Header = ({ title, onBack }: { title: string; onBack: () => void }) => (
@@ -26,12 +19,12 @@ const Header = ({ title, onBack }: { title: string; onBack: () => void }) => (
 );
 
 const CurrencyInfo = ({ pool }: { pool: EnterAmountPageProps["pool"] }) => {
-  const currencyIcons = {
-    USDT: "/images/usdt.png",
-    USDC: "/images/usdc.png",
-    STRK: "/images/strk.png",
-    UNKNOWN: "/images/default-currency.png",
-  };
+  // const currencyIcons = {
+  //   USDT: "/images/usdt.png",
+  //   USDC: "/images/usdc.png",
+  //   STRK: "/images/strk.png",
+  //   UNKNOWN: "/images/default-currency.png",
+  // };
 
   const CurrencyIcon = ({ currencyType }: { currencyType: string }) => {
     const iconPath = currencyIcons[currencyType as keyof typeof currencyIcons];
