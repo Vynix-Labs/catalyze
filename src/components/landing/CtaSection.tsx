@@ -1,5 +1,5 @@
 import Button from "../../common/ui/button";
-import bg from "../../../public/images/cta_bg.png";
+import bg from "../../assets/images/cta_bg.png";
 function CtaSection() {
   return (
     <section>

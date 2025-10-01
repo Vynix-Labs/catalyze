@@ -25,25 +25,25 @@ function Requirement() {
   ];
 
   return (
-    <section className="py-13">
+    <section className="md:py-13 px-4 md:px-0">
       <div
         style={{ backgroundImage: `url(${bg})` }}
-        className="max-w-7xl  mx-auto bg-cover bg-center bg-no-repeat py-20 border border-[#EEEEEE] rounded-lg space-y-14"
+        className="md:max-w-7xl mx-auto bg-cover bg-center bg-no-repeat md:py-20 border border-[#EEEEEE] rounded-lg space-y-14"
       >
-        <div className="max-w-[35.5rem] mx-auto space-y-3 text-center">
-          <h2 className="text-5xl font-black text-black">
+        <div className="md:max-w-[35.5rem] mx-auto space-y-3 text-center">
+          <h2 className="text-2xl md:text-5xl font-black text-black">
             Everything You Need to Start Investing — Simplified.
           </h2>
-          <p className="text-base font-semibold text-gray-100">
+          <p className="text-xs md:text-base font-semibold text-gray-100">
             From micro-investments to built-in education and portfolio tools,
             Catalyze brings powerful financial features to your fingertips — no
             experience required.
           </p>
         </div>
 
-        <div className="flex justify-between max-w-6xl mx-auto">
+        <div className="flex justify-between flex-col space-y-4 md:flex-row md:max-w-6xl md:mx-auto">
           {/* Left side timeline */}
-          <div className="flex max-w-md gap-6 py-4 relative">
+          <div className="flex md:max-w-md gap-6 py-4 relative">
             <div className="w-1 bg-[#D1D1D1B2] flex flex-col justify-between relative max-h-[31rem]">
               {steps.map((_, index) => (
                 <div key={index} className="h-34 relative">
@@ -70,8 +70,10 @@ function Requirement() {
                   onClick={() => setActive(index + 1)}
                   className={`cursor-pointer space-y-2`}
                 >
-                  <p className="text-2xl font-black text-black">{step.title}</p>
-                  <p className="text-sm font-semibold text-gray-100">
+                  <p className="text-xl md:text-2xl font-black text-black">
+                    {step.title}
+                  </p>
+                  <p className="text-xs md:text-sm font-semibold text-gray-100">
                     {step.description}
                   </p>
                 </div>
@@ -80,8 +82,8 @@ function Requirement() {
           </div>
 
           {/* Right side image */}
-          <div>
-            <img src={coins} alt="coins" className="max-w-lg" />
+          <div className="hidden md:block">
+            <img src={coins} alt="coins" className="md:max-w-lg" />
           </div>
         </div>
       </div>

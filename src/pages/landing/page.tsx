@@ -15,10 +15,10 @@ function LandingPage() {
       <Hero />
       <Impact />
       <Requirement />
-      <FeaturesSection />
-      <Faq />
+      {/* <FeaturesSection /> */}
+      {/* <Faq />
       <CtaSection />
-      <Footer />
+      <Footer /> */}
     </div>
   );
 }
