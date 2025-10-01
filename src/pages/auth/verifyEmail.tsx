@@ -16,6 +16,7 @@ function VerifyEmail() {
 
   const handleProceed = () => {
     if (!canSubmit) return;
+
     authClient.verifyEmail(
       { query: { token: otp, callbackURL: RoutePath.DASHBOARD } },
       {
@@ -54,7 +55,11 @@ function VerifyEmail() {
           } to verify your account.`}
           isLink={false}
         />
-        <OtpInput ref={otpInputRef} onComplete={setOtp} onResend={handleResend} />
+        <OtpInput
+          ref={otpInputRef}
+          onComplete={setOtp}
+          onResend={handleResend}
+        />
       </div>
       <div>
         <div className="flex-col flex items-center w-full">
