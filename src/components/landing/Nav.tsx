@@ -13,6 +13,19 @@ function Nav() {
   const lastScrollY = useRef(window.scrollY);
   const dropDownRef = useRef<HTMLLIElement | null>(null);
 
+  // Add inside your Nav component
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden"; // disable scroll
+    } else {
+      document.body.style.overflow = ""; // restore scroll
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
+
   // Hide/show header on scroll
   useEffect(() => {
     const handleScroll = () => {
