@@ -6,7 +6,7 @@ function FeaturesSection() {
   return (
     <section className="md:py-30 py-14 space-y-20 px-4 md:px-0 bg-[#FEFEFE]">
       <div className="md:max-w-6xl flex flex-col md:flex-row gap-6 md:gap-16 justify-between mx-auto">
-        <div className="bg-white pt-15 md:px-11 w-fit border border-[#EEEEEE]">
+        <div className="bg-white pt-15 md:px-11 w-fit">
           <img
             src={iphone_top}
             alt="illustration of the Catalyze app on mobile"
