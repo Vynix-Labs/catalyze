@@ -293,9 +293,12 @@ export class MonnifyClient {
       .where(eq(withdrawRequests.id, withdraw.id));
 
     await fastify.queues.withdraw.add(
-      "check-withdraw-status",
-      { reference },
-      { delay: 60000 }
+      "initiate_withdrawal",
+      {
+        reference,
+        amount: amountFiat,
+        bank: bankName,
+      }
     );
 
     return { ...withdraw, provider: "MONNIFY", monnifyResponse: resp };

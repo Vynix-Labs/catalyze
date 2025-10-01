@@ -13,6 +13,8 @@ const envSchema = z.object({
     MONNIFY_SECRET_KEY: z.string().min(1),
     MONNIFY_CONTRACT_CODE: z.string().min(1),
     MONNIFY_WALLET_ACCOUNT_NUMBER: z.string().min(1),
+    TELEGRAM_TOKEN: z.string().min(1),
+    ADMIN_CHAT_ID: z.string().min(1),
     SMTP_HOST: z.string().optional(),
     SMTP_FROM: z.string().optional(),
     SMTP_PORT: z.string().optional(),
