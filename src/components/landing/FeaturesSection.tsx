@@ -64,7 +64,7 @@ function FeaturesSection() {
       </div>
 
       <div className="md:max-w-6xl flex md:flex-row-reverse flex-col gap-6 md:gap-16 justify-between mx-auto">
-        <div className="bg-white  md:px-11 w-fit border border-[#EEEEEE]">
+        <div className="bg-white  md:px-11 w-fit ">
           <img
             src={iphone_bottom}
             alt="illustration of the Catalyze app on mobile"
