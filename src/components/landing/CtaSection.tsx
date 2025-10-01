@@ -19,16 +19,16 @@ function CtaSection() {
             experience needed.
           </p>
         </div>
-        <div className="relative max-w-[35rem] w-full bg-white/40 rounded-full h-16 overflow-hidden ">
+        <div className="relative max-w-[35rem] w-full bg-white/40 rounded-full md:h-16 h-10 overflow-hidden ">
           <input
             type="email"
             placeholder="email address"
-            className="w-full h-full px-11 py-5.5 outline-none border-0 text-xs md:text-base font-semibold text-white placeholder:capitalize placeholder:text-white"
+            className="w-full h-full md:px-11 md:py-5.5 pl-2  outline-none border-0 text-xs md:text-base font-semibold text-white placeholder:capitalize placeholder:text-white"
           />
-          <div className="absolute top-1/2 right-1.5 -translate-y-1/2">
+          <div className="absolute top-1/2 md:right-1.5 right-0 -translate-y-1/2">
             <Button
               variants="primary"
-              classes="text-xs md:text-base !w-fit text-nowrap px-6 py-3 capitalize font-bold shadow-[inset_4px_4px_16px_#0647DF]"
+              classes="text-xs md:text-base !w-fit text-nowrap md:px-6 md:py-3 capitalize font-bold shadow-[inset_4px_4px_16px_#0647DF]"
             >
               join waitlist today!
             </Button>
