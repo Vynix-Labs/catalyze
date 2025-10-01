@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 function Hero() {
   return (
     <section
-      className="bg-cover bg-center bg-no-repeat pt-18 px-4 md:px-0 md:pt-46 space-y-14 min-h-svh sm:min-h-screen "
+      className="bg-cover bg-center bg-no-repeat pt-32 px-4 md:px-0 md:pt-46 space-y-14 min-h-svh sm:min-h-screen "
       style={{
         backgroundImage: `url(${bg})`,
       }}
