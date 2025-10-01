@@ -1,4 +1,7 @@
+import CtaSection from "../../components/landing/CtaSection";
+import Faq from "../../components/landing/Faq";
 import FeaturesSection from "../../components/landing/FeaturesSection";
+import Footer from "../../components/landing/Footer";
 import Hero from "../../components/landing/Hero";
 import Impact from "../../components/landing/Impact";
 import Nav from "../../components/landing/Nav";
@@ -12,6 +15,9 @@ function LandingPage() {
       <Impact />
       <Requirement />
       <FeaturesSection />
+      <Faq />
+      <CtaSection />
+      <Footer />
     </div>
   );
 }
