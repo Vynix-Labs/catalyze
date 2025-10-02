@@ -10,7 +10,7 @@ function CtaSection() {
         className="bg-cover bg-center bg-no-repeat rounded-2xl px-2 md:py-19 py-8 md:max-w-7xl mx-auto flex items-center justify-center w-full flex-col gap-10"
       >
         <div className="space-y-4 text-center">
-          <h2 className="text-2xl md:text-7xl font-black text-white md:max-w-[29ch]">
+          <h2 className="text-2xl md:text-4xl lg:text-7xl font-black text-white md:max-w-[29ch]">
             Ready to start your investment journey? Join the waitlist now!
           </h2>
 

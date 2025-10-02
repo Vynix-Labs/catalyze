@@ -6,11 +6,11 @@ import Accordion from "./FaqDropDown";
 function Faq() {
   const [activeAccordion, setActiveAccordion] = useState<number | null>(1);
   return (
-    <section className="md:pt-30 md:pb-25 py-10  px-4">
+    <section className="md:pt-30 md:pb-25 py-8  px-4">
       <div className="md:max-w-6xl mx-auto flex flex-col md:flex-row gap-6 md:gap-14.5">
         <div className="md:max-w-[35rem] md:space-y-16 space-y-6">
           <div className="space-y-3">
-            <h3 className="text-2xl md:text-5xl text-black font-bold tracking-[-3%] leading-auto capitalize">
+            <h3 className="text-2xl lg:text-5xl text-center md:text-start text-black font-bold tracking-[-3%] leading-auto capitalize">
               frequently asked questions
             </h3>
             <p className="text-xs md:text-base font-semibold text-gray-100">
@@ -37,7 +37,7 @@ function Faq() {
                 setActiveAccordion(activeAccordion === index ? null : index);
               }}
             >
-              <p className="pt-3 text-gray-100 text-center font-semibold text-xs md:text-base">
+              <p className="pt-3 text-gray-100 text-center font-semibold text-xs lg:text-base">
                 {faq.description}
               </p>
             </Accordion>
