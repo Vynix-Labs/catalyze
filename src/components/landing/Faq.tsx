@@ -20,7 +20,7 @@ function Faq() {
           </div>
 
           <Button
-            variants="primary"
+            variants="primary" fullWidth
             classes="text-sm md:text-base md:!w-fit text-nowrap px-6 py-3 font-bold shadow-[inset_4px_4px_16px_#0647DF]"
           >
             Join waitlist

@@ -47,6 +47,7 @@ function Footer() {
 
         {/* Social & Info */}
         <div className="space-y-6 flex-1">
+          
           <p className="text-xl md:text-2xl font-bold leading-7 capitalize">
             connect
           </p>

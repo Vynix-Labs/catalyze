@@ -27,7 +27,7 @@ function CtaSection() {
           />
           <div className="absolute top-1/2 md:right-1.5 right-0 -translate-y-1/2">
             <Button
-              variants="primary"
+              variants="primary" fullWidth
               classes="text-xs md:text-base !w-fit text-nowrap md:px-6 md:py-3 capitalize font-bold shadow-[inset_4px_4px_16px_#0647DF]"
             >
               join waitlist today!
