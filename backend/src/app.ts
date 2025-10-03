@@ -12,6 +12,7 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import {
   serializerCompiler,
   validatorCompiler,
+  jsonSchemaTransform,
 } from "fastify-type-provider-zod";
 import { addBackgroundTaskJob } from './utils/queue';
 
@@ -83,7 +84,8 @@ export const buildApp = async () => {
         }
       },
       security: [{ sessionCookie: [] }]
-    }
+    },
+    transform: jsonSchemaTransform,
   });
 
   await fastify.register(swaggerUi, {
