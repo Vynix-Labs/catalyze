@@ -1,6 +1,6 @@
 import { randomUUID, createHash } from "crypto";
-import { eq, and } from "drizzle-orm";
-import { depositIntents, balances, transactions, withdrawRequests } from "../../db/schema";
+import { eq, and, desc } from "drizzle-orm";
+import { depositIntents, balances, transactions, withdrawRequests, priceFeeds } from "../../db/schema";
 import env from "../../config/env";
 import { Buffer } from "buffer";
 import { InitiateFiatDepositInput, InitiateFiatTransferInput } from "./fiat.schema";
@@ -72,9 +72,29 @@ export class MonnifyClient {
     userId: string,
     input: InitiateFiatDepositInput
   ) {
-    const { amountFiat, tokenSymbol } = input;
+    let { amountFiat, tokenSymbol } = input;
     const providerRef = `MNFY-${Date.now()}-${randomUUID()}`;
 
+    tokenSymbol = tokenSymbol.toLowerCase();
+
+    const amountToken = await fastify.db
+    .select()
+    .from(priceFeeds)
+    .where(eq(priceFeeds.tokenSymbol, tokenSymbol))
+    .orderBy(desc(priceFeeds.updatedAt))
+    .limit(1)
+    .then((rows) => {
+      if (rows.length === 0) {
+        throw new Error(`No price feed available for ${tokenSymbol}`);
+      }
+      const priceInNGN = parseFloat(rows[0].priceNgn);
+      if (priceInNGN <= 0) {
+        throw new Error(`Invalid price feed for ${tokenSymbol}`);
+      }
+      return (amountFiat / priceInNGN).toFixed(8);
+    });
+    
+    // Insert deposit intent with status 'awaiting_payment'
     const [intent] = await fastify.db
       .insert(depositIntents)
       .values({
@@ -82,7 +102,7 @@ export class MonnifyClient {
         userId,
         tokenSymbol,
         amountFiat: amountFiat.toFixed(2),
-        amountToken: amountFiat.toString(),
+        amountToken: amountToken,
         status: "awaiting_payment",
         provider: "MONNIFY",
         providerRef,
@@ -172,8 +192,27 @@ export class MonnifyClient {
     userId: string,
     input: InitiateFiatTransferInput
   ) {
-    const { amountFiat, tokenSymbol, bankName, bankCode, accountNumber, narration } = input;
+    let { amountFiat, tokenSymbol, bankName, bankCode, accountNumber, narration } = input;
     const reference = `MNFY-WDR-${Date.now()}-${randomUUID()}`;
+
+    tokenSymbol = tokenSymbol.toLowerCase();
+
+    const amountToken = await fastify.db
+    .select()
+    .from(priceFeeds)
+    .where(eq(priceFeeds.tokenSymbol, tokenSymbol))
+    .orderBy(desc(priceFeeds.updatedAt))
+    .limit(1)
+    .then((rows) => {
+      if (rows.length === 0) {
+        throw new Error(`No price feed available for ${tokenSymbol}`);
+      }
+      const priceInNGN = parseFloat(rows[0].priceNgn);
+      if (priceInNGN <= 0) {
+        throw new Error(`Invalid price feed for ${tokenSymbol}`);
+      }
+      return (amountFiat / priceInNGN).toFixed(8);
+    });
 
     // Lookup user balance
     const [balance] = await fastify.db
@@ -202,7 +241,7 @@ export class MonnifyClient {
           userId,
           tokenSymbol,
           amountFiat: amountFiat.toFixed(2),
-          amountToken: amountFiat.toString(), // TODO: conversion logic can go here
+          amountToken: amountToken,
           bankName,
           accountNumber,
           status: "pending",
