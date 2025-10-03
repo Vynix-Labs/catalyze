@@ -10,11 +10,11 @@ function CtaSection() {
         className="bg-cover bg-center bg-no-repeat rounded-2xl px-4 md:py-19 py-8 md:max-w-7xl mx-auto flex items-center justify-center w-full flex-col gap-10"
       >
         <div className="space-y-4 text-center">
-          <h2 className="text-2xl md:text-4xl lg:text-7xl font-black text-white lg:max-w-[29ch]">
+          <h2 className="text-lg md:text-4xl lg:text-7xl font-black text-white lg:max-w-[29ch]">
             Ready to start your investment journey? Join the waitlist now!
           </h2>
 
-          <p className="text-sm md:text-xl font-semibold md:leading-8 text-white text-pretty md:max-w-[49ch] mx-auto">
+          <p className="text-sm md:text-xl font-semibold md:leading-8 text-white text-pretty max-w-[35ch] md:max-w-[49ch] mx-auto">
             Be among the first to unlock easy, affordable investing — no
             experience needed.
           </p>
