@@ -169,14 +169,14 @@ function Nav() {
         {/* Mobile Menu */}
         <AnimatePresence>
           <motion.div
-            initial={{ x: "-100%" }}
-            exit={{ x: "-100%" }}
+            initial={{ x: "100%" }}
+            exit={{ x: "100%" }}
             transition={{ duration: 0.9, ease: "easeInOut" }}
             animate={
               mobileMenuOpen
                 ? { x: "0" }
                 : {
-                    x: "-100%",
+                    x: "100%",
                   }
             }
             className="fixed inset-0 z-50 bg-black/40 md:hidden"

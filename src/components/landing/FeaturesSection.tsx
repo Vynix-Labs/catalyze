@@ -4,9 +4,9 @@ import iphone_bottom from "../../assets/images/iphone_bottom.png";
 import Button from "../../common/ui/button";
 function FeaturesSection() {
   return (
-    <section className="lg:py-30 pb-14 space-y-20 px-4 lg:px-0 bg-[#FEFEFE]">
-      <div className="lg:max-w-6xl flex flex-col lg:flex-row gap-6 lg:gap-16 justify-between mx-auto">
-        <div className="bg-white pt-15 lg:px-11 w-fit">
+    <section className="lg:py-30 pb-14 space-y-20 px-4 lg:px-6 bg-[#FEFEFE]">
+      <div className="lg:max-w-6xl flex flex-col lg:flex-row gap-6 md:gap-16 justify-between mx-auto items-center">
+        <div className="bg-white/50 pt-15 lg:px-11 w-fit">
           <img
             src={iphone_top}
             alt="illustration of the Catalyze app on mobile"
@@ -50,21 +50,20 @@ function FeaturesSection() {
               </li>
             </ul>
           </div>
+
           <div>
-            <div>
-              <Button
-                variants="primary"
-                fullWidth
-                classes="text-sm lg:text-base lg:!w-fit text-nowrap px-6 py-3 font-bold shadow-[inset_4px_4px_16px_#0647DF]"
-              >
-                Join waitlist
-              </Button>
-            </div>
+            <Button
+              variants="primary"
+              fullWidth
+              classes="text-sm lg:text-base md:!w-fit text-nowrap px-6 py-3 font-bold shadow-[inset_4px_4px_16px_#0647DF]"
+            >
+              Join waitlist
+            </Button>
           </div>
         </div>
       </div>
 
-      <div className="lg:max-w-6xl flex lg:flex-row-reverse flex-col gap-6 lg:gap-16 justify-between mx-auto">
+      <div className="lg:max-w-6xl flex lg:flex-row-reverse flex-col gap-6 lg:gap-16 justify-between mx-auto items-center">
         <div className="bg-white lg:px-11 w-fit ">
           <img
             src={iphone_bottom}
@@ -110,16 +109,15 @@ function FeaturesSection() {
               </li>
             </ul>
           </div>
+
           <div>
-            <div>
-              <Button
-                variants="primary"
-                fullWidth
-                classes="text-sm lg:text-base lg:!w-fit text-nowrap px-6 py-3 font-bold shadow-[inset_4px_4px_16px_#0647DF]"
-              >
-                Join waitlist
-              </Button>
-            </div>
+            <Button
+              variants="primary"
+              fullWidth
+              classes="text-sm lg:text-base md:!w-fit text-nowrap px-6 py-3 font-bold shadow-[inset_4px_4px_16px_#0647DF]"
+            >
+              Join waitlist
+            </Button>
           </div>
         </div>
       </div>

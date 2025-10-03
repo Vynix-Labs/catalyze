@@ -13,7 +13,7 @@ function Faq() {
             <h3 className="text-2xl lg:text-5xl text-center md:text-start text-black font-bold tracking-[-3%] leading-auto capitalize">
               frequently asked questions
             </h3>
-            <p className="text-xs md:text-base font-semibold text-gray-100">
+            <p className="text-xs lg:text-base font-semibold text-gray-100">
               Got questions? We’ve got answers — everything you need to know
               about getting started with Catalyze.
             </p>
