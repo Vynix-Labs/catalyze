@@ -5,6 +5,7 @@ const betterAuthHandler: FastifyPluginAsync = async (fastify) => {
   fastify.route({
     method: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     url: "/auth/*",
+    schema: { hide: true },
     async handler(request, reply) {
       try {
         // Construct full URL
