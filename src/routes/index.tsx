@@ -16,7 +16,7 @@ import StakingPage from "../pages/more/staking";
 import CryptoTransferFlow from "../pages/dashboard/CryptoTransferFlow";
 import Settings from "../pages/settings/settings";
 import Layout from "../layout";
-import PersonalInfo from "../pages/settings/PersonalInfo";
+import PersonalInfo from "../pages/settings/personalInfo";
 import SetPin from "../pages/settings/SetPin";
 import UpdatePassword from "../pages/settings/updatePassword";
 import EnterAmountPageWrapper from "../components/EnterAmountPageWrapper";
