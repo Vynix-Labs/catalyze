@@ -41,7 +41,7 @@ function Impact() {
     },
   ];
   return (
-    <section className="py-20 space-y-14 px-4 lg:px-0">
+    <section className="md:py-20 pb-20 md:pb-0 space-y-14 px-4 lg:px-0">
       <div className="md:max-w-[39rem] mx-auto space-y-3">
         <h2 className="text-2xl md:text-5xl font-black text-black text-center">
           Why Catalyze? Real Benefits. Real Impact.

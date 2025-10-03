@@ -161,7 +161,7 @@ function Nav() {
                 <X size={22} className="text-gray-700" />
               ) : (
                 <Menu size={22} className="text-gray-700" />
-              )}
+              )}  
             </button>
           </div>
         </div>
