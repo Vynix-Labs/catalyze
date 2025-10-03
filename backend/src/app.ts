@@ -1,4 +1,5 @@
 import swagger from '@fastify/swagger';
+import type { SwaggerTransform } from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import cors from '@fastify/cors';
 import Fastify from "fastify";
@@ -18,6 +19,25 @@ import { addBackgroundTaskJob } from './utils/queue';
 
 export const buildApp = async () => {
   const fastify = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
+
+  // Guarded transform to avoid crashes on routes without schemas (e.g., 3rd-party handlers)
+  const safeJsonSchemaTransform: SwaggerTransform = (input) => {
+    const url = input.url || "";
+    try {
+      // Skip Better Auth proxy routes from being transformed
+      if (url.startsWith("/api/auth")) {
+        return { schema: {}, url };
+      }
+      // If route has no schema, do not transform
+      if (!input.schema) {
+        return { schema: {}, url };
+      }
+      return jsonSchemaTransform(input);
+    } catch (err) {
+      fastify.log.error({ err, url }, "Swagger transform error");
+      return { schema: {}, url };
+    }
+  };
 
   // Register CORS
   await fastify.register(cors, {
@@ -85,7 +105,7 @@ export const buildApp = async () => {
       },
       security: [{ sessionCookie: [] }]
     },
-    transform: jsonSchemaTransform,
+    transform: safeJsonSchemaTransform,
   });
 
   await fastify.register(swaggerUi, {

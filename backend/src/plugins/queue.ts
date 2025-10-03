@@ -1,6 +1,6 @@
 import type { FastifyPluginAsync } from "fastify";
 import fp from "fastify-plugin";
-import { queues, workers } from "../utils/queue";
+import { queues, workers, closeQueuesAndWorkers } from "../utils/queue";
 
 const queuePlugin: FastifyPluginAsync = async (fastify) => {
   // Decorate fastify with queue instances
@@ -11,8 +11,8 @@ const queuePlugin: FastifyPluginAsync = async (fastify) => {
 
   // Graceful shutdown
   fastify.addHook("onClose", async () => {
-    fastify.log.info("Closing BullMQ queues and workers...");
-    // Workers and queues handle their own shutdown via process signals
+    fastify.log.info("Closing BullMQ queues and workers (fastify onClose)...");
+    await closeQueuesAndWorkers();
   });
 };
 
