@@ -18,8 +18,8 @@ import Settings from "../pages/settings/settings";
 import Layout from "../layout";
 
 import UpdatePassword from "../pages/settings/updatePassword";
-import PersonalInfo from "../pages/settings/personalInfo";
-import SetPin from "../pages/settings/setPin";
+import PersonalInfo from "../pages/settings/PersonalInfo";
+import SetPin from "../pages/settings/SetPin";
 
 export const routes = createBrowserRouter([
   {
