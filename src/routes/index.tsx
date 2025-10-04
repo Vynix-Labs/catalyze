@@ -17,7 +17,7 @@ import CryptoTransferFlow from "../pages/dashboard/CryptoTransferFlow";
 import Settings from "../pages/settings/settings";
 import Layout from "../layout";
 import PersonalInfo from "../pages/settings/personalInfo";
-import SetPin from "../pages/settings/setPin";
+import SetPin from "../pages/settings/SetPin";
 import UpdatePassword from "../pages/settings/updatePassword";
 import EnterAmountPageWrapper from "../components/EnterAmountPageWrapper";
 import LandingPage from "../pages/landing/page";

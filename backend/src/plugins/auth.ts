@@ -1,9 +1,9 @@
 import type { FastifyPluginAsync } from "fastify";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "./db"
-import * as schema from "../db/schema"
-import { emailOTP, openAPI, jwt } from 'better-auth/plugins';
+import { db } from "./db";
+import * as schema from "../db/schema";
+import { emailOTP, openAPI, jwt } from "better-auth/plugins";
 // import { sendOtp } from "../utils/email/otp";
 import fp from "fastify-plugin";
 import env from "../config/env";
@@ -24,7 +24,7 @@ export const auth = betterAuth({
         required: false,
         input: true,
       },
-      
+
       role: {
         type: "string",
         required: false,
@@ -40,7 +40,10 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: false,
     sendResetPassword: async ({ user, url }) => {
-      await sendEmail(user.email, "Reset your password", `
+      await sendEmail(
+        user.email,
+        "Reset your password",
+        `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2>Reset your password</h2>
             <p>Hi ${user.name},</p>
@@ -57,7 +60,8 @@ export const auth = betterAuth({
               This email was sent from Catalyze. Please do not reply to this email.
             </p>
           </div>
-        `);
+        `
+      );
     },
   },
 
@@ -102,7 +106,7 @@ export const auth = betterAuth({
     //   enabled: true,
     // },
   },
-  
+
   plugins: [
     openAPI(),
     jwt(),
@@ -112,9 +116,12 @@ export const auth = betterAuth({
       sendVerificationOnSignUp: true,
       overrideDefaultEmailVerification: true,
       async sendVerificationOTP({ email, otp }) {
-        console.log('Sending verification OTP to', email, otp);
+        console.log("Sending verification OTP to", email, otp);
         // await sendOtp(email, otp);
-        await sendEmail(email, "Verification OTP", `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        await sendEmail(
+          email,
+          "Verification OTP",
+          `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2>Verification OTP</h2>
             <p>Hi ${email},</p>
             <p>Your verification OTP is: ${otp}</p>
@@ -124,7 +131,8 @@ export const auth = betterAuth({
             <p style="color: #666; font-size: 12px;">
               This email was sent from Catalyze. Please do not reply to this email.
             </p>
-          </div>`);
+          </div>`
+        );
       },
     }),
   ],
@@ -140,6 +148,6 @@ declare module "fastify" {
   }
 }
 
-export type User = typeof auth.$Infer.Session.user
+export type User = typeof auth.$Infer.Session.user;
 
 export default fp(authPlugin);

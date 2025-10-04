@@ -1,5 +1,6 @@
 import type { FastifyPluginAsync } from "fastify";
 import { verifyPinSchema, setPinSchema } from "./auth.schema";
+import { SuccessMessageResponse, ErrorResponse } from "../../schemas/common";
 import { setUserPin, verifyUserPin } from "./auth.service";
 import { requireAuth } from "../../plugins/requireAuth";
 
@@ -19,25 +20,9 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
         security: [{ sessionCookie: [] }],
         body: setPinSchema,
         response: {
-          201: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean' },
-              message: { type: 'string' }
-            }
-          },
-          400: {
-            type: 'object',
-            properties: {
-              error: { type: 'string' }
-            }
-          },
-          401: {
-            type: 'object',
-            properties: {
-              error: { type: 'string' }
-            }
-          }
+          201: SuccessMessageResponse,
+          400: ErrorResponse,
+          401: ErrorResponse,
         }
       },
     },
@@ -65,25 +50,9 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
         security: [{ sessionCookie: [] }],
         body: verifyPinSchema,
         response: {
-          200: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean' },
-              message: { type: 'string' }
-            }
-          },
-          400: {
-            type: 'object',
-            properties: {
-              error: { type: 'string' }
-            }
-          },
-          401: {
-            type: 'object',
-            properties: {
-              error: { type: 'string' }
-            }
-          }
+          200: SuccessMessageResponse,
+          400: ErrorResponse,
+          401: ErrorResponse,
         }
       },
     },

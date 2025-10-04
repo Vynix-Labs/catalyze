@@ -45,8 +45,8 @@ export const queues = {
     connection: redis,
     defaultJobOptions: {
       removeOnComplete: 10,
-      removeOnFail: 5,
-      attempts: 3,
+      removeOnFail: 1,
+      attempts: 1,
       backoff: {
         type: 'exponential',
         delay: 5000,
@@ -72,31 +72,31 @@ export const workers = {
 
   [QUEUE_NAMES.BACKGROUND_TASK]: new Worker(QUEUE_NAMES.BACKGROUND_TASK, backgroundTaskProcessor, {
     connection: redis,
-    concurrency: 2,
+    concurrency: 1,
   }),
 };
 
-// Graceful shutdown
-process.on('SIGINT', async () => {
-  console.log('Shutting down queues and workers...');
+// Basic worker event logging for visibility and debugging
+for (const [name, worker] of Object.entries(workers)) {
+  worker.on('completed', (job) => {
+    console.log(`[worker:${name}] job completed`, { id: job.id, name: job.name });
+  });
+  worker.on('failed', (job, err) => {
+    console.error(`[worker:${name}] job failed`, { id: job?.id, name: job?.name, err });
+  });
+  worker.on('error', (err) => {
+    console.error(`[worker:${name}] worker error`, err);
+  });
+}
 
+// Expose an explicit closer to be called from Fastify onClose hook
+export async function closeQueuesAndWorkers() {
+  console.log('Closing BullMQ queues and workers...');
   await Promise.all([
-    ...Object.values(queues).map(queue => queue.close()),
-    ...Object.values(workers).map(worker => worker.close()),
+    ...Object.values(queues).map((q) => q.close()),
+    ...Object.values(workers).map((w) => w.close()),
   ]);
-
   console.log('Queues and workers shut down gracefully');
-});
-
-process.on('SIGTERM', async () => {
-  console.log('Shutting down queues and workers...');
-
-  await Promise.all([
-    ...Object.values(queues).map(queue => queue.close()),
-    ...Object.values(workers).map(worker => worker.close()),
-  ]);
-
-  console.log('Queues and workers shut down gracefully');
-});
+}
 
 export default queues;

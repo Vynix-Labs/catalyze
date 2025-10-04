@@ -9,15 +9,15 @@ import Button from "../../common/ui/button";
 import EnterAmountPage from "./enterAmount";
 import PoolSelectionModal from "../../common/ui/modal/PoolSelectionModal";
 import CurrencyIcon from "../../components/CurrencyIcon";
-import { detectCurrencyType } from "../../types/types";
+import { detectCurrencyType, type Pool } from "../../types/types";
 
-interface Pool {
-  id: number;
-  name: string;
-  fullName: string;
-  apy: number;
-  lockPeriod: string;
-}
+// interface Pool {
+//   id: number;
+//   name: string;
+//   fullName: string;
+//   apy: number;
+//   lockPeriod: string;
+// }
 
 const StakingPage = () => {
   const [activeTab, setActiveTab] = useState<"pools" | "stakes">("pools");

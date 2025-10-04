@@ -103,6 +103,24 @@ export interface PinEntryStepProps {
   amountNGN?: string;
 }
 
+export interface EnterAmountPageProps {
+  pool: {
+    id: number;
+    name: string;
+    fullName: string;
+    apy: number;
+    lockPeriod: string;
+  };
+  onBack: () => void;
+}
+
+export interface Pool {
+  id: number;
+  name: string;
+  fullName: string;
+  apy: number;
+  lockPeriod: string;
+}
 export interface SuccessStepProps {
   flowType: "deposit" | "transfer";
   currencyMode: "crypto" | "fiat";
