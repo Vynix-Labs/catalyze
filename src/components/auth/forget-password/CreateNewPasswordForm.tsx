@@ -22,7 +22,7 @@ const CreateNewPasswordForm = forwardRef<
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     watch,
   } = useForm<CreateNewPasswordFormData>({
     defaultValues: {
@@ -105,14 +105,6 @@ const CreateNewPasswordForm = forwardRef<
           </p>
         )}
       </div>
-
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="btn btn-primary w-full mt-4"
-      >
-        {isSubmitting ? "Updating..." : "Update Password"}
-      </button>
     </form>
   );
 });

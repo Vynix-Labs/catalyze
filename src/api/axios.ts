@@ -4,12 +4,12 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from "axios";
 
-const baseURL =
-  import.meta.env.VITE_API_BASE_URL || "https://catalyze-api.apps.ikem.dev";
+const baseURL = import.meta.env.VITE_BASE_URL;
 
 export const axiosInstance = axios.create({
   baseURL,
   timeout: 10000,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -36,11 +36,8 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      // Handle unauthorized access
-      localStorage.removeItem("auth-token");
-      window.location.href = "/auth/signin";
-    }
+    // Don't automatically logout on 401 - let the auth state handle it
+    // This prevents premature logouts when the session might still be valid
     return Promise.reject(error);
   }
 );

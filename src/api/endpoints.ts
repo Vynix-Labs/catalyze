@@ -12,6 +12,12 @@ export const endpoints = {
     confirmDeposit: "/fiat/deposit/confirm",
     fiat: "/fiat", //(Get, post, put, delete, options)
   },
+
+  transactions: {
+    all: "/transactions",
+    singleTransaction: (id: string) => `/transactions/${id}`,
+    adminTransactions: "/admin/transactions",
+    balance: "/users/balances",
+    balanceWithToken: (token: string) => `/users/balances/${token}`,
+  },
 };
-
-

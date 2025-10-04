@@ -28,7 +28,10 @@ function ForgetPassword() {
       // });
       toast.success("Password reset link sent to your email");
       navigate(
-        RoutePath.RESET_OTP.replace(":email", encodeURIComponent(data.email))
+        `${RoutePath.RESET_OTP.replace(
+          ":email",
+          encodeURIComponent(data.email)
+        )}?type=reset-password`
       );
     } catch (error) {
       toast.error(

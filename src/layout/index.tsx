@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
-import BottomNav from "./BottomNav";
 import { RoutePath } from "../routes/routePath";
+import BottomNav from "./BottomNav";
 
 const Layout = () => {
   const location = useLocation();
@@ -17,16 +17,13 @@ const Layout = () => {
   const activeTab = getActiveTab();
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      {/* Page Content */}
-      <div className="max-w-[420px] mx-auto min-h-screen flex flex-col pb-16">
-        <div className="flex-1 overflow-y-auto">
-          <Outlet />
-        </div>
+    <div className="min-h-vh overflow-hidden">
+      <div className="flex-1 w-md max-h-[91vh] mx-auto max-w-md overflow-x-hidden no-scrollbar">
+        <Outlet />
       </div>
 
       {/* Fixed Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-[420px] mx-auto">
+      <div className="fixed bottom-0 left-0 right-0 max-w-md w-md mx-auto overflow-hidden">
         <BottomNav activeTab={activeTab} />
       </div>
     </div>

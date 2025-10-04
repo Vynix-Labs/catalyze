@@ -21,7 +21,7 @@ const LoginForm = forwardRef<HTMLFormElement, LoginFormProps>(
     const {
       register,
       handleSubmit,
-      formState: { errors, isSubmitting },
+      formState: { errors },
     } = useForm<LoginFormData>({
       defaultValues: {
         email: "",
@@ -97,13 +97,7 @@ const LoginForm = forwardRef<HTMLFormElement, LoginFormProps>(
           </Link>
         </div>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="btn btn-primary w-full mt-4"
-        >
-          {isSubmitting ? "Signing In..." : "Sign In"}
-        </button>
+
       </form>
     );
   }

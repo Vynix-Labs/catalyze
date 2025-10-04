@@ -1,24 +1,11 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "../api/axios";
 import { endpoints } from "../api/endpoints";
-
-// Types
-interface InitiateDepositData {
-  amount: number;
-  currency: string;
-  paymentMethod?: string;
-}
+import type { fiatDeposit, fiatResponse } from "../utils/types";
 
 interface ConfirmDepositData {
   transactionId: string;
   paymentReference?: string;
-}
-
-interface InitiateDepositResponse {
-  success: boolean;
-  transactionId: string;
-  paymentUrl?: string;
-  message: string;
 }
 
 interface ConfirmDepositResponse {
@@ -27,16 +14,16 @@ interface ConfirmDepositResponse {
   balance?: number;
 }
 
-interface FiatData {
-  transactions: any[];
-  balance: number;
-  currency: string;
-}
+// interface FiatData {
+//   transactions: any[];
+//   balance: number;
+//   currency: string;
+// }
 
 // Initiate Deposit Hook
 export const useInitiateDeposit = () => {
-  return useMutation<InitiateDepositResponse, Error, InitiateDepositData>({
-    mutationFn: async (data: InitiateDepositData) => {
+  return useMutation<fiatResponse, Error, fiatDeposit>({
+    mutationFn: async (data: fiatDeposit) => {
       const response = await axiosInstance.post(
         endpoints.fiat.initiateDeposit,
         data
@@ -60,12 +47,12 @@ export const useConfirmDeposit = () => {
 };
 
 // Get Fiat Data Hook
-export const useFiatData = () => {
-  return useQuery<FiatData, Error>({
-    queryKey: ["fiat", "data"],
-    queryFn: async () => {
-      const response = await axiosInstance.get(endpoints.fiat.fiat);
-      return response.data;
-    },
-  });
-};
+// export const useFiatData = () => {
+//   return useQuery<FiatData, Error>({
+//     queryKey: ["fiat", "data"],
+//     queryFn: async () => {
+//       const response = await axiosInstance.get(endpoints.fiat.fiat);
+//       return response.data;
+//     },
+//   });
+// };
