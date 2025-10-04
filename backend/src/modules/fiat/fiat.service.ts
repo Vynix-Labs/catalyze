@@ -3,11 +3,19 @@ import { eq, and } from "drizzle-orm";
 import { depositIntents, balances, transactions } from "../../db/schema";
 import env from "../../config/env";
 import { Buffer } from "buffer";
-import { InitiateFiatDepositInput } from "./fiat.schema";
-import crypto from "crypto";
-
+import type { InitiateFiatDepositInput } from "./fiat.schema";
 
 const { MONNIFY_BASE_URL, MONNIFY_API_KEY, MONNIFY_SECRET_KEY, MONNIFY_CONTRACT_CODE } = env;
+
+// Monnify API response types (partial, only what's needed here)
+type MonnifyAuthResponse = {
+  requestSuccessful: boolean;
+  responseMessage?: string;
+  responseBody: {
+    accessToken: string;
+    expiresIn: number; // seconds
+  };
+};
 
 export class MonnifyClient {
   private cachedToken: string | null = null;
@@ -29,14 +37,14 @@ export class MonnifyClient {
       throw new Error(`Monnify auth failed: ${res.status} ${await res.text()}`);
     }
 
-    const json = await res.json();
+    const json = (await res.json()) as MonnifyAuthResponse;
     if (!json.requestSuccessful) {
       throw new Error(json.responseMessage || "Failed to authenticate with Monnify");
     }
 
     this.cachedToken = json.responseBody.accessToken;
     this.tokenExpiry = now + json.responseBody.expiresIn - 30;
-    return this.cachedToken;
+    return this.cachedToken!;
   }
 
   private async post<T = any>(endpoint: string, body: any): Promise<T> {
@@ -154,7 +162,7 @@ export class MonnifyClient {
  */
 export async function handleMonnifyWebhook(fastify: any, request: any) {
   const rawBodyStr: string =
-    (request as any).rawBody?.toString("utf8") ??
+    request.rawBody?.toString("utf8") ??
     (typeof request.body === "string" ? request.body : JSON.stringify(request.body));
 
   fastify.log.info({ rawBodyStr }, "Raw body used for signature");
@@ -272,7 +280,7 @@ export async function handleMonnifyWebhook(fastify: any, request: any) {
       .where(eq(depositIntents.id, deposit.id));
 
     return { success: true };
-  } catch (err: any) {
+  } catch (err) {
     await fastify.db
       .update(depositIntents)
       .set({ status: "failed", updatedAt: new Date() })

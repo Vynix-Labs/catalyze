@@ -1,5 +1,6 @@
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
+import cors from '@fastify/cors';
 import Fastify from "fastify";
 import dbPlugin from "./plugins/db";
 import authPlugin from "./plugins/auth";
@@ -12,9 +13,18 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-type-provider-zod";
+import { addBackgroundTaskJob } from './utils/queue';
 
 export const buildApp = async () => {
   const fastify = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
+
+  // Register CORS
+  await fastify.register(cors, {
+    origin: true, // Allow all origins in development
+    credentials: true, // Allow credentials (cookies, authorization headers)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  });
 
   // Hook in Zod validator & serializer
   fastify.setValidatorCompiler(validatorCompiler);
@@ -27,7 +37,7 @@ export const buildApp = async () => {
     function (req, body, done) {
       try {
         const json = JSON.parse(body as string);
-        (req as any).rawBody = body; // attach raw JSON string
+        req.rawBody = body; // attach raw JSON string
         done(null, json);
       } catch (err) {
         done(err as Error, undefined);
@@ -105,6 +115,15 @@ export const buildApp = async () => {
 
   // register all other routes
   fastify.register(routes, { prefix: "/api" });
+
+  // Start recurring background task after plugins/routes are ready
+  setInterval(() => {
+    addBackgroundTaskJob({
+      taskName: 'update_price_feeds',
+      payload: {},       // optional extra data
+      priority: 'medium' // optional
+    }).catch(err => fastify.log.error('Failed to enqueue background task:', err));
+  }, 30_000); // every 30 seconds
 
   return fastify;
 };

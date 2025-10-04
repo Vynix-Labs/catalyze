@@ -1,4 +1,4 @@
-import { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsync } from "fastify";
 import { z } from "zod";
 import { requireAuth } from "../../plugins/requireAuth";
 import { initiateFiatDepositSchema, FiatDepositResponse, SuccessResponse, ErrorResponse } from "./fiat.schema";
@@ -31,9 +31,9 @@ const fiatRoutes: FastifyPluginAsync = async (fastify) => {
         const deposit = await monnify.createDepositIntent(fastify, userId, input);
 
         return reply.code(201).send(FiatDepositResponse.parse(deposit));
-      } catch (err: any) {
+      } catch (err) {
         fastify.log.error(err);
-        return reply.code(400).send(ErrorResponse.parse({ error: err.message }));
+        return reply.code(400).send(ErrorResponse.parse({ error: (err as Error).message }));
       }
     }
   );
@@ -54,11 +54,11 @@ const fiatRoutes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        await handleMonnifyWebhook(fastify, request, reply);
+        await handleMonnifyWebhook(fastify, request);
         return reply.code(200).send(SuccessResponse.parse({ success: true }));
-      } catch (err: any) {
+      } catch (err) {
         fastify.log.error(err);
-        return reply.code(400).send(ErrorResponse.parse({ error: err.message }));
+        return reply.code(400).send(ErrorResponse.parse({ error: (err as Error).message }));
       }
     }
   );

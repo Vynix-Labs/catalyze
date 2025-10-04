@@ -1,3 +1,5 @@
+import { currencyIcons } from "../utils";
+
 export interface Asset {
   id: string;
   symbol: string;
@@ -16,12 +18,6 @@ interface AssetsProps {
   selectedAsset?: Asset | null; // Track selected asset
 }
 
-// Currency icon mapping - using proper image paths
-const currencyIcons = {
-  USDT: "/images/usdt.png",
-  USDC: "/images/usdc.png",
-  STRK: "/images/strk.png",
-};
 
 // Fallback component for unknown currencies
 const FallbackIcon = ({ symbol }: { symbol: string }) => (
@@ -41,7 +37,7 @@ const Assets: React.FC<AssetsProps> = ({
   const displayAssets = assets.slice(0, maxDisplayItems);
 
   return (
-    <div className="mb-6 rounded-lg bg-white p-3">
+    <div className=" rounded-lg bg-white pt-4">
       <div className="space-y-4">
         {displayAssets.map((asset) => {
           const iconPath =

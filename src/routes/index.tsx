@@ -16,10 +16,11 @@ import StakingPage from "../pages/more/staking";
 import CryptoTransferFlow from "../pages/dashboard/CryptoTransferFlow";
 import Settings from "../pages/settings/settings";
 import Layout from "../layout";
-
-import UpdatePassword from "../pages/settings/updatePassword";
 import PersonalInfo from "../pages/settings/personalInfo";
 import SetPin from "../pages/settings/setPin";
+import UpdatePassword from "../pages/settings/updatePassword";
+import EnterAmountPageWrapper from "../components/EnterAmountPageWrapper";
+import LandingPage from "../pages/landing/page";
 
 export const routes = createBrowserRouter([
   {
@@ -28,6 +29,7 @@ export const routes = createBrowserRouter([
     errorElement: <NotFound />,
     index: true,
   },
+  { path: RoutePath.LANDING, element: <LandingPage /> },
 
   {
     path: "/dashboard",
@@ -39,15 +41,16 @@ export const routes = createBrowserRouter([
       { path: RoutePath.INVESTMENT, element: <InvestmentPage /> },
       { path: RoutePath.REWARD, element: <RewardPage /> },
       { path: RoutePath.STAKING, element: <StakingPage /> },
+      {
+        path: RoutePath.ENTERAMOUNTPAGE,
+        element: <EnterAmountPageWrapper />, // Use the wrapper instead of direct component
+      },
       { path: RoutePath.TRANSFER, element: <CryptoTransferFlow /> },
       { path: RoutePath.SETTINGS, element: <Settings /> },
     ],
   },
-
-
   // Nested route under settings
   { path: RoutePath.PERSONAL_INFO, element: <PersonalInfo /> },
-  
   {
     path: RoutePath.TRANSACTION_PIN,
     element: <SetPin />,

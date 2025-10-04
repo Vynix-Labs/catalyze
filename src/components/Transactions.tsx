@@ -1,3 +1,5 @@
+import { detectCurrencyType } from "../types/types";
+import { currencyIcons } from "../utils";
 
 export interface Transaction {
   id: string;
@@ -19,11 +21,7 @@ interface TransactionsProps {
 }
 
 // Currency icon mapping - using proper image paths
-const currencyIcons = {
-  USDT: "/images/usdt.png",
-  USDC: "/images/usdc.png",
-  STRK: "/images/strk.png",
-};
+
 
 // Fallback component for unknown currencies
 const FallbackIcon = ({ currencyType }: { currencyType: string }) => (
@@ -40,13 +38,7 @@ const Transactions: React.FC<TransactionsProps> = ({
   onViewAll,
   onTransactionClick,
 }) => {
-  // Function to detect currency type from title
-  const detectCurrencyType = (title: string): string => {
-    if (title.includes("USDT")) return "USDT";
-    if (title.includes("USDC")) return "USDC";
-    if (title.includes("STRK")) return "STRK";
-    return "UNKNOWN";
-  };
+ 
 
   // Show only limited items if maxDisplayItems is provided
   const displayTransactions = transactions.slice(0, maxDisplayItems);

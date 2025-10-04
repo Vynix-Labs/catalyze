@@ -1,4 +1,8 @@
 import { Job } from 'bullmq';
+import { db } from '../../../plugins/db';
+import { priceFeeds } from '../../../db/schema';
+import { getExchangeRate } from '../../ex/rates';
+import { CryptoCurrency, Action } from '../../../config';
 
 interface BackgroundTaskJobData {
   taskName: string;
@@ -6,49 +10,76 @@ interface BackgroundTaskJobData {
   priority?: 'low' | 'medium' | 'high';
 }
 
+const TRACKED_TOKENS: CryptoCurrency[] = ['usdt', 'usdc', 'strk', "eth"];
+const ACTION: Action = 'buy';
+
 export const backgroundTaskProcessor = async (job: Job<BackgroundTaskJobData>) => {
   const { taskName, payload, priority = 'medium' } = job.data;
 
   try {
-    console.log(`🔄 Processing background task ${job.id}: ${taskName} (priority: ${priority})`);
-
-    // TODO: Implement actual background task processing logic
-    // This could handle various background operations like:
-    // - Data cleanup
-    // - Report generation
-    // - API calls to external services
-    // - Database maintenance
-    // - File processing
+    console.log(`Processing background task ${job.id}: ${taskName} (priority: ${priority})`);
 
     switch (taskName) {
       case 'cleanup_expired_sessions':
-        // Clean up expired sessions
         console.log('Cleaning up expired sessions...');
         // Implementation here
         break;
 
       case 'generate_reports':
-        // Generate periodic reports
         console.log('Generating reports...');
         // Implementation here
         break;
 
       case 'sync_external_data':
-        // Sync data from external APIs
         console.log('Syncing external data...');
         // Implementation here
         break;
 
+      case 'update_price_feeds':
+        console.log('Updating price feeds...');
+
+        // Fetch rates concurrently
+        const rates = await Promise.all(
+          TRACKED_TOKENS.map(async (token) => {
+            const rate = await getExchangeRate(token, ACTION);
+            return rate ? { token, ...rate } : null;
+          })
+        );
+
+        // Filter out failed fetches
+        const validRates = rates.filter((r): r is { token: CryptoCurrency; rateInNGN: number; source: string } => !!r);
+
+        // Upsert into priceFeeds table
+        for (const rate of validRates) {
+          await db
+            .insert(priceFeeds)
+            .values({
+              tokenSymbol: rate.token,
+              priceNgn: rate.rateInNGN,
+              source: rate.source,
+            })
+            .onConflictDoUpdate({
+              target: priceFeeds.tokenSymbol,
+              set: {
+                priceNgn: rate.rateInNGN,
+                source: rate.source,
+                updatedAt: new Date(),
+              },
+            });
+        }
+
+        console.log('Price feeds updated successfully');
+        break;
+
       default:
         console.log(`Executing generic task: ${taskName} with payload:`, payload);
-        // Generic task execution
         break;
     }
 
-    console.log(`✅ Background task completed: ${job.id}`);
+    console.log(`Background task completed: ${job.id}`);
     return { success: true, taskId: `task_${job.id}`, result: { processed: true } };
   } catch (error) {
-    console.error(`❌ Failed to execute background task ${job.id}:`, error);
+    console.error(`Failed to execute background task ${job.id}:`, error);
     throw error;
   }
 };

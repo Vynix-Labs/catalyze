@@ -9,6 +9,8 @@ import {
   text,
   jsonb,
   pgEnum,
+  unique,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 
 // Prefix all tables with catalyze
@@ -69,6 +71,7 @@ export const user = createTable("user", {
   role: text("role").default("user"),
   email: varchar("email", { length: 255 }).notNull().unique(),
   emailVerified: boolean("email_verified").notNull().default(false),
+  name: varchar("name", { length: 255 }),
   phone: varchar("phone", { length: 20 }),
   betterAuthId: varchar("better_auth_id", { length: 255 }),
   walletAddress: varchar("wallet_address", { length: 255 }),
@@ -138,7 +141,9 @@ export const balances = createTable('balances', {
   tokenSymbol: varchar('token_symbol', { length: 10 }).notNull(),
   balance: decimal('balance', { precision: 38, scale: 18 }).default('0'),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
-});
+}, (t) => [
+  uniqueIndex("user_token_unique").on(t.userId, t.tokenSymbol)
+]);
 
 // ----------------- TRANSACTIONS -----------------
 export const transactions = createTable('transactions', {
@@ -250,7 +255,9 @@ export const priceFeeds = createTable('price_feeds', {
   priceNgn: decimal('price_ngn', { precision: 38, scale: 2 }).notNull(),
   source: varchar('source', { length: 255 }),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
-});
+}, (t) => [
+  uniqueIndex("token_unique").on(t.tokenSymbol)
+]);
 
 export const jwks = createTable("jwks", {
   id: text("id").primaryKey(),

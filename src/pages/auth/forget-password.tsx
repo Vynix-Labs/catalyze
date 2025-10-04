@@ -19,12 +19,17 @@ function ForgetPassword() {
   const handleFormSubmit = async (data: ForgetPasswordFormData) => {
     setIsLoading(true);
     try {
-      await authClient.forgetPassword({
+      await authClient.emailOtp.sendVerificationOtp({
         email: data.email,
-        redirectTo: RoutePath.RESET_OTP.replace(":email", encodeURIComponent(data.email)),
+        type: "forget-password",
       });
+      // await authClient.forgetPassword({
+      //   email: data.email,
+      // });
       toast.success("Password reset link sent to your email");
-      navigate(RoutePath.RESET_OTP.replace(":email", encodeURIComponent(data.email)));
+      navigate(
+        RoutePath.RESET_OTP.replace(":email", encodeURIComponent(data.email))
+      );
     } catch (error) {
       toast.error(
         (error as Error)?.message ??

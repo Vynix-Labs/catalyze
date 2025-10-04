@@ -1,6 +1,5 @@
 import { MagicWandIcon, VideoIcon } from "../../../assets/svg";
-import SettingsLink from "./Link";
-
+import SettingsLink from "../links/Link";
 const links = [
   {
     name: "Help Center",
