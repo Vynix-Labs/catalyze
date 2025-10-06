@@ -1,9 +1,9 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
-import { gsap } from "gsap";
 import { motion } from "framer-motion";
-import Button from "../../common/ui/button";
+import { gsap } from "gsap";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Button from "../../common/ui/button";
 import { RoutePath } from "../../routes/routePath";
 
 function Slider() {
@@ -106,7 +106,7 @@ function Slider() {
   }, [activeSlide, previousSlide]);
 
   return (
-    <div className=" flex justify-center gap-10  items-center h-svh w-auto  flex-col  px-5 pb-6">
+    <div className=" flex justify-center gap-10 w-full  items-center h-svh w-auto  flex-col  px-5 pb-6">
       <div
         ref={containerRef}
         className="relative overflow-hidden flex h-full  w-full "

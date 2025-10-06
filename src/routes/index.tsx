@@ -1,26 +1,27 @@
 import { createBrowserRouter } from "react-router-dom";
-import { RoutePath } from "./routePath";
-import Home from "../pages/dashboard";
-import NotFound from "../pages/notFound";
-import VerifyEmail from "../pages/auth/verifyEmail";
+import EnterAmountPageWrapper from "../components/EnterAmountPageWrapper";
+import ProtectedRoute from "../components/ProtectedRoute";
+import Layout from "../layout";
+import CreatePassword from "../pages/auth/CreatePassword";
+import CreatePin from "../pages/auth/createPin";
+import ForgetPassword from "../pages/auth/forget-password";
+import Login from "../pages/auth/login";
 import Onboarding from "../pages/auth/onBoarding";
 import SignUp from "../pages/auth/signup";
-import CreatePin from "../pages/auth/createPin";
-import Login from "../pages/auth/login";
-import ForgetPassword from "../pages/auth/forget-password";
-import CreatePassword from "../pages/auth/CreatePassword";
-import MorePage from "../pages/more";
-import InvestmentPage from "../pages/investment";
-import RewardPage from "../pages/reward";
-import StakingPage from "../pages/more/staking";
+import VerifyEmail from "../pages/auth/verifyEmail";
+import Home from "../pages/dashboard";
 import CryptoTransferFlow from "../pages/dashboard/CryptoTransferFlow";
-import Settings from "../pages/settings/settings";
-import Layout from "../layout";
-import PersonalInfo from "../pages/settings/personalInfo";
-import SetPin from "../pages/settings/SetPin";
-import UpdatePassword from "../pages/settings/updatePassword";
-import EnterAmountPageWrapper from "../components/EnterAmountPageWrapper";
+import InvestmentPage from "../pages/investment";
 import LandingPage from "../pages/landing/page";
+import MorePage from "../pages/more";
+import StakingPage from "../pages/more/staking";
+import NotFound from "../pages/notFound";
+import RewardPage from "../pages/reward";
+import PersonalInfo from "../pages/settings/personalInfo";
+import SetPin from "../pages/settings/setPin";
+import Settings from "../pages/settings/settings";
+import UpdatePassword from "../pages/settings/updatePassword";
+import { RoutePath } from "./routePath";
 
 export const routes = createBrowserRouter([
   {
@@ -33,7 +34,11 @@ export const routes = createBrowserRouter([
 
   {
     path: "/dashboard",
-    element: <Layout />,
+    element: (
+      <ProtectedRoute>
+        <Layout />
+      </ProtectedRoute>
+    ),
     errorElement: <NotFound />,
     children: [
       { index: true, element: <Home /> }, // index route
@@ -49,14 +54,31 @@ export const routes = createBrowserRouter([
       { path: RoutePath.SETTINGS, element: <Settings /> },
     ],
   },
-  // Nested route under settings
-  { path: RoutePath.PERSONAL_INFO, element: <PersonalInfo /> },
+  // Nested route under settings (protected)
+  {
+    path: RoutePath.PERSONAL_INFO,
+    element: (
+      <ProtectedRoute>
+        <PersonalInfo />
+      </ProtectedRoute>
+    ),
+  },
   {
     path: RoutePath.TRANSACTION_PIN,
-    element: <SetPin />,
+    element: (
+      <ProtectedRoute>
+        <SetPin />
+      </ProtectedRoute>
+    ),
   },
-
-  { path: RoutePath.UPDATE_PASSWORD, element: <UpdatePassword /> },
+  {
+    path: RoutePath.UPDATE_PASSWORD,
+    element: (
+      <ProtectedRoute>
+        <UpdatePassword />
+      </ProtectedRoute>
+    ),
+  },
 
   {
     path: "/auth",
