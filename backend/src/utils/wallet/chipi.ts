@@ -16,16 +16,47 @@ const chipiSDK = new ChipiSDK({
  * @param userId - The authenticated user's ID
  */
 export async function createWallet(userId: string): Promise<WalletData> {
-    const bearerToken = await generateUserJWT(userId);
-    
+  const bearerToken = await generateUserJWT(userId);
+  console.log("userId:", userId);
+  console.log(" bearerToken:", bearerToken);
+
+  try {
     const chipiWallet = await chipiSDK.createWallet({
-        encryptKey: env.CHIPI_ENCRYPT_KEY,
-        bearerToken,
+      encryptKey: process.env.CHIPI_ENCRYPT_KEY!,
+      bearerToken,
+      network: "starknet",
     });
 
-    // Return the WalletData from ChipiSDK
+    console.log("Wallet created:", chipiWallet);
     return chipiWallet.wallet;
+
+  } catch (err: any) {
+    console.error("createWallet failed:", err);
+
+    // Extra debug logs
+    if (err instanceof Error && err.message.includes("typedData")) {
+      console.error("Chipi didn't return typeData. inspect manually");
+
+      // fetch to inspect the real API output
+      const debugResponse = await fetch("https://api.chipipay.com/v1/chipi-wallets/prepare-creation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${bearerToken}`,
+          "x-api-key": process.env.CHIPI_API_PUBLIC_KEY!,
+        },
+        body: JSON.stringify({ publicKey: "debug" }),
+      });
+
+      const debugText = await debugResponse.text();
+      console.error("Raw response from Chipi prepare-creation:", debugText);
+    }
+
+    throw new Error(`Wallet creation failed: ${err.message || err}`);
+  }
 }
+
+
 
 export async function transferWithChipi(from: WalletData, to: string, amount: number, currency: CryptoCurrency, userId: string) {
     const bearerToken = await generateUserJWT(userId);
@@ -88,4 +119,33 @@ export async function withdrawVesuUsdc(wallet: WalletData, amount: number, userI
         recipient: wallet.publicKey,
         bearerToken,
     });
+}
+
+export async function stakeWithChipi(
+  wallet: WalletData,
+  amount: number,
+  userId: string,
+  tokenSymbol: string,
+  contractAddress: string,
+  strategyId?: string
+) {
+  const symbol = tokenSymbol.toLowerCase();
+  const decimals = await getTokenDecimals(symbol as any);
+
+  if (symbol === "usdc") {
+    return await stakeVesuUsdc(wallet, amount, userId);
+  }
+
+  const entrypoint = "deposit";
+
+  const calls: Call[] = [
+    {
+      contractAddress,
+      entrypoint,
+      calldata: [BigInt(Math.floor(amount * 10 ** decimals))],
+    },
+  ];
+
+  // Execute contract call via Chipi
+  return await callContractWithChipi(wallet, contractAddress, calls, userId);
 }

@@ -205,6 +205,16 @@ export const cryptoDeposits = createTable('crypto_deposits', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
 
+export const userWallets = createTable('user_wallets', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('user_id').references(() => user.id).notNull().unique(),
+  network: varchar('network', { length: 50 }).notNull().default('starknet'),
+  publicKey: varchar('public_key', { length: 255 }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+});
+
+
 // ----------------- STAKING POOLS -----------------
 export const pools = createTable('pools', {
   id: uuid('id').defaultRandom().primaryKey(),

@@ -38,18 +38,11 @@ export const backgroundTaskProcessor = async (job: Job<BackgroundTaskJobData>) =
       case 'update_price_feeds': {
         console.log('Updating price feeds...');
 
-        type CombinedRate = { token: CryptoCurrency } & RateInfo;
+        // Fetch all rates at once
+        const allRates = await getExchangeRate(ACTION);
 
-        // Fetch rates concurrently
-        const rates = await Promise.all(
-          TRACKED_TOKENS.map(async (token): Promise<CombinedRate | null> => {
-            const rate = await getExchangeRate(token, ACTION);
-            return rate ? { token, ...rate } : null;
-          })
-        );
-
-        // Filter out failed fetches
-        const validRates: CombinedRate[] = rates.filter((r): r is CombinedRate => r !== null);
+        // Filter only the tokens we're tracking
+        const validRates = allRates.filter(rate => TRACKED_TOKENS.includes(rate.currency));
 
         if (validRates.length === 0) {
           console.warn('No valid rates fetched; skipping upsert');
@@ -58,11 +51,11 @@ export const backgroundTaskProcessor = async (job: Job<BackgroundTaskJobData>) =
 
         // Upsert into priceFeeds table
         for (const rate of validRates) {
+          console.log(`Upserting rate for ${rate.currency}: NGN ${rate.rateInNGN}`);
           await db
             .insert(priceFeeds)
             .values({
-              tokenSymbol: rate.token,
-              // store decimals as strings for safety with Postgres decimals
+              tokenSymbol: rate.currency,
               priceNgn: rate.rateInNGN.toString(),
               source: rate.source,
             })
@@ -79,6 +72,7 @@ export const backgroundTaskProcessor = async (job: Job<BackgroundTaskJobData>) =
         console.log('Price feeds updated successfully');
         break;
       }
+
 
       default:
         console.log(`Executing generic task: ${taskName} with payload:`, payload);
