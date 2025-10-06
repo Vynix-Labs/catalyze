@@ -18,12 +18,12 @@ function Accordion({
       <div
         onClick={handleOpen}
         role="button"
-        className={`px-6 bg-[#FAFAFA] rounded-sm py-8 `}
+        className={`md:px-6 px-4 bg-[#FAFAFA] rounded-sm py-8 `}
       >
-        <div className="flex flex-col md:flex-row items-center justify-between gap-2  font-semibold  cursor-pointer">
-          <div className="flex md:gap-11.5 gap-4 items-center">
+        <div className="flex flex-row items-center justify-between gap-2  font-semibold  cursor-pointer">
+          <div className="flex lg:gap-11.5 gap-4 items-center">
             <p
-              className={`text-black font-bold text-xs md:text-xl leading-auto truncate `}
+              className={`text-black font-bold text-xs lg:text-xl leading-auto truncate `}
             >
               {title}
             </p>

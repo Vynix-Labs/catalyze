@@ -77,17 +77,19 @@ function Nav() {
       animate={{ y: showHeader ? 0 : "-30vh" }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
     >
-      <nav className="max-w-4xl w-full mx-auto">
+      <nav className="max-w-4xl w-full mx-auto ">
         <div className="flex items-center w-full bg-white p-3 rounded-4xl">
           {/* Logo */}
           <div className="flex gap-2 items-center flex-1">
             <LogoIcon />
-            <p className="text-2xl font-bold text-black">catalyze</p>
+            <p className="text-2xl font-bold text-black hidden md:block">
+              catalyze
+            </p>
           </div>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex flex-1 gap-6 items-center justify-between">
-            <ul className="flex gap-6 items-center text-gray-700 text-base font-bold capitalize relative">
+          <div className="hidden sm:flex flex-1 gap-6 items-center justify-between">
+            <ul className="flex gap-6 justify-between w-full items-center text-gray-700 text-base font-bold capitalize relative">
               {/* Dropdown */}
               <li className="relative" ref={dropDownRef}>
                 <button
@@ -139,7 +141,7 @@ function Nav() {
               </li>
             </ul>
 
-            <div>
+            <div className="md:block hidden">
               <Button
                 variants="primary"
                 classes="text-base text-nowrap px-6 py-3 font-bold shadow-[inset_4px_4px_16px_#0647DF]"
@@ -150,134 +152,119 @@ function Nav() {
           </div>
 
           {/* Mobile Toggle */}
-          <div className="md:hidden">
+          <div className="sm:hidden relative z-[9999]">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg shadow hover:bg-neutral-50"
+              className="p-2 rounded-lg  hover:bg-neutral-50"
             >
               {mobileMenuOpen ? (
                 <X size={22} className="text-gray-700" />
               ) : (
                 <Menu size={22} className="text-gray-700" />
-              )}
+              )}  
             </button>
           </div>
         </div>
 
         {/* Mobile Menu */}
         <AnimatePresence>
-          {mobileMenuOpen && (
+          <motion.div
+            initial={{ x: "100%" }}
+            exit={{ x: "100%" }}
+            transition={{ duration: 0.9, ease: "easeInOut" }}
+            animate={
+              mobileMenuOpen
+                ? { x: "0" }
+                : {
+                    x: "100%",
+                  }
+            }
+            className="fixed inset-0 z-50 bg-black/40 md:hidden"
+            onClick={() => setMobileMenuOpen(false)} // backdrop closes menu
+          >
+            {/* Drawer */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-50 bg-black/40 md:hidden"
-              onClick={() => setMobileMenuOpen(false)} // backdrop closes menu
+              className="absolute inset-0 h-full w-full bg-white px-4 py-2 flex flex-col justify-between shadow-lg"
+              onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
             >
-              {/* Drawer */}
-              <motion.div
-                initial={{ x: "100%" }}
-                animate={{ x: 0 }}
-                exit={{ x: "100%" }}
-                transition={{ duration: 0.3 }}
-                className="absolute right-0 top-0 h-full w-4/5 bg-white rounded-l-3xl px-4 py-2 flex flex-col justify-between shadow-lg"
-                onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
-              >
-                {/* Top Bar with Close Button */}
-                <div className="flex justify-end pt-2">
+              {/* Nav Links */}
+              <ul className="flex flex-col gap-6 pr-4 mt-24 [&>li]:border-b [&>li]:border-gray-100/40 [&>li]:pb-4  text-gray-700 text-base font-bold capitalize flex-1">
+                <li>
                   <button
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="p-2 rounded-lg hover:bg-neutral-50 shadow"
+                    onClick={() => setMobileDropdownOpen((prev) => !prev)}
+                    className="flex items-center justify-between w-full"
                   >
-                    <X size={22} className="text-gray-700" />
+                    <span>Company</span>
+                    <ChevronDown
+                      size={16}
+                      className={`transition-transform duration-200 ${
+                        mobileDropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
                   </button>
-                </div>
-
-                {/* Nav Links */}
-                <ul className="flex flex-col gap-6 mt-6 text-gray-700 text-sm font-bold capitalize flex-1">
-                  <li>
-                    <button
-                      onClick={() => setMobileDropdownOpen((prev) => !prev)}
-                      className="flex items-center justify-between w-full"
-                    >
-                      <span>company</span>
-                      <ChevronDown
-                        size={16}
-                        className={`transition-transform duration-200 ${
-                          mobileDropdownOpen ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-                    <AnimatePresence>
-                      {mobileDropdownOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="mt-2 pl-2 flex flex-col gap-4 text-sm font-medium text-gray-700"
+                  <AnimatePresence>
+                    {mobileDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="mt-2 pl-4 flex flex-col gap-4 text-sm font-medium text-gray-700"
+                      >
+                        <Link
+                          to="/about"
+                          onClick={() => setMobileMenuOpen(false)}
                         >
-                          <Link
-                            to="/about"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            About Us
-                          </Link>
-                          <Link
-                            to="/careers"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            Careers
-                          </Link>
-                          <Link
-                            to="/team"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            Our Team
-                          </Link>
-                          <Link
-                            to="/contact"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            Contact
-                          </Link>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </li>
+                          About Us
+                        </Link>
+                        <Link
+                          to="/careers"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Careers
+                        </Link>
+                        <Link
+                          to="/team"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Our Team
+                        </Link>
+                        <Link
+                          to="/contact"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Contact
+                        </Link>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </li>
 
-                  <li>
-                    <Link
-                      to="/features"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      features
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/pricing"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      pricing
-                    </Link>
-                  </li>
-                </ul>
+                <li>
+                  <Link to="/features" onClick={() => setMobileMenuOpen(false)}>
+                    features
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/pricing" onClick={() => setMobileMenuOpen(false)}>
+                    pricing
+                  </Link>
+                </li>
+              </ul>
 
-                {/* Button pinned at bottom */}
-                <div className="pt-6">
-                  <Button
-                    variants="primary"
-                    classes="w-full text-sm py-3 font-bold shadow-[inset_4px_4px_16px_#0647DF]"
-                    handleClick={() => setMobileMenuOpen(false)}
-                  >
-                    Join waitlist
-                  </Button>
-                </div>
-              </motion.div>
+              {/* Button pinned at bottom */}
+              <div className="pt-6">
+                <Button
+                  fullWidth
+                  variants="primary"
+                  classes="w-full text-sm py-3 font-bold shadow-[inset_4px_4px_16px_#0647DF]"
+                  handleClick={() => setMobileMenuOpen(false)}
+                >
+                  Join waitlist
+                </Button>
+              </div>
             </motion.div>
-          )}
+          </motion.div>
         </AnimatePresence>
       </nav>
     </motion.header>

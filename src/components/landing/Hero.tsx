@@ -16,13 +16,13 @@ function Hero() {
     >
       <div className="md:max-w-3xl mx-auto flex flex-col gap-8 items-center justify-center">
         <div className="flex flex-col gap-4 items-center justify-center">
-          <h1 className="text-2xl md:text-8xl font-black text-center text-black tracking-[-3%] leading-auto">
+          <h1 className="text-2xl md:text-6xl lg:text-8xl font-black text-center text-black tracking-[-3%] leading-auto">
             <span className="bg-primary-100/10 border border-primary-100 pr-2 pl-4">
               Catalyze
             </span>{" "}
             – Invest Smarter, Starting Small
           </h1>
-          <p className="text-xs md:text-base">
+          <p className="text-sm text-center md:text-base">
             Empowering you Through Micro-Investments in Digital Assets
           </p>
         </div>
@@ -33,11 +33,12 @@ function Hero() {
           Join waitlist Today!
         </Button>
       </div>
+
       <div className="relative">
         <motion.img
           src={solana}
           alt="solana"
-          className="md:max-w-[350px] absolute md:block hidden left-1/2 -translate-x-1/2"
+          className="md:max-w-[280px]  xl:max-w-[350px] absolute lg:block hidden left-1/2 -translate-x-1/2"
           initial={{
             x: 0,
             opacity: 0,
@@ -55,7 +56,7 @@ function Hero() {
         <motion.img
           src={bitcoin}
           alt="solana"
-          className="md:max-w-[350px] absolute md:block hidden left-1/2 -translate-x-1/2"
+          className="md:max-w-[280px]  xl:max-w-[350px] absolute lg:block hidden left-1/2 -translate-x-1/2"
           initial={{
             x: 0,
             opacity: 0,
@@ -85,12 +86,12 @@ function Hero() {
           }}
           src={iphone}
           alt=""
-          className="md:max-w-sm mx-auto relative z-30"
+          className="md:max-w-sm mx-auto h-[25rem] relative z-30"
         />
         <motion.img
           src={tether}
           alt="solana"
-          className="md:max-w-[350px] absolute md:block hidden left-1/2 -translate-x-1/2 bottom-20"
+          className="md:max-w-[280px]  xl:max-w-[350px] absolute lg:block hidden left-1/2 -translate-x-1/2 bottom-20"
           initial={{
             x: 0,
             opacity: 0,
@@ -108,7 +109,7 @@ function Hero() {
         <motion.img
           src={ethereum}
           alt="solana"
-          className="md:max-w-[350px] absolute md:block hidden left-1/2 -translate-x-1/2 bottom-20"
+          className="md:max-w-[280px]  xl:max-w-[350px] absolute lg:block hidden left-1/2 -translate-x-1/2 bottom-20"
           initial={{
             x: 0,
             opacity: 0,
