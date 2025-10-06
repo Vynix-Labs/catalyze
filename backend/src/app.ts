@@ -125,7 +125,7 @@ export const buildApp = async () => {
       payload: {},       // optional extra data
       priority: 'medium' // optional
     }).catch(err => fastify.log.error('Failed to enqueue background task:', err));
-  }, 5_000); // every 5 secs
+  }, 15 * 60 * 1000); // every 15 minutes
 
   return fastify;
 };
