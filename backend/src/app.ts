@@ -118,12 +118,14 @@ export const buildApp = async () => {
   // register all other routes
   fastify.register(routes, { prefix: "/api" });
 
+  fastify.log.info("Registering interval for update_price_feeds", new Date().toISOString());
+
   // Start recurring background task after plugins/routes are ready
   setInterval(() => {
     addBackgroundTaskJob({
       taskName: 'update_price_feeds',
       payload: {},       // optional extra data
-      priority: 'medium' // optional
+      priority: 'medium'
     }).catch(err => fastify.log.error('Failed to enqueue background task:', err));
   }, 15 * 60 * 1000); // every 15 minutes
 
