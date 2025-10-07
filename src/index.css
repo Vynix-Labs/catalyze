@@ -17,6 +17,7 @@ body {
   max-width: 420px;
   min-height: 100vh;
   background: #fff;} */
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }

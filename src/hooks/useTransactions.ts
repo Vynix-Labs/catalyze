@@ -3,6 +3,7 @@ import { axiosInstance } from "../api/axios";
 import { endpoints } from "../api/endpoints";
 import type { balances, transactions } from "../utils/types";
 import { useAuthState } from "./useAuthState";
+import { authClient } from "../lib/auth-client";
 
 /**
  * Hook to fetch all transactions for the authenticated user
@@ -11,8 +12,14 @@ import { useAuthState } from "./useAuthState";
 export const useTransactions = (options?: {
   page?: number;
   limit?: number;
-  type?: string;
-  status?: string;
+  type?: "deposit" | "withdraw" | "transfer" | "stake" | "unstake" | "claim";
+  subtype?: "fiat" | "crypto";
+  status?: "pending" | "processing" | "completed" | "failed";
+  tokenSymbol?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  sortBy?: "createdAt" | "amountFiat" | "amountToken";
+  sortDir?: "asc" | "desc";
 }) => {
   const { logout } = useAuthState();
 
@@ -24,7 +31,13 @@ export const useTransactions = (options?: {
       if (options?.page) params.append("page", options.page.toString());
       if (options?.limit) params.append("limit", options.limit.toString());
       if (options?.type) params.append("type", options.type);
+      if (options?.subtype) params.append("subtype", options.subtype);
       if (options?.status) params.append("status", options.status);
+      if (options?.tokenSymbol) params.append("tokenSymbol", options.tokenSymbol);
+      if (options?.dateFrom) params.append("dateFrom", options.dateFrom);
+      if (options?.dateTo) params.append("dateTo", options.dateTo);
+      if (options?.sortBy) params.append("sortBy", options.sortBy);
+      if (options?.sortDir) params.append("sortDir", options.sortDir);
 
       const queryString = params.toString();
       const url = queryString
@@ -44,7 +57,6 @@ export const useTransactions = (options?: {
             );
             // Try to refresh the session first
             try {
-              const { authClient } = await import("../lib/auth-client");
               const session = await authClient.getSession();
               if (!session?.data?.user) {
                 console.log("Session is invalid, logging out...");
