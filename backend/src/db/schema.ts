@@ -9,7 +9,6 @@ import {
   text,
   jsonb,
   pgEnum,
-  unique,
   uniqueIndex,
 } from 'drizzle-orm/pg-core';
 

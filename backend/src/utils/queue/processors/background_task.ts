@@ -2,7 +2,7 @@ import type { Job } from 'bullmq';
 import { db } from '../../../plugins/db';
 import { priceFeeds } from '../../../db/schema';
 import { getExchangeRate } from '../../ex/rates';
-import type { CryptoCurrency, Action, RateInfo } from '../../../config';
+import type { CryptoCurrency, Action } from '../../../config';
 
 interface BackgroundTaskJobData {
   taskName: string;
