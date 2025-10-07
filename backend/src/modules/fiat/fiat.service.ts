@@ -1,9 +1,10 @@
 import { randomUUID, createHash } from "crypto";
-import { eq, and } from "drizzle-orm";
-import { depositIntents, balances, transactions } from "../../db/schema";
+import { eq, and, desc } from "drizzle-orm";
+import { depositIntents, balances, transactions, withdrawRequests, priceFeeds } from "../../db/schema";
 import env from "../../config/env";
 import { Buffer } from "buffer";
-import type { InitiateFiatDepositInput } from "./fiat.schema";
+import type { InitiateFiatDepositInput, InitiateFiatTransferInput } from "./fiat.schema";
+import { mapMonnifyStatus } from "../../utils/monnify";
 
 const { MONNIFY_BASE_URL, MONNIFY_API_KEY, MONNIFY_SECRET_KEY, MONNIFY_CONTRACT_CODE } = env;
 
@@ -80,9 +81,29 @@ export class MonnifyClient {
     userId: string,
     input: InitiateFiatDepositInput
   ) {
-    const { amountFiat, tokenSymbol } = input;
+    let { amountFiat, tokenSymbol } = input;
     const providerRef = `MNFY-${Date.now()}-${randomUUID()}`;
 
+    tokenSymbol = tokenSymbol.toLowerCase();
+
+    const amountToken = await fastify.db
+    .select()
+    .from(priceFeeds)
+    .where(eq(priceFeeds.tokenSymbol, tokenSymbol))
+    .orderBy(desc(priceFeeds.updatedAt))
+    .limit(1)
+    .then((rows) => {
+      if (rows.length === 0) {
+        throw new Error(`No price feed available for ${tokenSymbol}`);
+      }
+      const priceInNGN = parseFloat(rows[0].priceNgn);
+      if (priceInNGN <= 0) {
+        throw new Error(`Invalid price feed for ${tokenSymbol}`);
+      }
+      return (amountFiat / priceInNGN).toFixed(8);
+    });
+    
+    // Insert deposit intent with status 'awaiting_payment'
     const [intent] = await fastify.db
       .insert(depositIntents)
       .values({
@@ -90,7 +111,7 @@ export class MonnifyClient {
         userId,
         tokenSymbol,
         amountFiat: amountFiat.toFixed(2),
-        amountToken: amountFiat.toString(),
+        amountToken: amountToken,
         status: "awaiting_payment",
         provider: "MONNIFY",
         providerRef,
@@ -150,8 +171,250 @@ export class MonnifyClient {
       paymentInstructions: bankResp.responseBody,
     };
   }
+
+  async initiateDisbursement(payload: any) {
+    return this.post("/api/v2/disbursements/single", payload);
+  }
+
+  async authorizeDisbursement(reference: string, authorizationCode: string) {
+    return this.post("/api/v2/disbursements/single/validate-otp", {
+      reference,
+      authorizationCode,
+    });
+  }
+
+  async getDisbursementStatus(reference: string) {
+    const token = await this.getToken();
+    const res = await fetch(
+      `${MONNIFY_BASE_URL}/api/v2/disbursements/single/summary?reference=${reference}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  }
+
+  /**
+   * Create a fiat transfer intent (withdraw)
+   */
+  async createTransferIntent(
+    fastify: any,
+    userId: string,
+    input: InitiateFiatTransferInput
+  ) {
+    let { amountFiat, tokenSymbol, bankName, bankCode, accountNumber, narration } = input;
+    const reference = `MNFY-WDR-${Date.now()}-${randomUUID()}`;
+
+    tokenSymbol = tokenSymbol.toLowerCase();
+
+    const amountToken = await fastify.db
+    .select()
+    .from(priceFeeds)
+    .where(eq(priceFeeds.tokenSymbol, tokenSymbol))
+    .orderBy(desc(priceFeeds.updatedAt))
+    .limit(1)
+    .then((rows) => {
+      if (rows.length === 0) {
+        throw new Error(`No price feed available for ${tokenSymbol}`);
+      }
+      const priceInNGN = parseFloat(rows[0].priceNgn);
+      if (priceInNGN <= 0) {
+        throw new Error(`Invalid price feed for ${tokenSymbol}`);
+      }
+      return (amountFiat / priceInNGN).toFixed(8);
+    });
+
+    // Lookup user balance
+    const [balance] = await fastify.db
+      .select()
+      .from(balances)
+      .where(and(eq(balances.userId, userId), eq(balances.tokenSymbol, tokenSymbol)));
+
+    if (!balance || Number(balance.balance) < Number(amountFiat)) {
+      throw new Error("Insufficient balance");
+    }
+
+    let withdraw: any;
+
+    // Transaction block: deduct balance, insert withdraw and ledger
+    await fastify.db.transaction(async (tx) => {
+      const newBalance = (Number(balance.balance) - Number(amountFiat)).toString();
+      await tx
+        .update(balances)
+        .set({ balance: newBalance, updatedAt: new Date() })
+        .where(eq(balances.id, balance.id));
+
+      const [wr] = await tx
+        .insert(withdrawRequests)
+        .values({
+          id: randomUUID(),
+          userId,
+          tokenSymbol,
+          amountFiat: amountFiat.toFixed(2),
+          amountToken: amountToken,
+          bankName,
+          accountNumber,
+          status: "pending",
+          reference,
+        })
+        .returning();
+      withdraw = wr;
+
+      await tx.insert(transactions).values({
+        id: randomUUID(),
+        userId,
+        type: "withdraw",
+        subtype: "fiat",
+        tokenSymbol,
+        amountToken: amountFiat.toString(),
+        amountFiat: amountFiat.toFixed(2),
+        status: "pending",
+        reference,
+        txHash: null,
+        metadata: JSON.stringify({}),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    });
+
+    // Call Monnify after DB commit
+    const resp = await this.initiateDisbursement({
+      amount: amountFiat,
+      reference,
+      narration: (narration ?? "Wallet Transfer").slice(0, 80),
+      destinationBankCode: bankCode,
+      destinationAccountNumber: accountNumber,
+      currency: "NGN",
+      sourceAccountNumber: env.MONNIFY_WALLET_ACCOUNT_NUMBER,
+    });
+
+    if (!resp.requestSuccessful) {
+      if (resp.responseCode === "D07") {
+        // Duplicate request -> fetch status instead of failing
+        const statusResp = await this.getDisbursementStatus(reference);
+        if (statusResp.requestSuccessful) {
+          const body = statusResp.responseBody;
+          const mappedStatus = mapMonnifyStatus(body.status);
+
+          // Update DB with actual status
+          await fastify.db
+            .update(withdrawRequests)
+            .set({ status: mappedStatus, updatedAt: new Date() })
+            .where(eq(withdrawRequests.reference, reference));
+
+          await fastify.db
+            .update(transactions)
+            .set({
+              status: mappedStatus,
+              txHash: body.transactionReference ?? null,
+              updatedAt: new Date(),
+            })
+            .where(eq(transactions.reference, reference));
+
+          return { ...withdraw, provider: "MONNIFY", monnifyResponse: body };
+        }
+      }
+
+      // Rollback effect: mark failed  and refund
+      await fastify.db.transaction(async (tx) => {
+        await tx
+          .update(withdrawRequests)
+          .set({ status: "failed" })
+          .where(eq(withdrawRequests.id, withdraw.id));
+
+        await tx
+          .update(transactions)
+          .set({ status: "failed" })
+          .where(eq(transactions.reference, reference));
+
+        await tx
+          .update(balances)
+          .set({ balance: balance.balance, updatedAt: new Date() })
+          .where(eq(balances.id, balance.id));
+      });
+
+      throw new Error(resp.responseMessage || "Disbursement failed");
+    }
+
+    await fastify.db
+      .update(withdrawRequests)
+      .set({ status: "processing" })
+      .where(eq(withdrawRequests.id, withdraw.id));
+
+    await fastify.queues.withdraw.add(
+      "initiate_withdrawal",
+      {
+        reference,
+        amount: amountFiat,
+        bank: bankName,
+      }
+    );
+
+    return { ...withdraw, provider: "MONNIFY", monnifyResponse: resp };
+  }
+
 }
 
+export const monnify = new MonnifyClient();
+
+export async function syncTransferStatus(fastify: any, reference: string) {
+  const resp = await monnify.getDisbursementStatus(reference);
+
+  if (!resp.requestSuccessful) {
+    throw new Error(resp.responseMessage || "Monnify status check failed");
+  }
+
+  const body = resp.responseBody;
+  const status = body.status;
+  const mappedStatus = mapMonnifyStatus(body.status);
+
+  // Transaction block for consistency
+  await fastify.db.transaction(async (tx) => {
+    // Update withdraw_requests
+    await tx
+      .update(withdrawRequests)
+      .set({ status: mappedStatus, updatedAt: new Date() })
+      .where(eq(withdrawRequests.reference, reference));
+
+    // Update transactions
+    await tx
+      .update(transactions)
+      .set({
+        status: mappedStatus,
+        txHash: body.transactionReference ?? null,
+        updatedAt: new Date(),
+      })
+      .where(eq(transactions.reference, reference));
+
+    // Refund balance if failed
+    if (status === "FAILED") {
+      const [wr] = await tx
+        .select()
+        .from(withdrawRequests)
+        .where(eq(withdrawRequests.reference, reference));
+
+      if (wr) {
+        const [bal] = await tx
+          .select()
+          .from(balances)
+          .where(
+            and(eq(balances.userId, wr.userId), eq(balances.tokenSymbol, wr.tokenSymbol))
+          );
+
+        if (bal) {
+          await tx
+            .update(balances)
+            .set({
+              balance: (Number(bal.balance) + Number(wr.amountToken)).toString(),
+              updatedAt: new Date(),
+            })
+            .where(eq(balances.id, bal.id));
+        }
+      }
+    }
+  });
+
+  return { reference, status: mappedStatus, monnifyResponse: body };
+}
 
 
 /**

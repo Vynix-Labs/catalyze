@@ -1,9 +1,10 @@
-import { COINGECKO_IDS, SPREAD, type CryptoCurrency, type Action, type RateInfo } from "../../config";
+import { COINGECKO_IDS, SPREAD, type CryptoCurrency, type RateInfo } from "../../config";
 
 /**
  * Get current exchange rates for all cryptocurrencies at once
+ * Returns base, buy, sell for each token
  */
-export async function getExchangeRate(action: Action): Promise<RateInfo[]> {
+export async function getExchangeRates(): Promise<RateInfo[]> {
   try {
     const coinIds = Object.values(COINGECKO_IDS).join(","); // join all CoinGecko IDs
     const response = await fetch(
@@ -19,18 +20,17 @@ export async function getExchangeRate(action: Action): Promise<RateInfo[]> {
     // Map each currency to RateInfo
     const rates: RateInfo[] = Object.entries(COINGECKO_IDS).map(([currency, coinId]) => {
       // @ts-expect-error - CoinGecko API response type
-      const baseRate = data[coinId]?.ngn || 0;
-      const spreadRate = Math.max(0, baseRate + SPREAD[action]);
+      const baseRate = Math.max(0, Number(data[coinId]?.ngn || 0));
+      const buy = Math.max(0, baseRate + SPREAD.buy);
+      const sell = Math.max(0, baseRate + SPREAD.sell);
 
       return {
         currency: currency as CryptoCurrency,
-        rateInNGN: spreadRate,
+        price: { base: baseRate, buy, sell },
         source: "coingecko",
         lastUpdated: new Date(),
       };
     });
-
-    console.log("Fetched all exchange rates:", rates);
 
     return rates;
   } catch (error) {

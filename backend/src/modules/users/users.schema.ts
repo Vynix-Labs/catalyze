@@ -16,3 +16,7 @@ export const BalanceParam = z.object({
 });
 
 export const BalanceResponse = BalanceItem;
+
+export const BalanceQuery = z.object({
+  quote: z.enum(["base", "buy", "sell"]).optional(),
+});

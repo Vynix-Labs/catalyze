@@ -1,5 +1,3 @@
-export const exchangeRate = 1500;
-
 export const currencyIcons = {
   USDT: "/images/usdt.png",
   USDC: "/images/usdc.png",
