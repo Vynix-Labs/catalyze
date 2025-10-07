@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../api/axios";
 import { endpoints } from "../api/endpoints";
+import { authClient } from "../lib/auth-client";
 import type { balances, transactions } from "../utils/types";
 import { useAuthState } from "./useAuthState";
 
@@ -44,7 +45,6 @@ export const useTransactions = (options?: {
             );
             // Try to refresh the session first
             try {
-              const { authClient } = await import("../lib/auth-client");
               const session = await authClient.getSession();
               if (!session?.data?.user) {
                 console.log("Session is invalid, logging out...");
