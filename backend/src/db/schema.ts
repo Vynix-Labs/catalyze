@@ -261,7 +261,12 @@ export const auditLogs = createTable('audit_logs', {
 export const priceFeeds = createTable('price_feeds', {
   id: uuid('id').defaultRandom().primaryKey(),
   tokenSymbol: varchar('token_symbol', { length: 10 }).notNull(),
-  priceNgn: decimal('price_ngn', { precision: 38, scale: 2 }).notNull(),
+  // Base NGN price from source (no spread)
+  priceNgnBase: decimal('price_ngn_base', { precision: 38, scale: 2 }).notNull(),
+  // Buy price = base + spread.buy
+  priceNgnBuy: decimal('price_ngn_buy', { precision: 38, scale: 2 }).notNull(),
+  // Sell price = base + spread.sell
+  priceNgnSell: decimal('price_ngn_sell', { precision: 38, scale: 2 }).notNull(),
   source: varchar('source', { length: 255 }),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 }, (t) => [

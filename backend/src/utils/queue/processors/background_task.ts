@@ -1,8 +1,8 @@
 import type { Job } from 'bullmq';
 import { db } from '../../../plugins/db';
 import { priceFeeds } from '../../../db/schema';
-import { getExchangeRate } from '../../ex/rates';
-import type { CryptoCurrency, Action } from '../../../config';
+import { getExchangeRates } from '../../ex/rates';
+import type { CryptoCurrency } from '../../../config';
 
 interface BackgroundTaskJobData {
   taskName: string;
@@ -11,7 +11,6 @@ interface BackgroundTaskJobData {
 }
 
 const TRACKED_TOKENS: CryptoCurrency[] = ['usdt', 'usdc', 'strk', 'eth'];
-const ACTION: Action = 'buy';
 
 export const backgroundTaskProcessor = async (job: Job<BackgroundTaskJobData>) => {
   const { taskName, payload, priority = 'medium' } = job.data;
@@ -38,8 +37,8 @@ export const backgroundTaskProcessor = async (job: Job<BackgroundTaskJobData>) =
       case 'update_price_feeds': {
         console.log('Updating price feeds...');
 
-        // Fetch all rates at once
-        const allRates = await getExchangeRate(ACTION);
+        // Fetch all rates at once (base, buy, sell)
+        const allRates = await getExchangeRates();
 
         // Filter only the tokens we're tracking
         const validRates = allRates.filter(rate => TRACKED_TOKENS.includes(rate.currency));
@@ -51,18 +50,23 @@ export const backgroundTaskProcessor = async (job: Job<BackgroundTaskJobData>) =
 
         // Upsert into priceFeeds table
         for (const rate of validRates) {
-          console.log(`Upserting rate for ${rate.currency}: NGN ${rate.rateInNGN}`);
+          const token = (rate.currency as string).toUpperCase();
+          console.log(`Upserting rates for ${token}: base=${rate.price.base} buy=${rate.price.buy} sell=${rate.price.sell}`);
           await db
             .insert(priceFeeds)
             .values({
-              tokenSymbol: rate.currency,
-              priceNgn: rate.rateInNGN.toString(),
+              tokenSymbol: token,
+              priceNgnBase: rate.price.base.toString(),
+              priceNgnBuy: rate.price.buy.toString(),
+              priceNgnSell: rate.price.sell.toString(),
               source: rate.source,
             })
             .onConflictDoUpdate({
               target: priceFeeds.tokenSymbol,
               set: {
-                priceNgn: rate.rateInNGN.toString(),
+                priceNgnBase: rate.price.base.toString(),
+                priceNgnBuy: rate.price.buy.toString(),
+                priceNgnSell: rate.price.sell.toString(),
                 source: rate.source,
                 updatedAt: new Date(),
               },
