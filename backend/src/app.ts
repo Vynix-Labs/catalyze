@@ -15,6 +15,7 @@ import {
   jsonSchemaTransform,
 } from "fastify-type-provider-zod";
 import { addBackgroundTaskJob } from './utils/queue';
+import "./utils/telegram/bot";
 
 export const buildApp = async () => {
   const fastify = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
@@ -111,6 +112,27 @@ export const buildApp = async () => {
     const sessionFunc = hasAuth && typeof fastify.auth?.api?.getSession === "function";
     return { hasAuth, sessionFunc };
   });
+
+  fastify.get("/api/debug/withdraw-queue", async () => {
+    const q = fastify.queues.withdraw;
+
+    const [waiting, delayed, active, completed, failed] = await Promise.all([
+      q.getWaiting(),
+      q.getDelayed(),
+      q.getActive(),
+      q.getCompleted(),
+      q.getFailed(),
+    ]);
+
+    return {
+      waiting: waiting.map(j => ({ id: j.id, data: j.data })),
+      delayed: delayed.map(j => ({ id: j.id, data: j.data })),
+      active: active.map(j => ({ id: j.id, data: j.data })),
+      completed: completed.map(j => ({ id: j.id, data: j.data })),
+      failed: failed.map(j => ({ id: j.id, data: j.data, failedReason: j.failedReason })),
+    };
+  });
+
 
   // Register Better Auth handler
   await fastify.register(betterAuthHandler, { prefix: '/api' });
