@@ -1,6 +1,5 @@
 import { SwapIcon } from "../../assets/svg";
 import type { BaseComponentProps } from "../../types/types";
-import { exchangeRate } from "../../utils";
 
 interface FiatTransferProps extends BaseComponentProps {
   onSwap: () => void;
@@ -15,6 +14,9 @@ export const FiatTransfer: React.FC<FiatTransferProps> = ({
   onAmountNGNChange,
   onSwap,
   isSwapped,
+  rate,
+  isRateLoading,
+  rateError,
 }) => {
   return (
     <div className="p-4 space-y-4">
@@ -32,6 +34,7 @@ export const FiatTransfer: React.FC<FiatTransferProps> = ({
             value={amount}
             onChange={(e) => onAmountChange(e.target.value)}
             className="w-full placeholder:text-sm p-3 border border-gray-200 bg-neutral-50 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={isRateLoading || !!rateError}
           />
         </div>
       </div>
@@ -49,7 +52,15 @@ export const FiatTransfer: React.FC<FiatTransferProps> = ({
 
       <div className="mb-4">
         <div className="text-sm text-gray-600 mb-2">
-          Exchange Rate: ₦{exchangeRate.toLocaleString()}/{currencyType}
+          {isRateLoading ? (
+            <span>Exchange Rate: Loading...</span>
+          ) : rateError ? (
+            <span className="text-red-500">Exchange Rate unavailable</span>
+          ) : (
+            <span>
+              Exchange Rate: ₦{rate.toLocaleString(undefined, { maximumFractionDigits: 2 })}/{currencyType}
+            </span>
+          )}
         </div>
 
         <div className="relative">
@@ -60,6 +71,7 @@ export const FiatTransfer: React.FC<FiatTransferProps> = ({
             value={amountNGN}
             onChange={(e) => onAmountNGNChange(e.target.value)}
             className="w-full placeholder:text-sm p-3 border border-gray-200 bg-neutral-50 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={isRateLoading || !!rateError}
           />
         </div>
       </div>
