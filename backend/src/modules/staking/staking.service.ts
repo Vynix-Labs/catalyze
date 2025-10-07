@@ -1,13 +1,15 @@
-import { drizzle } from "drizzle-orm";
 import { getStrategies } from "../../utils/troves/strategies";
-import { approveWithChipi, stakeVesuUsdc, withdrawVesuUsdc } from "../../utils/wallet/chipi";
+import { approveWithChipi, withdrawVesuUsdc } from "../../utils/wallet/chipi";
 import { validateSufficientBalance } from "../../utils/wallet/tokens";
 import { TransactionsService } from "../transactions/transactions.service";
+import { db } from "../../plugins/db";
+
+type Database = typeof db;
 
 export class StakingService {
-  db: any;
+  db: Database;
   txSvc: TransactionsService;
-  constructor(db: any) {
+  constructor(db: Database) {
     this.db = db;
     this.txSvc = new TransactionsService(db);
   }
@@ -60,7 +62,7 @@ export class StakingService {
 
   async stake(userId: string, strategyId: string, amount: number) {
     // Get user wallet
-    const wallet = await this.db.query.userWallet.findFirst({
+    const wallet = await this.db.query.userWallets.findFirst({
         where: { userId },
     });
     if (!wallet) throw new Error("User wallet not found");
@@ -75,7 +77,7 @@ export class StakingService {
     if (!contractAddress) throw new Error("Strategy contract not found");
 
     // Validate user’s on-chain balance
-    const { isValid, message } = await validateSufficientBalance(wallet.publicKey, amount, tokenSymbol as any);
+    const { isValid, message } = await validateSufficientBalance(wallet.publicKey, amount, tokenSymbol);
     if (!isValid) throw new Error(message);
 
     // Record pending transaction before staking

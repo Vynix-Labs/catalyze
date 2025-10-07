@@ -8,15 +8,18 @@ const envSchema = z.object({
   DATABASE_URL: z.string().min(1),
   JWT_SECRET: z.string().min(1),
   APP_URL: z.string().min(1),
+
   MONNIFY_BASE_URL: z.string().min(1),
   MONNIFY_API_KEY: z.string().min(1),
   MONNIFY_SECRET_KEY: z.string().min(1),
   MONNIFY_CONTRACT_CODE: z.string().min(1),
+
   SMTP_HOST: z.string().optional(),
   SMTP_FROM: z.string().optional(),
   SMTP_PORT: z.string().optional(),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
+
   RESEND_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().optional().default("Catalyze <no-reply@catalyze.com>"),
   GOOGLE_CLIENT_ID: z.string().optional(),
@@ -34,6 +37,8 @@ const envSchema = z.object({
   REDIS_PASSWORD: z.string().optional(),
   REDIS_DB: z.coerce.number().optional().default(0),
 
+  SYSTEM_WALLET_ADDRESS: z.string().min(1),
+  SYSTEM_WALLET_KEY: z.string().min(1),
 });
 
 export type env = z.infer<typeof envSchema>;
