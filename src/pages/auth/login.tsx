@@ -1,11 +1,12 @@
-import { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import AuthFooter from "../../common/auth/AuthFooter";
 import Divider from "../../common/auth/Divider";
 import ThirdPartyAuth from "../../common/auth/ThirdPartyAuth";
 import AuthHeader from "../../components/auth/header";
 import LoginForm from "../../components/auth/login/LoginForm";
+import { useAuthState } from "../../hooks/useAuthState";
 import { authClient } from "../../lib/auth-client";
 import { RoutePath } from "../../routes/routePath";
 
@@ -21,9 +22,29 @@ const link = {
 
 function Login() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
   const formRef = useRef<HTMLFormElement>(null);
+  const { login, isAuthenticated, initializeAuth } = useAuthState();
 
+  // Get the return URL from location state
+  const from = location.state?.from || RoutePath.DASHBOARD;
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      await initializeAuth();
+      setIsCheckingAuth(false);
+    };
+
+    checkAuth();
+  }, [initializeAuth]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, from]);
   const handleFormSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     const payload = {
@@ -47,7 +68,13 @@ function Login() {
             )
           );
         } else {
-          navigate(RoutePath.DASHBOARD);
+          await authClient.getSession(undefined, {
+            onSuccess: (data) => {
+              // Login user and store token
+              login(data?.data?.user, data?.data?.session?.token);
+              navigate(from, { replace: true });
+            },
+          });
         }
       },
       onError: (error) => {
@@ -63,16 +90,28 @@ function Login() {
     }
   };
 
+  // Show loading while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-100 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="py-6 px-5 h-svh flex-col flex justify-between">
-      <div className="space-y-10">
+    <div className="py-6 px-5 h-svh flex-col max-w-md mx-auto flex justify-between">
+      <div className="space-y-10 w-full">
         <AuthHeader
           title="log in to your account"
           description="Don't have an account? "
           isLink
           link={link}
         />
-        <div className="space-y-10 ">
+        <div className="space-y-10 w-full">
           <LoginForm ref={formRef} onSubmit={handleFormSubmit} />
           <Divider />
           <ThirdPartyAuth />

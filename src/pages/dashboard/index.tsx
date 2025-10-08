@@ -1,8 +1,4 @@
 import { useState } from "react";
-import Transactions, { type Transaction } from "../../components/Transactions";
-import Assets, { type Asset } from "../../components/Assets";
-import CurrencyDetailPage from "./CurrencyDetailPage";
-import TransactionDetailsPage from "./transactionDetails";
 import {
   ArrowDownRight,
   ArrowUpRightIcon,
@@ -10,9 +6,16 @@ import {
   EyeIcon,
   EyeOffIcon,
 } from "../../assets/svg";
+import Assets, { type Asset } from "../../components/Assets";
+import Transactions, { type Transaction } from "../../components/Transactions";
+import CurrencyDetailPage from "./CurrencyDetailPage";
+import TransactionDetailsPage from "./transactionDetails";
 
-import GlobalModal from "../../common/ui/modal/GlobalModal";
+import { useAtom } from "jotai";
 import { useNavigate } from "react-router-dom";
+import GlobalModal from "../../common/ui/modal/GlobalModal";
+import { useTransactions } from "../../hooks";
+import { authAtom } from "../../store/jotai";
 
 const Home: React.FC = () => {
   const [showTransactionDetails, setShowTransactionDetails] = useState(false);
@@ -24,7 +27,12 @@ const Home: React.FC = () => {
   const [transferType, setTransferType] = useState<"transfer" | "deposit">(
     "transfer"
   );
-
+  const {
+    data: transactionData,
+    // isLoading: transactionsLoading,
+    // error: transactionsError,
+  } = useTransactions();
+  const [user] = useAtom(authAtom);
   const navigate = useNavigate();
 
   const toggleBalanceVisibility = () => {
@@ -118,62 +126,16 @@ const Home: React.FC = () => {
     return "UNKNOWN";
   };
 
-  const transactionsData: Transaction[] = [
-    {
-      id: "1",
-      title: "Deposit to USDT wallet",
-      date: "9th June, 2024",
-      amount: "10,000",
+  const transactionsData: Transaction[] =
+    transactionData?.items?.map((tx) => ({
+      id: tx.id,
+      title: `${tx.type} ${tx.tokenSymbol}`,
+      date: new Date(tx.createdAt).toLocaleDateString(),
+      amount: tx.amountFiat,
       currency: "₦",
-      type: "deposit",
-      currencyType: "USDT",
-    },
-    {
-      id: "2",
-      title: "Deposit to USDC wallet",
-      date: "9th June, 2024",
-      amount: "20,000",
-      currency: "₦",
-      type: "deposit",
-      currencyType: "USDC",
-    },
-    {
-      id: "3",
-      title: "Deposit to STRK wallet",
-      date: "9th June, 2024",
-      amount: "20,000",
-      currency: "₦",
-      type: "deposit",
-      currencyType: "STRK",
-    },
-    {
-      id: "4",
-      title: "Withdrawal from USDT wallet",
-      date: "8th June, 2024",
-      amount: "5,000",
-      currency: "₦",
-      type: "withdrawal",
-      currencyType: "USDT",
-    },
-    {
-      id: "5",
-      title: "Transfer to USDC wallet",
-      date: "7th June, 2024",
-      amount: "15,000",
-      currency: "₦",
-      type: "transfer",
-      currencyType: "USDC",
-    },
-    {
-      id: "6",
-      title: "Deposit to STRK wallet",
-      date: "6th June, 2024",
-      amount: "30,000",
-      currency: "₦",
-      type: "deposit",
-      currencyType: "STRK",
-    },
-  ];
+      type: tx.type as "transfer" | "deposit" | "withdrawal",
+      currencyType: tx.tokenSymbol,
+    })) || [];
 
   const assetsData: Asset[] = [
     {
@@ -226,7 +188,7 @@ const Home: React.FC = () => {
   }
 
   return (
-    <div className="bg-neutral-50">
+    <div className="bg-neutral-50 w-full">
       {/* Main content container with proper spacing for bottom nav */}
       <div className="max-w-md mx-auto flex flex-col">
         {/* Scrollable content area */}
@@ -236,11 +198,15 @@ const Home: React.FC = () => {
             <div className="flex justify-between items-center">
               <div className="flex gap-2 items-center">
                 <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-                  <span className="text-white font-black">AO</span>
+                  <span className="text-white font-black">
+                    {user?.name
+                      ? user.name.charAt(0) + user.name.charAt(1)
+                      : "AO"}
+                  </span>
                 </div>
                 <div className="text-sm">
                   <p className=" text-gray-600 font-semibold">Good Morning</p>
-                  <h1 className=" font-black text-gray-800">Amara</h1>
+                  <h1 className=" font-black text-gray-800">{user?.name}</h1>
                 </div>
               </div>
               <BellIcon className="w-6 h-6 cursor-pointer" />

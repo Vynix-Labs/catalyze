@@ -1,3 +1,4 @@
+import { useAtom } from "jotai";
 import { useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -6,7 +7,6 @@ import CreateNewPasswordForm from "../../components/auth/forget-password/CreateN
 import AuthHeader from "../../components/auth/header";
 import { authClient } from "../../lib/auth-client";
 import { RoutePath } from "../../routes/routePath";
-import { useAtom } from "jotai";
 import { otpAtom } from "../../store/jotai";
 
 interface CreateNewPasswordFormData {
@@ -35,6 +35,9 @@ function CreatePassword() {
             toast.success("Password updated successfully");
             setOtp("");
             navigate(RoutePath.SIGNIN);
+          },
+          onError: (error) => {
+            toast.error(error?.error?.message ?? "Failed to update password");
           },
         }
       );
