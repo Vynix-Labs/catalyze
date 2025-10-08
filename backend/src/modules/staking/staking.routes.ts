@@ -6,7 +6,6 @@ import {
   UnstakeBody,
   StakingActionResponse,
   StrategiesResponse,
-  BalanceResponse,
   listStrategiesQuery,
 } from "./staking.schema";
 
@@ -51,7 +50,7 @@ const stakingRoutes: FastifyPluginAsync = async (fastify) => {
     }
   );
 
-  /*// ------------------- POST /staking/unstake -------------------
+  // ------------------- POST /staking/unstake -------------------
   fastify.post(
     "/staking/unstake",
     {
@@ -60,30 +59,12 @@ const stakingRoutes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       const userId = request.currentUserId as string;
-      const wallet = await fastify.db.query.userWallet.findFirst({ where: { userId } });
       const body = UnstakeBody.parse(request.body);
-
-      const result = await svc.unstake(userId, wallet, body.strategyId, body.amount);
+      const result = await svc.unstake(userId, body.strategyId, body.amount);
       return reply.code(200).send(result);
     }
   );
-
-  // ------------------- GET /staking/balance -------------------
-  fastify.get(
-    "/staking/balance",
-    {
-      preHandler: requireAuth(fastify),
-      schema: { response: { 200: BalanceResponse } },
-    },
-    async (request, reply) => {
-      const userId = request.currentUserId as string;
-      const wallet = await fastify.db.query.userWallet.findFirst({ where: { userId } });
-      const { strategyId } = request.query as any;
-
-      const result = await svc.getUserBalance(wallet.publicKey, strategyId);
-      return reply.code(200).send(result);
-    }
-  ); */
-};
+}
+;
 
 export default stakingRoutes;

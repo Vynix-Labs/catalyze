@@ -48,7 +48,7 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       const userId = request.currentUserId as string;
       const wallet = await ensureUserWallet(fastify, userId);
-      const tokens: CryptoCurrency[] = ["usdt", "usdc", "strk", "eth", "weth", "wbtc"];
+      const tokens: CryptoCurrency[] = ["usdt", "usdc", "strk", "weth", "wbtc"];
       const results = await Promise.all(
         tokens.map(async (t) => {
           const b = await getNormalizedBalance(wallet.publicKey, t);
