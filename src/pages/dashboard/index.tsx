@@ -125,10 +125,16 @@ const Home: React.FC = () => {
 
   // Helper function to detect currency type from title
   const detectCurrencyType = (title: string): string => {
-    if (title.includes("USDT")) return "USDT";
-    if (title.includes("USDC")) return "USDC";
-    if (title.includes("STRK")) return "STRK";
-    return "UNKNOWN";
+    switch (true) {
+      case title.includes("USDT"):
+        return "USDT";
+      case title.includes("USDC"):
+        return "USDC";
+      case title.includes("STRK"):
+        return "STRK";
+      default:
+        return "UNKNOWN";
+    }
   };
 
   const transactionsData: Transaction[] =
@@ -254,12 +260,11 @@ const Home: React.FC = () => {
 
                     <div className="flex items-center mt-2 justify-center">
                       <p className="text-4xl font-bold min-w-36 max-w-36 truncate ">
-                        {balancesLoading 
-                          ? "Loading..." 
-                          : isBalanceVisible 
-                            ? `₦${balanceData?.totalFiat || "0.00"}` 
-                            : "*********"
-                        }
+                        {balancesLoading
+                          ? "Loading..."
+                          : isBalanceVisible
+                          ? `₦${balanceData?.totalFiat || "0.00"}`
+                          : "*********"}
                       </p>
                       <button
                         onClick={toggleBalanceVisibility}

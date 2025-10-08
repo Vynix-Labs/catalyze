@@ -4,7 +4,6 @@ import { endpoints } from "../api/endpoints";
 import { authClient } from "../lib/auth-client";
 import type { balances, transactions } from "../utils/types";
 import { useAuthState } from "./useAuthState";
-import { authClient } from "../lib/auth-client";
 
 /**
  * Hook to fetch all transactions for the authenticated user
@@ -34,7 +33,8 @@ export const useTransactions = (options?: {
       if (options?.type) params.append("type", options.type);
       if (options?.subtype) params.append("subtype", options.subtype);
       if (options?.status) params.append("status", options.status);
-      if (options?.tokenSymbol) params.append("tokenSymbol", options.tokenSymbol);
+      if (options?.tokenSymbol)
+        params.append("tokenSymbol", options.tokenSymbol);
       if (options?.dateFrom) params.append("dateFrom", options.dateFrom);
       if (options?.dateTo) params.append("dateTo", options.dateTo);
       if (options?.sortBy) params.append("sortBy", options.sortBy);

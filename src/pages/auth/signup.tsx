@@ -56,10 +56,12 @@ function SignUp() {
       password: data.password,
     };
     setIsLoading(true);
+    console.log("testing");
+
     authClient.signUp.email(payload, {
       onSuccess: async () => {
         setIsLoading(false);
-        await authClient.sendVerificationEmail({ email: payload.email });
+        // await authClient.sendVerificationEmail({ email: payload.email });
         toast.success("Verification email sent");
         navigate(
           RoutePath.RESET_OTP.replace(
