@@ -17,14 +17,11 @@ const chipiSDK = new ChipiSDK({
  */
 export async function createWallet(userId: string): Promise<WalletData> {
   const bearerToken = await generateUserJWT(userId);
-  console.log("userId:", userId);
-  console.log(" bearerToken:", bearerToken);
 
   try {
     const chipiWallet = await chipiSDK.createWallet({
       encryptKey: process.env.CHIPI_ENCRYPT_KEY!,
       bearerToken,
-      network: "starknet",
     });
 
     console.log("Wallet created:", chipiWallet);

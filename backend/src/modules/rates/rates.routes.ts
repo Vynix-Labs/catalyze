@@ -106,7 +106,7 @@ const ratesRoutes: FastifyPluginAsync = async (fastify) => {
       },
     },
     async (request, reply) => {
-      const token = request.params.token.toUpperCase();
+      const token = request.params.token.toLowerCase();
       const [row] = await fastify.db
         .select()
         .from(priceFeeds)

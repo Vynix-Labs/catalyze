@@ -81,7 +81,7 @@ export class BalancesService<T extends Database> {
     const [price] = await this.db
       .select()
       .from(priceFeeds)
-      .where(eq(priceFeeds.tokenSymbol, token));
+      .where(eq(priceFeeds.tokenSymbol, token.toLowerCase()));
 
     const fiatEquivalent = coalescePrice(price, quote) * Number(row.balance ?? 0);
 

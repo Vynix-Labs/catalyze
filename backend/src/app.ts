@@ -149,5 +149,14 @@ export const buildApp = async () => {
     }).catch(err => fastify.log.error('Failed to enqueue background task:', err));
   }, 15 * 60 * 1000); // every 15 minutes
 
+  // Expire pending reserves every 60 seconds
+  setInterval(() => {
+    addBackgroundTaskJob({
+      taskName: 'expire_reserves',
+      payload: {},
+      priority: 'high',
+    }).catch(err => fastify.log.error('Failed to enqueue expire_reserves task:', err));
+  }, 60 * 1000);
+
   return fastify;
 };

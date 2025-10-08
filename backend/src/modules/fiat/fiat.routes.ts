@@ -2,7 +2,7 @@ import type { FastifyPluginAsync } from "fastify";
 import { z } from "zod";
 import { requireAuth } from "../../plugins/requireAuth";
 import { initiateFiatDepositSchema, FiatDepositResponse, SuccessResponse, ErrorResponse, initiateFiatTransferSchema, FiatTransferResponse, TransferStatusResponse, AuthorizeTransferSchema } from "./fiat.schema";
-import { MonnifyClient, handleMonnifyWebhook, syncTransferStatus } from "./fiat.service";
+import { handleMonnifyWebhook, syncTransferStatus } from "./fiat.service";
 import { monnify } from "./fiat.service";
 
 const fiatRoutes: FastifyPluginAsync = async (fastify) => {
@@ -34,6 +34,73 @@ const fiatRoutes: FastifyPluginAsync = async (fastify) => {
         fastify.log.error(err);
         return reply.code(400).send(ErrorResponse.parse({ error: (err as Error).message }));
       }
+    }
+  );
+
+  // ------------------- MONNIFY OPERATIONAL ENDPOINTS -------------------
+  fastify.get(
+    "/monnify/banks",
+    {
+      preHandler: requireAuth(fastify),
+      schema: {
+        description: "List Nigerian banks from Monnify",
+        tags: ["Fiat"],
+      },
+    },
+    async (_req, reply) => {
+      const resp = await monnify.getBanks();
+      return reply.code(200).send(resp);
+    }
+  );
+
+  fastify.post(
+    "/monnify/validate-account",
+    {
+      preHandler: requireAuth(fastify),
+      schema: {
+        description: "Validate account via Monnify",
+        tags: ["Fiat"],
+        body: z.object({ bankCode: z.string(), accountNumber: z.string() }),
+      },
+    },
+    async (req, reply) => {
+      const { bankCode, accountNumber } = (req.body as { bankCode: string; accountNumber: string });
+      const resp = await monnify.validateAccount(bankCode, accountNumber);
+      return reply.code(200).send(resp);
+    }
+  );
+
+  fastify.post(
+    "/monnify/resend-otp",
+    {
+      preHandler: requireAuth(fastify),
+      schema: {
+        description: "Resend Monnify transfer OTP",
+        tags: ["Fiat"],
+        body: z.object({ reference: z.string() }),
+      },
+    },
+    async (req, reply) => {
+      const { reference } = (req.body as { reference: string });
+      const resp = await monnify.resendOtp(reference);
+      return reply.code(200).send(resp);
+    }
+  );
+
+  fastify.get(
+    "/monnify/disbursements/:reference",
+    {
+      preHandler: requireAuth(fastify),
+      schema: {
+        description: "Fetch Monnify disbursement status",
+        tags: ["Fiat"],
+        params: z.object({ reference: z.string() }),
+      },
+    },
+    async (req, reply) => {
+      const { reference } = req.params as { reference: string };
+      const resp = await monnify.getDisbursementStatus(reference);
+      return reply.code(200).send(resp);
     }
   );
 
@@ -82,9 +149,10 @@ const fiatRoutes: FastifyPluginAsync = async (fastify) => {
         const input = initiateFiatTransferSchema.parse(req.body);
         const result = await monnify.createTransferIntent(fastify, userId, input);
         return reply.code(201).send(FiatTransferResponse.parse(result));
-      } catch (err: any) {
+      } catch (err: unknown) {
         fastify.log.error(err);
-        return reply.code(400).send({ error: err.message });
+        const msg = err instanceof Error ? err.message : String(err);
+        return reply.code(400).send({ error: msg });
       }
     }
   );
@@ -110,8 +178,9 @@ const fiatRoutes: FastifyPluginAsync = async (fastify) => {
         const { reference } = req.params as { reference: string };
         const result = await syncTransferStatus(fastify, reference);
         return reply.code(200).send(result);
-      } catch (err: any) {
-        return reply.code(400).send({ error: err.message });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        return reply.code(400).send({ error: msg });
       }
     }
   );
@@ -146,8 +215,9 @@ const fiatRoutes: FastifyPluginAsync = async (fastify) => {
         );
 
         return reply.code(200).send({ success: true, monnifyResponse: resp });
-      } catch (err: any) {
-        return reply.code(400).send({ error: err.message });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        return reply.code(400).send({ error: msg });
       }
     }
   );

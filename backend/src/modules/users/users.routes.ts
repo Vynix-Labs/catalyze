@@ -36,7 +36,7 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       const userId = request.currentUserId as string;
       const { token } = BalanceParam.parse(request.params);
-      const normalizedToken = token.toUpperCase();
+      const normalizedToken = token.toLowerCase();
 
       const { quote } = BalanceQuery.parse(request.query ?? {});
       const result = await svc.getUserBalance(userId, normalizedToken, quote);

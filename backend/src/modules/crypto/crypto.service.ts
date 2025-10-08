@@ -1,11 +1,11 @@
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 import { randomUUID } from "crypto";
 import { eq, and } from "drizzle-orm";
 import env from "../../config/env";
 import { userWallets, cryptoDeposits, balances, transactions } from "../../db/schema";
-import { fromTokenUnits, getTokenDecimals } from "../../utils/wallet/tokens";
+// import { fromTokenUnits, getTokenDecimals } from "../../utils/wallet/tokens";
 import { createWallet } from "../../utils/wallet/chipi";
-import { WebhookBody } from "./deposit.schema";
+// import { WebhookBody } from "./deposit.schema";
 
 export class CryptoDepositService {
   fastify: FastifyInstance;
@@ -33,6 +33,7 @@ export class CryptoDepositService {
       userId,
       network,
       publicKey: wallet.publicKey,
+      encryptedPrivateKey: wallet.encryptedPrivateKey,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

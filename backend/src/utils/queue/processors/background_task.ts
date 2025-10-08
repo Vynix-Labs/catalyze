@@ -1,8 +1,9 @@
 import type { Job } from 'bullmq';
 import { db } from '../../../plugins/db';
-import { priceFeeds } from '../../../db/schema';
+import { priceFeeds, reserves } from '../../../db/schema';
 import { getExchangeRates } from '../../ex/rates';
 import type { CryptoCurrency } from '../../../config';
+import { and, eq, lt } from 'drizzle-orm';
 
 interface BackgroundTaskJobData {
   taskName: string;
@@ -48,10 +49,10 @@ export const backgroundTaskProcessor = async (job: Job<BackgroundTaskJobData>) =
           break;
         }
 
-        // Upsert into priceFeeds table
+        // Upsert into priceFeeds table (store lowercase token symbols)
         for (const rate of validRates) {
-          const token = (rate.currency as string).toUpperCase();
-          console.log(`Upserting rates for ${token}: base=${rate.price.base} buy=${rate.price.buy} sell=${rate.price.sell}`);
+          const token = (rate.currency as string).toLowerCase();
+          console.log(`Upserting rates for ${token.toUpperCase()}: base=${rate.price.base} buy=${rate.price.buy} sell=${rate.price.sell}`);
           await db
             .insert(priceFeeds)
             .values({
@@ -74,6 +75,17 @@ export const backgroundTaskProcessor = async (job: Job<BackgroundTaskJobData>) =
         }
 
         console.log('Price feeds updated successfully');
+        break;
+      }
+
+      case 'expire_reserves': {
+        console.log('Expiring stale reserves...');
+        const now = new Date();
+        const result = await db
+          .update(reserves)
+          .set({ status: 'expired', updatedAt: new Date() })
+          .where(and(eq(reserves.status, 'pending'), lt(reserves.expiresAt, now)));
+        console.log('Expired reserves result:', result);
         break;
       }
 
