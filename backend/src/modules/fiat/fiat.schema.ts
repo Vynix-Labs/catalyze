@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const initiateFiatDepositSchema = z.object({
   amountFiat: z.number().positive().min(20).max(10_000_000),
-  tokenSymbol: z.enum(["USDT", "USDC", "STRK"]),
+  tokenSymbol: z.enum(["USDT", "USDC", "STRK", "WETH", "WBTC"]),
 });
 
 export const FiatDepositResponse = z.object({
@@ -20,15 +20,18 @@ export const ErrorResponse = z.object({ error: z.string() });
 
 export type InitiateFiatDepositInput = z.infer<typeof initiateFiatDepositSchema>;
 
-// ---------------- TRANSFER (Withdraw) ----------------
+// Withdraw/Transfer (token -> fiat)
 export const initiateFiatTransferSchema = z.object({
-  amountFiat: z.number().positive().min(100).max(10_000_000),
-  tokenSymbol: z.enum(["USDT", "USDC", "STRK"]),
-  bankName: z.string().min(2).max(255),
-  bankCode: z.string().min(3).max(10),
-  accountNumber: z.string().min(6).max(20),
-  narration: z.string().max(120).optional(),
+  amountFiat: z.number().positive().min(20).max(10_000_000),
+  tokenSymbol: z.enum(["USDT", "USDC", "STRK", "WETH", "WBTC"]),
+  bankName: z.string().min(1),
+  bankCode: z.string().min(1),
+  accountNumber: z.string().min(6),
+  narration: z.string().max(80).optional(),
+  pinToken: z.string().uuid(),
 });
+
+export type InitiateFiatTransferInput = z.infer<typeof initiateFiatTransferSchema>;
 
 export const FiatTransferResponse = z.object({
   id: z.string(),
@@ -52,5 +55,4 @@ export const TransferStatusResponse = z.object({
 });
 
 
-export type InitiateFiatTransferInput = z.infer<typeof initiateFiatTransferSchema>;
 export type AuthorizeTransferInput = z.infer<typeof AuthorizeTransferSchema>;

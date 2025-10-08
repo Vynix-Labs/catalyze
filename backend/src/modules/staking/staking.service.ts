@@ -1,8 +1,12 @@
 import { getStrategies } from "../../utils/troves/strategies";
-import { approveWithChipi, withdrawVesuUsdc } from "../../utils/wallet/chipi";
+import { approveWithChipi, withdrawVesuUsdc, stakeWithChipi } from "../../utils/wallet/chipi";
 import { validateSufficientBalance } from "../../utils/wallet/tokens";
 import { TransactionsService } from "../transactions/transactions.service";
 import { db } from "../../plugins/db";
+import type { WalletData } from "@chipi-pay/chipi-sdk";
+import type { CryptoCurrency } from "../../config";
+import { transactions, userWallets } from "../../db";
+import { eq } from "drizzle-orm";
 
 type Database = typeof db;
 
@@ -63,7 +67,7 @@ export class StakingService {
   async stake(userId: string, strategyId: string, amount: number) {
     // Get user wallet
     const wallet = await this.db.query.userWallets.findFirst({
-        where: { userId },
+        where: eq(userWallets.userId, userId),
     });
     if (!wallet) throw new Error("User wallet not found");
     
@@ -72,7 +76,12 @@ export class StakingService {
     const strategy = strategies.find((s) => s.id === strategyId);
     if (!strategy) throw new Error("Invalid strategy selected");
 
-    const tokenSymbol = strategy.depositToken?.[0]?.symbol?.toLowerCase() || "unknown";
+    const lower = strategy.depositToken?.[0]?.symbol?.toLowerCase() || "";
+    const allowed: ReadonlyArray<CryptoCurrency> = ["usdt", "usdc", "strk", "eth", "weth", "wbtc"] as const;
+    if (!allowed.includes(lower as CryptoCurrency)) {
+      throw new Error("Unsupported token for strategy");
+    }
+    const tokenSymbol = lower as CryptoCurrency;
     const contractAddress = strategy.contract?.[0]?.address;
     if (!contractAddress) throw new Error("Strategy contract not found");
 
@@ -93,36 +102,43 @@ export class StakingService {
 
     try {
         // Approve tokens for contract to spend
-        await approveWithChipi(wallet, contractAddress, amount, tokenSymbol as any, userId);
+        await approveWithChipi(wallet as unknown as WalletData, contractAddress, amount, tokenSymbol, userId);
 
         // Perform staking using Chipi SDK
-        const tx = await stakeWithChipi(wallet, amount, userId, tokenSymbol as any, contractAddress, strategyId);
+        const tx = await stakeWithChipi(wallet as unknown as WalletData, amount, userId, tokenSymbol, contractAddress, strategyId);
+        const txHash = typeof tx === "string"
+          ? tx
+          : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
 
         // Update transaction as completed
         await this.db
-            .update("transactions")
-            .set({ status: "completed", txHash: tx.transaction_hash })
-            .where({ id: txRow.id });
+            .update(transactions)
+            .set({ status: "completed", txHash })
+            .where(eq(transactions.id, txRow.id));
 
         return {
             status: true,
             message: "Stake successful",
-            txHash: tx.transaction_hash,
+            txHash,
         };
-    } catch (err: any) {
+    } catch (err: unknown) {
         // Handle failures gracefully
         await this.db
-            .update("transactions")
-            .set({ status: "failed", metadata: { error: err.message } })
-            .where({ id: txRow.id });
+            .update(transactions)
+            .set({ status: "failed", metadata: { error: err instanceof Error ? err.message : String(err) } })
+            .where(eq(transactions.id, txRow.id));
 
-        throw new Error(`Stake failed: ${err.message || err}`);
+        const msg = err instanceof Error ? err.message : String(err);
+        throw new Error(`Stake failed: ${msg}`);
     }
   }
 
 
-  async unstake(userId: string, wallet: any, strategyId: string, amount: number) {
+  async unstake(userId: string, wallet: WalletData, strategyId: string, amount: number) {
     const tx = await withdrawVesuUsdc(wallet, amount, userId);
+    const txHash = typeof tx === "string"
+      ? tx
+      : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
     await this.txSvc.createTransaction({
       userId,
       type: "unstake",
@@ -130,14 +146,9 @@ export class StakingService {
       tokenSymbol: "usdc",
       amountToken: amount,
       status: "completed",
-      txHash: tx.transaction_hash,
+      txHash,
       metadata: { strategyId },
     });
-    return { status: true, message: "Unstake successful", txHash: tx.transaction_hash };
-  }
-
-  async getUserBalance(walletAddress: string, strategyId: string) {
-    // Placeholder — later  query vault contracts directly
-    return { status: true, tokenSymbol: "USDC", stakedAmount: 0 };
+    return { status: true, message: "Unstake successful", txHash };
   }
 }

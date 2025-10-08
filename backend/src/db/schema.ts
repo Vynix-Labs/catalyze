@@ -57,6 +57,14 @@ export const fiatDepositStatusEnum = pgEnum('fiat_deposit_status', [
   'failed',
 ]);
 
+export const reserveStatusEnum = pgEnum('reserve_status', [
+  'pending',
+  'succeeded',
+  'expired',
+  'needs_admin',
+  'cancelled',
+]);
+
 export const withdrawStatusEnum = pgEnum('withdraw_status', [
   'pending',
   'processing',
@@ -86,7 +94,7 @@ export const wallet = createTable("wallet", {
   id: text('id').primaryKey(),
   userId: text('user_id').references(() => user.id).notNull(),
   walletAddress: varchar("wallet_address", { length: 255 }).notNull(),
-  
+  encryptedPrivateKey: varchar("encrypted_private_key", { length: 255 }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
@@ -186,9 +194,31 @@ export const depositIntents = createTable('deposit_intents', {
   status: fiatDepositStatusEnum('status').notNull(),
   provider: varchar('provider', { length: 255 }),
   providerRef: varchar('provider_ref', { length: 255 }),
+  // Keep as plain uuid to avoid circular TS references to reserves
+  reserveId: uuid('reserve_id'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
-});
+}, (t) => [
+  uniqueIndex('deposit_provider_ref_unique').on(t.providerRef),
+]);
+
+// ----------------- RESERVES -----------------
+export const reserves = createTable('reserves', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('user_id').references(() => user.id).notNull(),
+  tokenSymbol: varchar('token_symbol', { length: 10 }).notNull(),
+  amountToken: decimal('amount_token', { precision: 38, scale: 18 }).notNull(),
+  status: reserveStatusEnum('status').notNull(),
+  // Keep as plain uuid to avoid circular TS references
+  intentId: uuid('intent_id'),
+  txHash: varchar('tx_hash', { length: 255 }),
+  notes: jsonb('notes'),
+  expiresAt: timestamp('expires_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+}, (t) => [
+  uniqueIndex('reserve_intent_unique').on(t.intentId),
+]);
 
 // ----------------- CRYPTO DEPOSITS -----------------
 export const cryptoDeposits = createTable('crypto_deposits', {
@@ -209,6 +239,7 @@ export const userWallets = createTable('user_wallets', {
   userId: text('user_id').references(() => user.id).notNull().unique(),
   network: varchar('network', { length: 50 }).notNull().default('starknet'),
   publicKey: varchar('public_key', { length: 255 }).notNull(),
+  encryptedPrivateKey: varchar('encrypted_private_key', { length: 255 }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });

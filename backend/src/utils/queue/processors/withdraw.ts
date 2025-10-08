@@ -40,10 +40,10 @@ export const withdrawProcessor = async (job: Job) => {
       console.log(result);
 
       if (["pending", "processing"].includes(result.status)) {
-        await queues[QUEUE_NAMES.WITHDRAW].add(
+        await fastify.queues.withdraw.add(
           "check_withdraw_status",
           { reference },
-          { delay: 2 * 60 * 1000 } // 2 minutes
+          { delay: 2 * 60 * 1000 }
         );
       }
 

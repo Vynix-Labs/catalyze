@@ -77,9 +77,9 @@ export class TransactionsService {
     const whereClauses: any[] = [];
     const f = opts.filters;
     if (f?.userId) whereClauses.push(eq(transactions.userId, f.userId));
-    if (f?.type) whereClauses.push(eq(transactions.type, f.type));
-    if (f?.subtype) whereClauses.push(eq(transactions.subtype, f.subtype));
-    if (f?.status) whereClauses.push(eq(transactions.status, f.status));
+    if (f?.type) whereClauses.push(eq(transactions.type, f.type as any));
+    if (f?.subtype) whereClauses.push(eq(transactions.subtype, f.subtype as any));
+    if (f?.status) whereClauses.push(eq(transactions.status, f.status as any));
     if (f?.tokenSymbol) whereClauses.push(eq(transactions.tokenSymbol, f.tokenSymbol));
     if (f?.dateFrom) whereClauses.push(gte(transactions.createdAt, new Date(f.dateFrom)));
     if (f?.dateTo) whereClauses.push(lte(transactions.createdAt, new Date(f.dateTo)));

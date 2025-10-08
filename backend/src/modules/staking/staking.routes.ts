@@ -1,4 +1,4 @@
-import { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsync } from "fastify";
 import { requireAuth } from "../../plugins/requireAuth";
 import { StakingService } from "./staking.service";
 import {
