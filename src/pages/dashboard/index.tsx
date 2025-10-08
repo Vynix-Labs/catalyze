@@ -264,7 +264,7 @@ const Home: React.FC = () => {
                           ? "Loading..."
                           : isBalanceVisible
                           ? `₦${balanceData?.totalFiat || "0.00"}`
-                          : "*********"}
+                          : "****"}
                       </p>
                       <button
                         onClick={toggleBalanceVisibility}

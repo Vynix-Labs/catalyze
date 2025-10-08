@@ -33,7 +33,7 @@ const LoginForm = forwardRef<HTMLFormElement, LoginFormProps>(
       <form
         ref={ref}
         onSubmit={handleSubmit(onSubmit)}
-        className="gap-y-6 flex b items-center w-full flex-col bg-red-400"
+        className="gap-y-6 flex  items-center w-full flex-col"
       >
         <div className="form-control w-full">
           <label htmlFor="email">Email</label>
