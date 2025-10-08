@@ -9,13 +9,13 @@ export const initiateCryptoDepositBody = z.object({
 
 export const InitiateCryptoDepositResponse = z.object({
   id: z.string().uuid(),
-  userId: z.string(),
-  tokenSymbol: z.string(),
+  userId: z.string().optional(),
+  tokenSymbol: z.string().optional(),
   depositAddress: z.string(),
-  memo: z.string().nullable(),
-  status: z.enum(["pending", "confirmed", "failed"]),
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  memo: z.string().nullable().optional(),
+  status: z.enum(["pending", "confirmed", "failed"]).optional(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
 });
 
 export const depositIdParam = z.object({
@@ -37,3 +37,23 @@ export const webhookBodySchema = z.object({
 
 export type InitiateCryptoDepositBody = z.infer<typeof initiateCryptoDepositBody>;
 export type WebhookBody = z.infer<typeof webhookBodySchema>;
+
+// New: address response
+export const CryptoAddressResponse = z.object({
+  address: z.string(),
+  network: z.string(),
+});
+
+// New: withdraw
+export const cryptoWithdrawBody = z.object({
+  tokenSymbol: z.enum(["USDT", "USDC", "STRK", "ETH", "WETH", "WBTC"]),
+  amount: z.number().positive(),
+  toAddress: z.string(),
+  pinToken: z.string().uuid(),
+});
+
+export const CryptoWithdrawResponse = z.object({
+  reference: z.string(),
+  status: z.enum(["pending", "processing", "completed", "failed"]).default("processing"),
+  txHash: z.string().optional(),
+});
