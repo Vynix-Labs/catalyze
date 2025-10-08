@@ -5,12 +5,14 @@ import { redis } from '../../config/redis';
 import { emailProcessor } from './processors/email';
 import { notificationProcessor } from './processors/notification';
 import { backgroundTaskProcessor } from './processors/background_task';
+import { withdrawProcessor } from './processors/withdraw';
 
 // Queue names
 export const QUEUE_NAMES = {
   EMAIL: 'email',
   NOTIFICATION: 'notification',
   BACKGROUND_TASK: 'background_task',
+  WITHDRAW: 'withdraw',
 } as const;
 
 // Queue configurations
@@ -53,6 +55,19 @@ export const queues = {
       },
     },
   }),
+
+  [QUEUE_NAMES.WITHDRAW]: new Queue(QUEUE_NAMES.WITHDRAW, {
+    connection: redis,
+    defaultJobOptions: {
+      removeOnComplete: 50,
+      removeOnFail: 10,
+      attempts: 5,
+      backoff: {
+        type: 'exponential',
+        delay: 60000,
+      },
+    },
+  }),
 };
 
 export const workers = {
@@ -74,7 +89,14 @@ export const workers = {
     connection: redis,
     concurrency: 1,
   }),
+
+  [QUEUE_NAMES.WITHDRAW]: new Worker(QUEUE_NAMES.WITHDRAW, withdrawProcessor, {
+    connection: redis,
+    concurrency: 1,
+  }),
 };
+
+
 
 // Basic worker event logging for visibility and debugging
 for (const [name, worker] of Object.entries(workers)) {

@@ -5,6 +5,10 @@ import { TOKEN_MAP, type CryptoCurrency } from "../../config";
 import { type Call } from "starknet";
 import { getTokenDecimals } from "./tokens";
 import { generateUserJWT } from "../auth/jwt";
+import type { FastifyInstance } from "fastify";
+import { userWallets } from "../../db/schema";
+import { randomUUID } from "crypto";
+import { eq } from "drizzle-orm";
 
 // Initialize ChipiSDK
 const chipiSDK = new ChipiSDK({
@@ -16,15 +20,69 @@ const chipiSDK = new ChipiSDK({
  * @param userId - The authenticated user's ID
  */
 export async function createWallet(userId: string): Promise<WalletData> {
-    const bearerToken = await generateUserJWT(userId);
-    
+  const bearerToken = await generateUserJWT(userId);
+
+  try {
     const chipiWallet = await chipiSDK.createWallet({
-        encryptKey: env.CHIPI_ENCRYPT_KEY,
-        bearerToken,
+      encryptKey: process.env.CHIPI_ENCRYPT_KEY!,
+      bearerToken,
     });
 
-    // Return the WalletData from ChipiSDK
+    console.log("Wallet created:", chipiWallet);
     return chipiWallet.wallet;
+
+  } catch (err: unknown) {
+    console.error("createWallet failed:", err);
+
+    // Extra debug logs
+    if (err instanceof Error && err.message.includes("typedData")) {
+      console.error("Chipi didn't return typeData. inspect manually");
+
+      // fetch to inspect the real API output
+      const debugResponse = await fetch("https://api.chipipay.com/v1/chipi-wallets/prepare-creation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${bearerToken}`,
+          "x-api-key": process.env.CHIPI_API_PUBLIC_KEY!,
+        },
+        body: JSON.stringify({ publicKey: "debug" }),
+      });
+
+      const debugText = await debugResponse.text();
+      console.error("Raw response from Chipi prepare-creation:", debugText);
+    }
+
+    const message = err instanceof Error ? err.message : String(err);
+    throw new Error(`Wallet creation failed: ${message}`);
+  }
+}
+
+
+export async function ensureUserWallet(fastify: FastifyInstance, userId: string, network: string = "starknet") {
+  const [existing] = await fastify.db
+    .select()
+    .from(userWallets)
+    .where(eq(userWallets.userId, userId));
+
+  if (existing) {
+    return existing;
+  }
+
+  const wallet = await createWallet(userId);
+  const row: typeof userWallets.$inferInsert = {
+    id: randomUUID(),
+    userId,
+    network,
+    publicKey: wallet.publicKey,
+    encryptedPrivateKey: wallet.encryptedPrivateKey,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  await fastify.db.insert(userWallets).values(row);
+
+  return row as unknown as typeof userWallets.$inferSelect;
 }
 
 export async function transferWithChipi(from: WalletData, to: string, amount: number, currency: CryptoCurrency, userId: string) {
@@ -88,4 +146,33 @@ export async function withdrawVesuUsdc(wallet: WalletData, amount: number, userI
         recipient: wallet.publicKey,
         bearerToken,
     });
+}
+
+export async function stakeWithChipi(
+  wallet: WalletData,
+  amount: number,
+  userId: string,
+  tokenSymbol: string,
+  contractAddress: string
+) {
+  const symbol = tokenSymbol.toLowerCase();
+  const currency = symbol as CryptoCurrency;
+  const decimals = await getTokenDecimals(currency);
+
+  if (symbol === "usdc") {
+    return await stakeVesuUsdc(wallet, amount, userId);
+  }
+
+  const entrypoint = "deposit";
+
+  const calls: Call[] = [
+    {
+      contractAddress,
+      entrypoint,
+      calldata: [BigInt(Math.floor(amount * 10 ** decimals))],
+    },
+  ];
+
+  // Execute contract call via Chipi
+  return await callContractWithChipi(wallet, contractAddress, calls, userId);
 }

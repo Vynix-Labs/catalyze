@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AlertCircle } from "lucide-react";
 import type { AmountEntryStepProps } from "../../types/types";
 import Button from "../../common/ui/button";
@@ -9,7 +9,8 @@ import { FiatDeposit } from "./FiatDeposit";
 import { FiatTransfer } from "./FiatTransfer";
 import { CryptoDeposit } from "./CryptoDeposit";
 import { CryptoTransfer } from "./CryptoTransfer";
-import { currencyIcons, exchangeRate, getNetworkName } from "../../utils";
+import { currencyIcons, getNetworkName } from "../../utils";
+import { fetchTokenRates, type RatePrices } from "../../api/rates";
 
 // Fallback component for unknown currencies
 const FallbackIcon = ({ currencyType }: { currencyType: string }) => (
@@ -58,6 +59,9 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   const [isSwapped, setIsSwapped] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+  const [rates, setRates] = useState<RatePrices | null>(null);
+  const [isRateLoading, setIsRateLoading] = useState(false);
+  const [rateError, setRateError] = useState<string | null>(null);
 
   // Use currencyMode directly instead of deriving from transferType
   const [activeTab, setActiveTab] = useState<"fiat" | "crypto">(currencyMode);
@@ -83,17 +87,75 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
     setAmountNGN,
   ]);
 
+  useEffect(() => {
+    if (!currencyType) {
+      setRates(null);
+      return;
+    }
+
+    let cancelled = false;
+    setIsRateLoading(true);
+    fetchTokenRates(currencyType)
+      .then((data) => {
+        if (cancelled) return;
+        setRates(data);
+        setRateError(null);
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setRates(null);
+        setRateError(err instanceof Error ? err.message : "Failed to fetch rate");
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setIsRateLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currencyType]);
+
+  const quoteType = useMemo<"base" | "buy" | "sell">(() => {
+    if (activeTab !== "fiat") return "base";
+    if (flowType === "deposit") return "buy";
+    if (flowType === "transfer") return "sell";
+    return "base";
+  }, [activeTab, flowType]);
+
+  const currentRate = useMemo(() => {
+    if (!rates) return 0;
+    switch (quoteType) {
+      case "buy":
+        return rates.buy;
+      case "sell":
+        return rates.sell;
+      default:
+        return rates.base;
+    }
+  }, [rates, quoteType]);
+
+  const baseRate = useMemo(() => rates?.base ?? 0, [rates]);
+
   const handleFiatUSDCChange = (value: string) => {
     setFiatAmount(value);
     const usdcAmount = parseFloat(value) || 0;
-    const ngnEquivalent = (usdcAmount * exchangeRate).toFixed(2);
+    if (!currentRate) {
+      setFiatAmountNGN("");
+      return;
+    }
+    const ngnEquivalent = (usdcAmount * currentRate).toFixed(2);
     setFiatAmountNGN(ngnEquivalent);
   };
 
   const handleFiatNGNChange = (value: string) => {
     setFiatAmountNGN(value);
     const ngnAmount = parseFloat(value) || 0;
-    const usdcEquivalent = (ngnAmount / exchangeRate).toFixed(6);
+    if (!currentRate) {
+      setFiatAmount("");
+      return;
+    }
+    const usdcEquivalent = (ngnAmount / currentRate).toFixed(6);
     setFiatAmount(usdcEquivalent);
   };
 
@@ -182,6 +244,9 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
               onAmountNGNChange={handleFiatNGNChange}
               onSwap={handleSwap}
               isSwapped={isSwapped}
+              rate={currentRate}
+              isRateLoading={isRateLoading}
+              rateError={rateError}
             />
           ) : (
             <FiatTransfer
@@ -192,6 +257,9 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
               onAmountNGNChange={handleFiatNGNChange}
               onSwap={handleSwap}
               isSwapped={isSwapped}
+              rate={currentRate}
+              isRateLoading={isRateLoading}
+              rateError={rateError}
             />
           )
         ) : flowType === "deposit" ? (
@@ -276,7 +344,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
               <p className="text-sm text-gray-500">
                 ≈₦
                 {(
-                  (parseFloat(cryptoAmount) || 0) * exchangeRate
+                  (parseFloat(cryptoAmount) || 0) * baseRate
                 ).toLocaleString()}
               </p>
             </div>

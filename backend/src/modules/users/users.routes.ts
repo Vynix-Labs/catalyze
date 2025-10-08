@@ -1,10 +1,11 @@
-import { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsync } from "fastify";
 import { requireAuth } from "../../plugins/requireAuth";
 import { BalancesService } from "./users.service";
 import {
   BalancesResponse,
   BalanceParam,
   BalanceResponse,
+  BalanceQuery,
 } from "./users.schema";
 
 const userRoutes: FastifyPluginAsync = async (fastify) => {
@@ -19,7 +20,8 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       const userId = request.currentUserId as string;
-      const result = await svc.listUserBalances(userId);
+      const { quote } = BalanceQuery.parse(request.query ?? {});
+      const result = await svc.listUserBalances(userId, quote);
       return reply.code(200).send(BalancesResponse.parse(result));
     }
   );
@@ -29,14 +31,15 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
     "/balances/:token",
     {
       preHandler: requireAuth(fastify),
-      schema: { params: BalanceParam, response: { 200: BalanceResponse } },
+      schema: { params: BalanceParam, response: { 200: BalanceResponse, 404: { type: "object", properties: { error: { type: "string" } } } } },
     },
     async (request, reply) => {
       const userId = request.currentUserId as string;
       const { token } = BalanceParam.parse(request.params);
-      const normalizedToken = token.toUpperCase();
+      const normalizedToken = token.toLowerCase();
 
-      const result = await svc.getUserBalance(userId, normalizedToken);
+      const { quote } = BalanceQuery.parse(request.query ?? {});
+      const result = await svc.getUserBalance(userId, normalizedToken, quote);
       if (!result) return reply.code(404).send({ error: "Balance not found" });
 
       return reply.code(200).send(BalanceResponse.parse(result));

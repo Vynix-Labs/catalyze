@@ -61,6 +61,9 @@ export interface BaseComponentProps {
   currencyType: string;
   onAmountChange: (amount: string) => void;
   onAmountNGNChange: (amount: string) => void;
+  rate: number;
+  isRateLoading: boolean;
+  rateError?: string | null;
 }
 
 export interface CryptoComponentProps {

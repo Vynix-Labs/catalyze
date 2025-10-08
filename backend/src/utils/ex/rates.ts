@@ -1,36 +1,40 @@
-
-import { COINGECKO_IDS, SPREAD,  type CryptoCurrency, type Action, type RateInfo } from "../../config";
+import { COINGECKO_IDS, SPREAD, type CryptoCurrency, type RateInfo } from "../../config";
 
 /**
- * Get current exchange rate from CoinGecko with NGN discount
- * TODO: cache rates for 15-30mins
+ * Get current exchange rates for all cryptocurrencies at once
+ * Returns base, buy, sell for each token
  */
-export async function getExchangeRate(currency: CryptoCurrency, action: Action): Promise<RateInfo | null> {
-    try {
-      const coinId = COINGECKO_IDS[currency];
-      const response = await fetch(
-        `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=ngn`,
-      );
-  
-      if (!response.ok) {
-        throw new Error(`Failed to fetch rate for ${currency}`);
-      }
-  
-      const data = await response.json();
+export async function getExchangeRates(): Promise<RateInfo[]> {
+  try {
+    const coinIds = Object.values(COINGECKO_IDS).join(","); // join all CoinGecko IDs
+    const response = await fetch(
+      `https://api.coingecko.com/api/v3/simple/price?ids=${coinIds}&vs_currencies=ngn`
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch rates for all currencies");
+    }
+
+    const data = await response.json();
+
+    // Map each currency to RateInfo
+    const rates: RateInfo[] = Object.entries(COINGECKO_IDS).map(([currency, coinId]) => {
       // @ts-expect-error - CoinGecko API response type
-      const baseRate = data[coinId]?.ngn || 0;
-  
-      const spreadRate = Math.max(0, baseRate + SPREAD[action]);
-  
+      const baseRate = Math.max(0, Number(data[coinId]?.ngn || 0));
+      const buy = Math.max(0, baseRate + SPREAD.buy);
+      const sell = Math.max(0, baseRate + SPREAD.sell);
+
       return {
-        currency,
-        rateInNGN: spreadRate,
+        currency: currency as CryptoCurrency,
+        price: { base: baseRate, buy, sell },
         source: "coingecko",
         lastUpdated: new Date(),
       };
-    }
-    catch (error) {
-      console.error(`Error fetching rate for ${currency}:`, error);
-      return null
-    }
+    });
+
+    return rates;
+  } catch (error) {
+    console.error("Error fetching all exchange rates:", error);
+    return [];
   }
+}
