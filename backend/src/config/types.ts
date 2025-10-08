@@ -1,5 +1,5 @@
 
-export type CryptoCurrency = "usdt" | "usdc" | "strk" | "eth" | "weth" | "wbtc";
+export type CryptoCurrency = "usdt" | "usdc" | "strk" | "weth" | "wbtc";
 export type FiatCurrency = "ngn";
 export type Action = "buy" | "sell";
 export type PriceQuoteType = "base" | Action;

@@ -66,7 +66,7 @@ export async function getStrategies(): Promise<Strategy[]> {
   }
   const data = await response.json() as StrategiesResponse;
   return data.strategies.filter(strategy =>
-    strategy.name.toLowerCase().includes('evergreen') ||
-    strategy.name.toLowerCase().includes('vesu fusion')
+    strategy.id.toLowerCase().includes('evergreen') ||
+    strategy.id.toLowerCase().includes('vesu_fusion')
   );
 }
