@@ -31,7 +31,7 @@ const SignUpForm = forwardRef<HTMLFormElement, SignUpFormProps>(
       <form
         ref={ref}
         onSubmit={handleSubmit(onSubmit)}
-        className="gap-y-6 flex b items-center w-full flex-col"
+        className="gap-y-6 flex  items-center w-full flex-col"
       >
         <div className="form-control w-full">
           <label htmlFor="email">Email</label>

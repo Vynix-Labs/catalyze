@@ -5,11 +5,13 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../common/ui/button";
 import { RoutePath } from "../../routes/routePath";
+import Cookies from "js-cookie";
 
 function Slider() {
   const [activeSlide, setActiveSlide] = useState(1);
   const [previousSlide, setPreviousSlide] = useState<number | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const isNewUser = Cookies.get("marker");
 
   const slideRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -51,6 +53,14 @@ function Slider() {
 
   // Initialize first slide
   useEffect(() => {
+    console.log(isNewUser);
+
+    if (isNewUser === undefined) {
+      Cookies.set("marker", "true");
+    } else if (isNewUser === "false") {
+      navigate(RoutePath.CREATE_ACCOUNT);
+    }
+
     if (!containerRef.current) return;
 
     const allSlides = Object.values(slideRefs.current).filter(Boolean);
@@ -105,70 +115,75 @@ function Slider() {
     );
   }, [activeSlide, previousSlide]);
 
-  return (
-    <div className=" flex justify-center gap-10 w-full  items-center h-svh w-auto  flex-col  px-5 pb-6">
-      <div
-        ref={containerRef}
-        className="relative overflow-hidden flex h-full  w-full "
-      >
-        {/* Slides */}
-        {sliders.map((slider) => (
-          <div
-            key={slider.id}
-            ref={(el) => {
-              if (el) slideRefs.current[slider.id] = el;
-              else delete slideRefs.current[slider.id];
-            }}
-            className="absolute bottom-8 w-full h-full flex flex-col items-center pt-16 justify-between gap-14 text-center"
-            style={{ transform: "translateX(100%)" }}
-          >
-            {/* Image */}
-            <div className=" size-70 bg-blue-500 blur-md rounded-full">
-              <img src="" alt="" />
-            </div>
-            <div className="text-left   max-w-[36rem] space-y-4 leading-[100%]">
-              {/* tag */}
-              <p className="w-fit py-2 px-3 bg-[#0647DF1A] text-primary-100 text-xs font-semibold rounded-full">
-                {slider.tag}
-              </p>
-              <h1 className="text-5xl max-w-[19.3rem]  font-black text-black leading-[132%]">
-                {slider.title}
-              </h1>
-              <p className="text-sm font-semibold text-gray-600 leading-[150%]">
-                {slider.description}
-              </p>
-            </div>
-          </div>
-        ))}
-
-        {/* Indicators */}
-        <div className="absolute z-40 bottom-0 left-10 lg:left-24 transform -translate-x-1/2 flex space-x-2">
-          {sliders.map((_, index) => (
-            <motion.button
-              key={index}
-              onClick={() => !isAnimating && setActiveSlide(index + 1)}
-              className={`outline-0 h-3 ${
-                activeSlide === index + 1 ? "w-6" : "w-2.5 bg-primary-100/20"
-              }  rounded-full  relative z-30 flex items-center`}
+  const handleProcessed = () => {
+    Cookies.set("marker", "false");
+    navigate(RoutePath.CREATE_ACCOUNT);
+  };
+  if (isNewUser === "true")
+    return (
+      <div className=" flex justify-center gap-10 w-full  items-center h-full  flex-col  px-5 pb-6">
+        <div
+          ref={containerRef}
+          className="relative overflow-hidden flex h-full  w-full "
+        >
+          {/* Slides */}
+          {sliders.map((slider) => (
+            <div
+              key={slider.id}
+              ref={(el) => {
+                if (el) slideRefs.current[slider.id] = el;
+                else delete slideRefs.current[slider.id];
+              }}
+              className="absolute bottom-8 w-full h-full flex flex-col items-center pt-16 justify-between gap-14 text-center"
+              style={{ transform: "translateX(100%)" }}
             >
-              {activeSlide === index + 1 && (
-                <motion.div
-                  layoutId="activeSlideBtn"
-                  className="absolute inset-0 rounded-full bg-[#0647DF] w-6 h-2.5"
-                />
-              )}
-            </motion.button>
+              {/* Image */}
+              <div className=" size-70 bg-blue-500 blur-md rounded-full">
+                <img src="" alt="" />
+              </div>
+              <div className="text-left   max-w-[36rem] space-y-4 leading-[100%]">
+                {/* tag */}
+                <p className="w-fit py-2 px-3 bg-[#0647DF1A] text-primary-100 text-xs font-semibold rounded-full">
+                  {slider.tag}
+                </p>
+                <h1 className="text-5xl max-w-[19.3rem]  font-black text-black leading-[132%]">
+                  {slider.title}
+                </h1>
+                <p className="text-sm font-semibold text-gray-600 leading-[150%]">
+                  {slider.description}
+                </p>
+              </div>
+            </div>
           ))}
-        </div>
-      </div>
 
-      <Button
-        variants="primary"
-        text="Get Started"
-        handleClick={() => navigate(RoutePath.CREATE_ACCOUNT)}
-      />
-    </div>
-  );
+          {/* Indicators */}
+          <div className="absolute z-40 bottom-0 left-0  transform flex space-x-2">
+            {sliders.map((_, index) => (
+              <motion.button
+                key={index}
+                onClick={() => !isAnimating && setActiveSlide(index + 1)}
+                className={`outline-0 h-3 ${
+                  activeSlide === index + 1 ? "w-6" : "w-2.5 bg-primary-100/20"
+                }  rounded-full  relative z-30 flex items-center`}
+              >
+                {activeSlide === index + 1 && (
+                  <motion.div
+                    layoutId="activeSlideBtn"
+                    className="absolute inset-0 rounded-full bg-[#0647DF] w-6 h-2.5"
+                  />
+                )}
+              </motion.button>
+            ))}
+          </div>
+        </div>
+
+        <Button
+          variants="primary"
+          text="Get Started"
+          handleClick={handleProcessed}
+        />
+      </div>
+    );
 }
 
 export default Slider;

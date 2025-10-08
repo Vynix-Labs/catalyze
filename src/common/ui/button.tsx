@@ -24,7 +24,7 @@ function Button({
     <button
       onClick={handleClick}
       className={`${btnShape()} ${classes} gap-2 h-12 flex ${
-        fullWidth ? "w-full" : "max-w-[21.9rem] w-full"
+        fullWidth ? "w-full" : "max-w-[26.2rem] w-full"
       } rounded-full items-center justify-center cursor-pointer disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed`}
       disabled={disabled}
     >

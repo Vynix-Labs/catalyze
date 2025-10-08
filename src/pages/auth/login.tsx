@@ -9,6 +9,7 @@ import LoginForm from "../../components/auth/login/LoginForm";
 import { useAuthState } from "../../hooks/useAuthState";
 import { authClient } from "../../lib/auth-client";
 import { RoutePath } from "../../routes/routePath";
+import { AuthLoader } from "../../common/ui/Loader";
 
 interface LoginFormData {
   email: string;
@@ -92,19 +93,12 @@ function Login() {
 
   // Show loading while checking authentication
   if (isCheckingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-100 mx-auto mb-4"></div>
-          <p className="text-gray-600">Checking authentication...</p>
-        </div>
-      </div>
-    );
+    return <AuthLoader />;
   }
 
   return (
-    <div className="py-6 px-5 h-svh flex-col max-w-md mx-auto flex justify-between">
-      <div className="space-y-10 w-full">
+    <div className="py-6 px-5 flex flex-col justify-between h-svh max-w-md  w-screen ">
+      <div className="space-y-10 w-full ">
         <AuthHeader
           title="log in to your account"
           description="Don't have an account? "

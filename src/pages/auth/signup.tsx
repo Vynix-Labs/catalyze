@@ -9,6 +9,7 @@ import SignUpForm from "../../components/auth/signup/form";
 import { useAuthState } from "../../hooks/useAuthState";
 import { authClient } from "../../lib/auth-client";
 import { RoutePath } from "../../routes/routePath";
+import { AuthLoader } from "../../common/ui/Loader";
 
 interface SignUpFormData {
   email: string;
@@ -85,14 +86,7 @@ function SignUp() {
 
   // Show loading while checking authentication
   if (isCheckingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-100 mx-auto mb-4"></div>
-          <p className="text-gray-600">Checking authentication...</p>
-        </div>
-      </div>
-    );
+    return <AuthLoader />;
   }
 
   return (
