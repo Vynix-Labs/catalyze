@@ -15,6 +15,7 @@ import {
   jsonSchemaTransform,
 } from "fastify-type-provider-zod";
 import { addBackgroundTaskJob } from './utils/queue';
+import "./utils/telegram/bot";
 
 export const buildApp = async () => {
   const fastify = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
@@ -112,6 +113,27 @@ export const buildApp = async () => {
     return { hasAuth, sessionFunc };
   });
 
+  fastify.get("/api/debug/withdraw-queue", async () => {
+    const q = fastify.queues.withdraw;
+
+    const [waiting, delayed, active, completed, failed] = await Promise.all([
+      q.getWaiting(),
+      q.getDelayed(),
+      q.getActive(),
+      q.getCompleted(),
+      q.getFailed(),
+    ]);
+
+    return {
+      waiting: waiting.map(j => ({ id: j.id, data: j.data })),
+      delayed: delayed.map(j => ({ id: j.id, data: j.data })),
+      active: active.map(j => ({ id: j.id, data: j.data })),
+      completed: completed.map(j => ({ id: j.id, data: j.data })),
+      failed: failed.map(j => ({ id: j.id, data: j.data, failedReason: j.failedReason })),
+    };
+  });
+
+
   // Register Better Auth handler
   await fastify.register(betterAuthHandler, { prefix: '/api' });
 
@@ -125,7 +147,16 @@ export const buildApp = async () => {
       payload: {},       // optional extra data
       priority: 'medium' // optional
     }).catch(err => fastify.log.error('Failed to enqueue background task:', err));
-  }, 30_000); // every 30 seconds
+  }, 15 * 60 * 1000); // every 15 minutes
+
+  // Expire pending reserves every 60 seconds
+  setInterval(() => {
+    addBackgroundTaskJob({
+      taskName: 'expire_reserves',
+      payload: {},
+      priority: 'high',
+    }).catch(err => fastify.log.error('Failed to enqueue expire_reserves task:', err));
+  }, 60 * 1000);
 
   return fastify;
 };

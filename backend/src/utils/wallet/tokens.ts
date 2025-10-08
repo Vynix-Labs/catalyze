@@ -22,7 +22,9 @@ export async function getTokenDecimals(currency: CryptoCurrency): Promise<number
       usdt: 6,
       usdc: 6,
       strk: 18,
-      eth: 18
+      eth: 18,
+      weth: 18,
+      wbtc: 18
     };
     return defaultDecimals[currency] || 18;
   }
@@ -130,7 +132,9 @@ export function validateTransactionAmount(amount: number, currency: CryptoCurren
     usdt: 6,
     usdc: 6,
     strk: 8,
-    eth: 8
+    eth: 8,
+    weth: 8,
+    wbtc: 8
   };
 
   const decimalPlaces = (amount.toString().split(".")[1] || "").length;

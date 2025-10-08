@@ -1,4 +1,5 @@
-import { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsync } from "fastify";
+import { z } from "zod";
 import { requireAuth } from "../../plugins/requireAuth";
 import { TransactionsService } from "./transactions.service";
 import {
@@ -47,7 +48,7 @@ const transactionsRoutes: FastifyPluginAsync = async (fastify) => {
     "/transactions/:id",
     {
       preHandler: requireAuth(fastify),
-      schema: { params: transactionIdParam, response: { 200: TransactionResponse } },
+      schema: { params: transactionIdParam, response: { 200: TransactionResponse, 403: z.object({ error: z.string() }), 404: z.object({ error: z.string() }) } },
     },
     async (request, reply) => {
       const userId = request.currentUserId as string;
@@ -70,7 +71,7 @@ const transactionsRoutes: FastifyPluginAsync = async (fastify) => {
     "/admin/transactions",
     {
       preHandler: requireAuth(fastify),
-      schema: { querystring: listTransactionsQuery, response: { 200: TransactionsListResponse } },
+      schema: { querystring: listTransactionsQuery, response: { 200: TransactionsListResponse, 403: z.object({ error: z.string() }) } },
     },
     async (request, reply) => {
       const userId = request.currentUserId as string;

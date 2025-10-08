@@ -1,7 +1,8 @@
 
-export type CryptoCurrency = "usdt" | "usdc" | "strk" | "eth";
+export type CryptoCurrency = "usdt" | "usdc" | "strk" | "eth" | "weth" | "wbtc";
 export type FiatCurrency = "ngn";
 export type Action = "buy" | "sell";
+export type PriceQuoteType = "base" | Action;
 
 export interface BalanceInfo {
     currency: CryptoCurrency;
@@ -9,9 +10,15 @@ export interface BalanceInfo {
     balanceInNGN: number;
   }
   
+  export interface PriceNGN {
+    base: number;
+    buy: number;
+    sell: number;
+  }
+  
   export interface RateInfo {
     currency: CryptoCurrency;
-    rateInNGN: number;
+    price: PriceNGN;
     source: string;
     lastUpdated: Date;
   }

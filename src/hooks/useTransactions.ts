@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../api/axios";
 import { endpoints } from "../api/endpoints";
+import { authClient } from "../lib/auth-client";
 import type { balances, transactions } from "../utils/types";
 import { useAuthState } from "./useAuthState";
 import { authClient } from "../lib/auth-client";

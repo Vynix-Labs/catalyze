@@ -1,8 +1,9 @@
 import type { Job } from 'bullmq';
 import { db } from '../../../plugins/db';
-import { priceFeeds } from '../../../db/schema';
-import { getExchangeRate } from '../../ex/rates';
-import type { CryptoCurrency, Action, RateInfo } from '../../../config';
+import { priceFeeds, reserves } from '../../../db/schema';
+import { getExchangeRates } from '../../ex/rates';
+import type { CryptoCurrency } from '../../../config';
+import { and, eq, lt } from 'drizzle-orm';
 
 interface BackgroundTaskJobData {
   taskName: string;
@@ -11,7 +12,6 @@ interface BackgroundTaskJobData {
 }
 
 const TRACKED_TOKENS: CryptoCurrency[] = ['usdt', 'usdc', 'strk', 'eth'];
-const ACTION: Action = 'buy';
 
 export const backgroundTaskProcessor = async (job: Job<BackgroundTaskJobData>) => {
   const { taskName, payload, priority = 'medium' } = job.data;
@@ -38,38 +38,36 @@ export const backgroundTaskProcessor = async (job: Job<BackgroundTaskJobData>) =
       case 'update_price_feeds': {
         console.log('Updating price feeds...');
 
-        type CombinedRate = { token: CryptoCurrency } & RateInfo;
+        // Fetch all rates at once (base, buy, sell)
+        const allRates = await getExchangeRates();
 
-        // Fetch rates concurrently
-        const rates = await Promise.all(
-          TRACKED_TOKENS.map(async (token): Promise<CombinedRate | null> => {
-            const rate = await getExchangeRate(token, ACTION);
-            return rate ? { token, ...rate } : null;
-          })
-        );
-
-        // Filter out failed fetches
-        const validRates: CombinedRate[] = rates.filter((r): r is CombinedRate => r !== null);
+        // Filter only the tokens we're tracking
+        const validRates = allRates.filter(rate => TRACKED_TOKENS.includes(rate.currency));
 
         if (validRates.length === 0) {
           console.warn('No valid rates fetched; skipping upsert');
           break;
         }
 
-        // Upsert into priceFeeds table
+        // Upsert into priceFeeds table (store lowercase token symbols)
         for (const rate of validRates) {
+          const token = (rate.currency as string).toLowerCase();
+          console.log(`Upserting rates for ${token.toUpperCase()}: base=${rate.price.base} buy=${rate.price.buy} sell=${rate.price.sell}`);
           await db
             .insert(priceFeeds)
             .values({
-              tokenSymbol: rate.token,
-              // store decimals as strings for safety with Postgres decimals
-              priceNgn: rate.rateInNGN.toString(),
+              tokenSymbol: token,
+              priceNgnBase: rate.price.base.toString(),
+              priceNgnBuy: rate.price.buy.toString(),
+              priceNgnSell: rate.price.sell.toString(),
               source: rate.source,
             })
             .onConflictDoUpdate({
               target: priceFeeds.tokenSymbol,
               set: {
-                priceNgn: rate.rateInNGN.toString(),
+                priceNgnBase: rate.price.base.toString(),
+                priceNgnBuy: rate.price.buy.toString(),
+                priceNgnSell: rate.price.sell.toString(),
                 source: rate.source,
                 updatedAt: new Date(),
               },
@@ -79,6 +77,18 @@ export const backgroundTaskProcessor = async (job: Job<BackgroundTaskJobData>) =
         console.log('Price feeds updated successfully');
         break;
       }
+
+      case 'expire_reserves': {
+        console.log('Expiring stale reserves...');
+        const now = new Date();
+        const result = await db
+          .update(reserves)
+          .set({ status: 'expired', updatedAt: new Date() })
+          .where(and(eq(reserves.status, 'pending'), lt(reserves.expiresAt, now)));
+        console.log('Expired reserves result:', result);
+        break;
+      }
+
 
       default:
         console.log(`Executing generic task: ${taskName} with payload:`, payload);
