@@ -14,7 +14,7 @@ import TransactionDetailsPage from "./transactionDetails";
 import { useAtom } from "jotai";
 import { useNavigate } from "react-router-dom";
 import GlobalModal from "../../common/ui/modal/GlobalModal";
-import { useTransactions } from "../../hooks";
+import { useTransactions, useBalances } from "../../hooks";
 import { authAtom } from "../../store/jotai";
 
 const Home: React.FC = () => {
@@ -32,6 +32,11 @@ const Home: React.FC = () => {
     // isLoading: transactionsLoading,
     // error: transactionsError,
   } = useTransactions();
+  const {
+    data: balanceData,
+    isLoading: balancesLoading,
+    // error: balancesError,
+  } = useBalances();
   const [user] = useAtom(authAtom);
   const navigate = useNavigate();
 
@@ -120,10 +125,16 @@ const Home: React.FC = () => {
 
   // Helper function to detect currency type from title
   const detectCurrencyType = (title: string): string => {
-    if (title.includes("USDT")) return "USDT";
-    if (title.includes("USDC")) return "USDC";
-    if (title.includes("STRK")) return "STRK";
-    return "UNKNOWN";
+    switch (true) {
+      case title.includes("USDT"):
+        return "USDT";
+      case title.includes("USDC"):
+        return "USDC";
+      case title.includes("STRK"):
+        return "STRK";
+      default:
+        return "UNKNOWN";
+    }
   };
 
   const transactionsData: Transaction[] =
@@ -131,35 +142,54 @@ const Home: React.FC = () => {
       id: tx.id,
       title: `${tx.type} ${tx.tokenSymbol}`,
       date: new Date(tx.createdAt).toLocaleDateString(),
-      amount: tx.amountFiat,
+      amount: tx.amountFiat || tx.amountToken,
       currency: "₦",
       type: tx.type as "transfer" | "deposit" | "withdrawal",
       currencyType: tx.tokenSymbol,
     })) || [];
 
-  const assetsData: Asset[] = [
+  // Helper function to get token name from symbol
+  const getTokenName = (symbol: string): string => {
+    const tokenNames: Record<string, string> = {
+      USDT: "Tether",
+      USDC: "USD Coin",
+      STRK: "Starknet",
+    };
+    return tokenNames[symbol] || symbol;
+  };
+
+  // Convert balance data to Asset format
+  const assetsData: Asset[] = balanceData?.items?.map((balance, index) => ({
+    id: (index + 1).toString(),
+    symbol: balance.tokenSymbol,
+    name: getTokenName(balance.tokenSymbol),
+    balance: balance.balance,
+    value: balance.fiatEquivalent,
+    currency: "₦",
+  })) || [
+    // Fallback data when loading or no data
     {
       id: "1",
       symbol: "USDT",
       name: "Tether",
-      balance: "10,000",
-      value: "100,000",
+      balance: "0.00",
+      value: "0.00",
       currency: "₦",
     },
     {
       id: "2",
       symbol: "USDC",
       name: "USD Coin",
-      balance: "5.00023",
-      value: "6,000,000.00",
+      balance: "0.00",
+      value: "0.00",
       currency: "₦",
     },
     {
       id: "3",
       symbol: "STRK",
       name: "Starknet",
-      balance: "10,000",
-      value: "100,000",
+      balance: "0.00",
+      value: "0.00",
       currency: "₦",
     },
   ];
@@ -230,7 +260,11 @@ const Home: React.FC = () => {
 
                     <div className="flex items-center mt-2 justify-center">
                       <p className="text-4xl font-bold min-w-36 max-w-36 truncate ">
-                        {isBalanceVisible ? "₦40,0000000000000" : "*********"}
+                        {balancesLoading
+                          ? "Loading..."
+                          : isBalanceVisible
+                          ? `₦${balanceData?.totalFiat || "0.00"}`
+                          : "****"}
                       </p>
                       <button
                         onClick={toggleBalanceVisibility}

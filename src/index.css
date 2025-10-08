@@ -12,11 +12,10 @@ body {
   min-height: 100vh;
 }
 
-/* #root {
-  width: 100%;
-  max-width: 420px;
-  min-height: 100vh;
-  background: #fff;} */
+#root {
+  background: #fff;
+}
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
