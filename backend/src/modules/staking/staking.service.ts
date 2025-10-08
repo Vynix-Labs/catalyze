@@ -8,6 +8,7 @@ import type { CryptoCurrency } from "../../config";
 import { transactions, userWallets } from "../../db";
 import { eq } from "drizzle-orm";
 import { buildErc4626DepositCalls, buildErc4626WithdrawCalls, parseUnits } from "../../utils/troves/calls";
+import { toTokenUnits } from "../../utils/wallet/tokens";
 
 type Database = typeof db;
 
@@ -117,7 +118,7 @@ export class StakingService {
       if (!token0) throw new Error("Strategy deposit token missing");
       const tokenAddr = token0.address;
       const decimals = token0.decimals;
-      const amountWei = parseUnits(amount, decimals);
+      const amountWei = await toTokenUnits(amount, tokenSymbol, decimals);
       const calls = buildErc4626DepositCalls({
         vault: contractAddress,
         tokenAddr,
@@ -144,7 +145,7 @@ export class StakingService {
         if (!token0) throw new Error("Strategy deposit token missing");
         const tokenAddr = token0.address;
         const decimals = token0.decimals;
-        const amountWei = parseUnits(amount, decimals);
+        const amountWei = await toTokenUnits(amount, tokenSymbol, decimals);
 
         // Approve via Chipi helper
         await approveWithChipi(wallet as unknown as WalletData, contractAddress, amount, tokenSymbol, userId);
