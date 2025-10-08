@@ -8,6 +8,10 @@ import {
   StrategiesResponse,
   listStrategiesQuery,
 } from "./staking.schema";
+import { validatePinToken } from "../../utils/pinToken";
+import { ErrorResponse } from "../../schemas/common";
+
+const PIN_ERROR_MESSAGE = "Invalid or expired PIN token";
 
 const stakingRoutes: FastifyPluginAsync = async (fastify) => {
   const svc = new StakingService(fastify.db);
@@ -39,13 +43,18 @@ const stakingRoutes: FastifyPluginAsync = async (fastify) => {
     "/staking/stake",
     {
       preHandler: requireAuth(fastify),
-      schema: { body: StakeBody, response: { 200: StakingActionResponse } },
+      schema: { body: StakeBody, response: { 200: StakingActionResponse, 400: ErrorResponse } },
     },
     async (request, reply) => {
       const userId = request.currentUserId as string;
       const body = StakeBody.parse(request.body);
+      const { strategyId, amount, pinToken } = body;
+      const pinValid = await validatePinToken(fastify, userId, pinToken, "crypto_stake");
+      if (!pinValid) {
+        return reply.status(400).send({ error: PIN_ERROR_MESSAGE });
+      }
 
-      const result = await svc.stake(userId, body.strategyId, body.amount);
+      const result = await svc.stake(userId, strategyId, amount);
       return reply.code(200).send(result);
     }
   );
@@ -55,12 +64,18 @@ const stakingRoutes: FastifyPluginAsync = async (fastify) => {
     "/staking/unstake",
     {
       preHandler: requireAuth(fastify),
-      schema: { body: UnstakeBody, response: { 200: StakingActionResponse } },
+      schema: { body: UnstakeBody, response: { 200: StakingActionResponse, 400: ErrorResponse } },
     },
     async (request, reply) => {
       const userId = request.currentUserId as string;
       const body = UnstakeBody.parse(request.body);
-      const result = await svc.unstake(userId, body.strategyId, body.amount);
+      const { strategyId, amount, pinToken } = body;
+      const pinValid = await validatePinToken(fastify, userId, pinToken, "crypto_unstake");
+      if (!pinValid) {
+        return reply.status(400).send({ error: PIN_ERROR_MESSAGE });
+      }
+
+      const result = await svc.unstake(userId, strategyId, amount);
       return reply.code(200).send(result);
     }
   );

@@ -1,9 +1,12 @@
 import { z } from "zod";
 
+const pinTokenField = z.string().uuid();
+
 // ---------------------- Input Schemas ----------------------
 export const StakeBody = z.object({
   strategyId: z.string(),
   amount: z.coerce.number().positive(),
+  pinToken: pinTokenField,
 });
 
 export const listStrategiesQuery = z.object({
@@ -17,6 +20,7 @@ export const listStrategiesQuery = z.object({
 export const UnstakeBody = z.object({
   strategyId: z.string(),
   amount: z.coerce.number().positive(),
+  pinToken: pinTokenField,
 });
 
 // ---------------------- Response Schemas ----------------------
