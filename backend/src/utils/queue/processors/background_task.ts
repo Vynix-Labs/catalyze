@@ -11,7 +11,7 @@ interface BackgroundTaskJobData {
   priority?: 'low' | 'medium' | 'high';
 }
 
-const TRACKED_TOKENS: CryptoCurrency[] = ['usdt', 'usdc', 'strk', 'eth'];
+const TRACKED_TOKENS: CryptoCurrency[] = ['usdt', 'usdc', 'strk', 'weth', 'wbtc'];
 
 export const backgroundTaskProcessor = async (job: Job<BackgroundTaskJobData>) => {
   const { taskName, payload, priority = 'medium' } = job.data;

@@ -54,19 +54,27 @@ interface Strategy {
 }
 
 interface StrategiesResponse {
-  status: boolean;
   strategies: Strategy[];
   lastUpdated: string;
 }
 
+import { apiCache } from "../../utils/cache";
+
 export async function getStrategies(): Promise<Strategy[]> {
-  const response = await fetch('https://app.troves.fi/api/strategies');
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  const data = await response.json() as StrategiesResponse;
-  return data.strategies.filter(strategy =>
-    strategy.id.toLowerCase().includes('evergreen') ||
-    strategy.id.toLowerCase().includes('vesu_fusion')
+  // Cache filtered ERC4626 strategies for 15 minutes to reduce API load
+  return apiCache.getOrSet<Strategy[]>(
+    "troves:strategies:erc4626",
+    async () => {
+      const response = await fetch('https://app.troves.fi/api/strategies');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json() as StrategiesResponse;
+      return data.strategies.filter((strategy) =>
+        strategy.id.toLowerCase().includes('evergreen') ||
+        strategy.id.toLowerCase().includes('vesu_fusion')
+      );
+    },
+    { ttl: 15 * 60 }
   );
 }
