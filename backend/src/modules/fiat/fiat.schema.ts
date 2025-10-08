@@ -28,6 +28,7 @@ export const initiateFiatTransferSchema = z.object({
   bankCode: z.string().min(1),
   accountNumber: z.string().min(6),
   narration: z.string().max(80).optional(),
+  pinToken: z.string().uuid(),
 });
 
 export type InitiateFiatTransferInput = z.infer<typeof initiateFiatTransferSchema>;

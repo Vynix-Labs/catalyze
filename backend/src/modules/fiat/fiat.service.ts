@@ -12,6 +12,7 @@ import { transferWithChipi, createWallet } from "../../utils/wallet/chipi";
 import type { WalletData } from "@chipi-pay/chipi-sdk";
 import type { FastifyInstance } from "fastify/types/instance";
 import type { FastifyRequest } from "fastify";
+import { validatePinToken } from "../../utils/pinToken";
 
 const { MONNIFY_BASE_URL, MONNIFY_API_KEY, MONNIFY_SECRET_KEY, MONNIFY_CONTRACT_CODE } = env;
 
@@ -281,12 +282,12 @@ export class MonnifyClient {
   /**
    * Create a fiat transfer intent (withdraw)
    */
-  async createTransferIntent(
-    fastify: FastifyInstance,
-    userId: string,
-    input: InitiateFiatTransferInput
-  ) {
-    const { amountFiat, tokenSymbol, bankName, bankCode, accountNumber, narration } = input;
+  async createTransferIntent(fastify: FastifyInstance, userId: string, input: InitiateFiatTransferInput) {
+    const { amountFiat, tokenSymbol, bankName, accountNumber, bankCode, narration, pinToken } = input;
+
+    const pinValid = await validatePinToken(fastify, userId, pinToken, "fiat_transfer");
+    if (!pinValid) throw new Error("Invalid or expired PIN token");
+
     const reference = `MNFY-WDR-${Date.now()}-${randomUUID()}`;
     const symbol = tokenSymbol.toLowerCase() as CryptoCurrency;
 

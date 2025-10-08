@@ -5,6 +5,10 @@ import { TOKEN_MAP, type CryptoCurrency } from "../../config";
 import { type Call } from "starknet";
 import { getTokenDecimals } from "./tokens";
 import { generateUserJWT } from "../auth/jwt";
+import type { FastifyInstance } from "fastify";
+import { userWallets } from "../../db/schema";
+import { randomUUID } from "crypto";
+import { eq } from "drizzle-orm";
 
 // Initialize ChipiSDK
 const chipiSDK = new ChipiSDK({
@@ -27,7 +31,7 @@ export async function createWallet(userId: string): Promise<WalletData> {
     console.log("Wallet created:", chipiWallet);
     return chipiWallet.wallet;
 
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("createWallet failed:", err);
 
     // Extra debug logs
@@ -49,11 +53,37 @@ export async function createWallet(userId: string): Promise<WalletData> {
       console.error("Raw response from Chipi prepare-creation:", debugText);
     }
 
-    throw new Error(`Wallet creation failed: ${err.message || err}`);
+    const message = err instanceof Error ? err.message : String(err);
+    throw new Error(`Wallet creation failed: ${message}`);
   }
 }
 
 
+export async function ensureUserWallet(fastify: FastifyInstance, userId: string, network: string = "starknet") {
+  const [existing] = await fastify.db
+    .select()
+    .from(userWallets)
+    .where(eq(userWallets.userId, userId));
+
+  if (existing) {
+    return existing;
+  }
+
+  const wallet = await createWallet(userId);
+  const row: typeof userWallets.$inferInsert = {
+    id: randomUUID(),
+    userId,
+    network,
+    publicKey: wallet.publicKey,
+    encryptedPrivateKey: wallet.encryptedPrivateKey,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  await fastify.db.insert(userWallets).values(row);
+
+  return row as unknown as typeof userWallets.$inferSelect;
+}
 
 export async function transferWithChipi(from: WalletData, to: string, amount: number, currency: CryptoCurrency, userId: string) {
     const bearerToken = await generateUserJWT(userId);
@@ -123,11 +153,11 @@ export async function stakeWithChipi(
   amount: number,
   userId: string,
   tokenSymbol: string,
-  contractAddress: string,
-  strategyId?: string
+  contractAddress: string
 ) {
   const symbol = tokenSymbol.toLowerCase();
-  const decimals = await getTokenDecimals(symbol as any);
+  const currency = symbol as CryptoCurrency;
+  const decimals = await getTokenDecimals(currency);
 
   if (symbol === "usdc") {
     return await stakeVesuUsdc(wallet, amount, userId);
