@@ -1,14 +1,24 @@
 import { detectCurrencyType } from "../types/types";
 import { currencyIcons } from "../utils";
 
+// export interface Transaction {
+//   id: string;
+//   title: string;
+//   date: string;
+//   amount: string;
+//   currency?: string;
+//   type: "deposit" | "withdrawal" | "transfer";
+//   currencyType?: "USDT" | "USDC" | "STRK" | string;
+// }
+
 export interface Transaction {
   id: string;
   title: string;
   date: string;
   amount: string;
   currency?: string;
-  type: "deposit" | "withdrawal" | "transfer";
-  currencyType?: "USDT" | "USDC" | "STRK" | string;
+  type: string; // Make more flexible instead of strict union
+  currencyType?: string; // Remove strict union
 }
 
 interface TransactionsProps {
@@ -21,7 +31,6 @@ interface TransactionsProps {
 }
 
 // Currency icon mapping - using proper image paths
-
 
 // Fallback component for unknown currencies
 const FallbackIcon = ({ currencyType }: { currencyType: string }) => (
@@ -38,8 +47,6 @@ const Transactions: React.FC<TransactionsProps> = ({
   onViewAll,
   onTransactionClick,
 }) => {
- 
-
   // Show only limited items if maxDisplayItems is provided
   const displayTransactions = transactions.slice(0, maxDisplayItems);
   const hasMoreTransactions = transactions.length > maxDisplayItems;
