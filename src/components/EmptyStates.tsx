@@ -61,5 +61,3 @@ export const NoAssets: React.FC = () => (
     description="You don't have any assets yet. Make a deposit to get started."
   />
 );
-
-
