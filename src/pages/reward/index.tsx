@@ -102,7 +102,7 @@ const RewardPage = () => {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-[420px] mx-auto">
       {/* Header */}
       <div className="mb-8 p-4">
         <h1 className="text-3xl font-bold text-gray-800">Rewards</h1>
@@ -373,47 +373,64 @@ const RewardPage = () => {
         <div className=" p-4">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Rewards</h2>
 
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-[420px] mx-auto">
             {/* Rewards Grid */}
-            <div className="grid grid-cols-1  gap-6">
-              {rewards.map((reward) => (
-                <div key={reward.id} className="bg-white rounded-xl">
-                  <div className="p-5 flex justify-between">
-                    <div className="flex gap-2">
-                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-500 text-white font-bold">
-                        icons
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-gray-800 text-base mb-2">
-                          {reward.title}
-                        </h3>
-                        <p className="text-gray-600 text-sm mb-4 max-w-48">
-                          {reward.description}
-                        </p>
-                        <div className="flex items-center gap-2 text-sm font-bold mb-5">
-                          <GiftIcon className="text-green-500" />
-                          {reward.tokens}
+            <div className="grid grid-cols-1 gap-6">
+              {rewards.map((reward) => {
+                const isClaimed = claimedRewards.includes(reward.id);
+
+                return (
+                  <div
+                    key={reward.id}
+                    className={`rounded-xl transition-colors ${
+                      isClaimed ? "bg-gray-50" : "bg-white"
+                    }`}
+                  >
+                    <div className="shadow-md p-2 rounded-xl flex justify-between">
+                      <div className="flex gap-2">
+                        <div
+                          className={`w-10 h-10 flex items-center justify-center rounded-full font-bold ${
+                            isClaimed
+                              ? "bg-gray-400 text-white"
+                              : "bg-blue-500 text-white"
+                          }`}
+                        >
+                          icons
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-gray-800 text-base mb-2">
+                            {reward.title}
+                          </h3>
+                          <p className="text-gray-600 text-sm mb-4 max-w-48">
+                            {reward.description}
+                          </p>
+                          <div className="flex items-center gap-2 text-sm font-bold mb-5">
+                            <GiftIcon
+                              className={
+                                isClaimed ? "text-gray-400" : "text-green-500"
+                              }
+                            />
+                            {reward.tokens}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div>
-                      <button
-                        onClick={() => handleClaim(reward.id)}
-                        disabled={claimedRewards.includes(reward.id)}
-                        className={`w-full py-1.5 px-4 rounded-lg transition-colors ${
-                          claimedRewards.includes(reward.id)
-                            ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                            : "bg-blue-600 hover:bg-blue-700 text-white"
-                        }`}
-                      >
-                        {claimedRewards.includes(reward.id)
-                          ? "Claimed"
-                          : "Claim"}
-                      </button>
+                      <div>
+                        <button
+                          onClick={() => handleClaim(reward.id)}
+                          disabled={isClaimed}
+                          className={`w-full py-1.5 px-4 rounded-lg transition-colors ${
+                            isClaimed
+                              ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                              : "bg-blue-600 hover:bg-blue-700 text-white"
+                          }`}
+                        >
+                          {isClaimed ? "Claimed" : "Claim"}
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
