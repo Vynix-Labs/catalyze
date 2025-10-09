@@ -9,6 +9,7 @@ import SignUpForm from "../../components/auth/signup/form";
 import { useAuthState } from "../../hooks/useAuthState";
 import { authClient } from "../../lib/auth-client";
 import { RoutePath } from "../../routes/routePath";
+import { AuthLoader } from "../../common/ui/Loader";
 
 interface SignUpFormData {
   email: string;
@@ -56,10 +57,12 @@ function SignUp() {
       password: data.password,
     };
     setIsLoading(true);
+    console.log("testing");
+
     authClient.signUp.email(payload, {
       onSuccess: async () => {
         setIsLoading(false);
-        await authClient.sendVerificationEmail({ email: payload.email });
+        // await authClient.sendVerificationEmail({ email: payload.email });
         toast.success("Verification email sent");
         navigate(
           RoutePath.RESET_OTP.replace(
@@ -83,14 +86,7 @@ function SignUp() {
 
   // Show loading while checking authentication
   if (isCheckingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-100 mx-auto mb-4"></div>
-          <p className="text-gray-600">Checking authentication...</p>
-        </div>
-      </div>
-    );
+    return <AuthLoader />;
   }
 
   return (

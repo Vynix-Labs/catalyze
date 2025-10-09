@@ -5,41 +5,41 @@ export type authPin = {
 };
 
 
-// transaction hook
+// Transaction types based on API documentation
+export type TransactionType = "deposit" | "withdraw" | "transfer" | "stake" | "unstake" | "claim";
+export type TransactionSubtype = "fiat" | "crypto";
+export type TransactionStatus = "pending" | "processing" | "completed" | "failed";
+
 export type transactions = {
-  items: [
-    {
-      id: string;
-      userId: string;
-      type: string;
-      subtype: string;
-      tokenSymbol: string;
-      amountToken: string;
-      amountFiat: string;
-      status: string;
-      reference: string;
-      txHash: string;
-      metadata: string;
-      createdAt: string;
-      updatedAt: string;
-    }
-  ];
+  items: {
+    id: string;
+    userId: string;
+    type: TransactionType;
+    subtype: TransactionSubtype | null;
+    tokenSymbol: string;
+    amountToken: string;
+    amountFiat: string | null;
+    status: TransactionStatus;
+    reference: string | null;
+    txHash: string | null;
+    metadata: any;
+    createdAt: string;
+    updatedAt: string;
+  }[];
   meta: {
-    page: 0;
-    limit: 0;
-    total: 0;
-    totalPages: 0;
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
   };
 };
 
 export type balances = {
-  items: [
-    {
-      tokenSymbol: string;
-      balance: string;
-      fiatEquivalent: string;
-    }
-  ];
+  items: {
+    tokenSymbol: string;
+    balance: string;
+    fiatEquivalent: string;
+  }[];
   totalFiat: string;
 };
 
