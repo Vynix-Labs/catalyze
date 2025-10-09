@@ -51,7 +51,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
         security: [{ sessionCookie: [] }],
         body: verifyPinSchema,
         response: {
-          200: SuccessMessageResponse,
+          200: verifyPinResponseSchema,
           400: ErrorResponse,
           401: ErrorResponse,
         }

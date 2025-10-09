@@ -19,8 +19,11 @@ function getSystemAccount(): Account {
 }
 
 export async function getSystemTokenBalance(token: CryptoCurrency): Promise<number> {
-  return onChainBalance(env.SYSTEM_WALLET_ADDRESS, token);
+  const address = String(env.SYSTEM_WALLET_ADDRESS);
+  console.log("Using system wallet address:", address);
+  return onChainBalance(address, token);
 }
+
 
 export async function transferFromSystem(
   token: CryptoCurrency,
