@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import GlobalModal from "../../common/ui/modal/GlobalModal";
 import { useTransactions, useBalances } from "../../hooks";
 import { authAtom } from "../../store/jotai";
+import { NoAssets, NoTransactions } from "../../components/EmptyStates";
 
 const Home: React.FC = () => {
   const [showTransactionDetails, setShowTransactionDetails] = useState(false);
@@ -302,22 +303,36 @@ const Home: React.FC = () => {
           <div className="p-5">
             {/* Transactions */}
             <div className="max-w-md mx-auto">
-              <Transactions
-                transactions={transactionsData}
-                title="Recent Transactions"
-                showDivider={false}
-                maxDisplayItems={2}
-                onViewAll={handleViewAllTransactions}
-                onTransactionClick={handleTransactionClick}
-              />
+              {transactionsData.length > 0 ? (
+                <Transactions
+                  transactions={transactionsData}
+                  title="Recent Transactions"
+                  showDivider={false}
+                  maxDisplayItems={2}
+                  onViewAll={handleViewAllTransactions}
+                  onTransactionClick={handleTransactionClick}
+                />
+              ) : (
+                <div className="mb-8">
+                  <h2 className="text-lg font-bold text-gray-800 mb-4">
+                    Recent Transactions
+                  </h2>
+                  <NoTransactions onDepositClick={handleDepositClick} />
+                </div>
+              )}
             </div>
 
             {/* Divider */}
-            <h2 className="text-sm font-bold text-gray-600 mb-4">Assets</h2>
+            <h2 className="text-sm font-bold text-gray-900 mb-4">Assets</h2>
 
             {/* Assets */}
             <div className="max-w-md mx-auto overflow-hidden">
-              <Assets assets={assetsData} onAssetClick={handleAssetClick} />
+              {assetsData.length > 0 &&
+              assetsData.some((asset) => parseFloat(asset.balance) > 0) ? (
+                <Assets assets={assetsData} onAssetClick={handleAssetClick} />
+              ) : (
+                <NoAssets />
+              )}
             </div>
           </div>
         </div>
