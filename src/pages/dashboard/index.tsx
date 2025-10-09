@@ -224,7 +224,7 @@ const Home: React.FC = () => {
   return (
     <div className="bg-neutral-50 w-full h-screen flex flex-col">
       {/* Main content container */}
-      <div className="  max-w-[420px] mx-auto flex flex-col flex-1">
+      <div className=" max-w-[420px] mx-auto flex flex-col flex-1">
         {/* Fixed header + balance */}
         <div className="sticky top-0 z-20 bg-neutral-50">
           {/* Header */}

@@ -10,6 +10,8 @@ import EnterAmountPage from "./enterAmount";
 import PoolSelectionModal from "../../common/ui/modal/PoolSelectionModal";
 import CurrencyIcon from "../../components/CurrencyIcon";
 import { detectCurrencyType, type Pool } from "../../types/types";
+import ClaimRewardsPage from "./claimRewards";
+import { useNavigate } from "react-router-dom";
 
 // interface Pool {
 //   id: number;
@@ -27,7 +29,10 @@ const StakingPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [showAmountPage, setShowAmountPage] = useState(false);
   const [highlightedPool, setHighlightedPool] = useState<number | null>(null);
+  const [showClaimRewards, setShowClaimRewards] = useState(false);
+  const [selectedStake, setSelectedStake] = useState<any>(null);
 
+  const navigate = useNavigate(); // Add navigate
   // Sample staking pools data
   const stakingPools = [
     {
@@ -104,6 +109,22 @@ const StakingPage = () => {
     setSelectedPool(null);
     setHighlightedPool(null);
   };
+
+  // Handle back from claim rewards
+  const handleBackFromClaimRewards = () => {
+    setShowClaimRewards(false);
+    setSelectedStake(null);
+  };
+
+  // If claim rewards page should be shown, render it
+  if (showClaimRewards && selectedStake) {
+    return (
+      <ClaimRewardsPage
+        stake={selectedStake}
+        onBack={handleBackFromClaimRewards}
+      />
+    );
+  }
 
   // If amount page should be shown, render it
   if (showAmountPage && selectedPool) {
@@ -288,7 +309,14 @@ const StakingPage = () => {
                       <span>Unstake</span>
                     </button>
 
-                    <button className="w-full flex items-center justify-center cursor-pointer gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors">
+                    <button
+                      onClick={() =>
+                        navigate("/dashboard/more/claim-reward", {
+                          state: { stake },
+                        })
+                      }
+                      className="w-full flex items-center justify-center cursor-pointer gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                    >
                       <MedalIcon className="w-4 h-4" />
                       <span>Claim</span>
                     </button>

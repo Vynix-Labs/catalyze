@@ -117,6 +117,18 @@ export interface EnterAmountPageProps {
   onBack: () => void;
 }
 
+export interface ClaimRewardsPageProps {
+  stake: {
+    id: number;
+    name: string;
+    amount: string;
+    reward: string;
+    apy: number;
+    progress: number;
+  };
+  onBack: () => void;
+}
+
 export interface Pool {
   id: number;
   name: string;
