@@ -384,7 +384,7 @@ const RewardPage = () => {
                         icons
                       </div>
                       <div>
-                        <h3 className="font-bold text-gray-800 text-lg mb-2">
+                        <h3 className="font-bold text-gray-800 text-base mb-2">
                           {reward.title}
                         </h3>
                         <p className="text-gray-600 text-sm mb-4 max-w-48">
@@ -400,7 +400,7 @@ const RewardPage = () => {
                       <button
                         onClick={() => handleClaim(reward.id)}
                         disabled={claimedRewards.includes(reward.id)}
-                        className={`w-full py-2 px-4 rounded-lg transition-colors ${
+                        className={`w-full py-1.5 px-4 rounded-lg transition-colors ${
                           claimedRewards.includes(reward.id)
                             ? "bg-gray-300 text-gray-600 cursor-not-allowed"
                             : "bg-blue-600 hover:bg-blue-700 text-white"
