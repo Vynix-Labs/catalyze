@@ -38,17 +38,19 @@ export default function GlobalModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 "
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       onClick={handleBackdropClick}
     >
       <div
-        className="bg-white rounded-t-lg shadow-xl max-w-[420px] max-h-[25rem] no-scrollbar space-y-4 flex flex-col absolute bottom-0 py-6 px-4 w-full"
+        className="bg-white rounded-t-lg shadow-xl max-w-[420px] w-full absolute bottom-0 flex flex-col py-6 px-4 space-y-4 max-h-[25rem]"
         onClick={(e) => e.stopPropagation()}
       >
         <p className="font-bold text-xl text-black mb-4">{headingText}</p>
 
-        {/* Scroll only children */}
-        <div className="flex-1 overflow-y-auto pr-2">{children}</div>
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto no-scrollbar pr-2 min-h-0">
+          {children}
+        </div>
 
         <AuthFooter
           text={btnText}
