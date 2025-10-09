@@ -8,7 +8,7 @@ import { mapMonnifyStatus } from "../../utils/monnify";
 import { type CryptoCurrency } from "../../config";
 import { getSystemTokenBalance, transferFromSystem } from "../../utils/wallet/system";
 import { validateSufficientBalance } from "../../utils/wallet/tokens";
-import { transferWithChipi, createWallet } from "../../utils/wallet/chipi";
+import { transferWithChipi, ensureUserWallet } from "../../utils/wallet/chipi";
 import type { WalletData } from "@chipi-pay/chipi-sdk";
 import type { FastifyInstance } from "fastify/types/instance";
 import type { FastifyRequest } from "fastify";
@@ -664,21 +664,7 @@ export async function handleMonnifyWebhook(
     }
 
     // Ensure user wallet exists
-    let [wallet] = await fastify.db.select().from(userWallets).where(eq(userWallets.userId, deposit.userId));
-    if (!wallet) {
-      const w = await createWallet(deposit.userId);
-      const row: typeof userWallets.$inferInsert = {
-        id: randomUUID(),
-        userId: deposit.userId,
-        network: "starknet",
-        publicKey: w.publicKey,
-        encryptedPrivateKey: w.encryptedPrivateKey,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      await fastify.db.insert(userWallets).values(row);
-      wallet = row as unknown as typeof userWallets.$inferSelect;
-    }
+    const wallet = await ensureUserWallet(fastify, deposit.userId);
 
     // Transfer from system wallet to user on-chain
     const tx = await transferFromSystem(symbol, wallet.publicKey, Number(deposit.amountToken));
