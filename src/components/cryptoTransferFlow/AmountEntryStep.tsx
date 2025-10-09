@@ -231,6 +231,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
         {activeTab === "fiat" ? (
           flowType === "deposit" ? (
             <FiatDeposit
+              availableAmount={"10000"}
               amount={fiatAmount}
               amountNGN={fiatAmountNGN}
               currencyType={currencyType}

@@ -4,6 +4,7 @@ import type { BaseComponentProps } from "../../types/types";
 interface FiatDepositProps extends BaseComponentProps {
   onSwap: () => void;
   isSwapped: boolean;
+  availableAmount: string;
 }
 
 export const FiatDeposit: React.FC<FiatDepositProps> = ({
@@ -13,6 +14,7 @@ export const FiatDeposit: React.FC<FiatDepositProps> = ({
   onAmountChange,
   onAmountNGNChange,
   onSwap,
+  availableAmount = "10,000",
   isSwapped,
   rate = 0,
   isRateLoading = false,
@@ -23,7 +25,7 @@ export const FiatDeposit: React.FC<FiatDepositProps> = ({
       <div className="">
         <div className="flex items-center justify-between text-sm mb-2">
           <div className="font-bold">Enter Amount</div>
-          <span>Available Amount: 10,000</span>
+          <span>Available Amount: {availableAmount}</span>
         </div>
 
         <div className="relative">

@@ -24,6 +24,7 @@ import {
 
 import { NoTransactions } from "../../components/EmptyStates";
 import { authAtom } from "../../store/jotai";
+import { getGreeting } from "../../utils";
 
 const Home: React.FC = () => {
   const [showTransactionDetails, setShowTransactionDetails] = useState(false);
@@ -239,7 +240,9 @@ const Home: React.FC = () => {
                   </span>
                 </div>
                 <div className="text-sm">
-                  <p className=" text-gray-600 font-semibold">Good Morning</p>
+                  <p className=" text-gray-600 font-semibold">
+                    {getGreeting()}
+                  </p>
                   <h1 className=" font-black capitalize text-gray-800">
                     {user?.name}
                   </h1>
