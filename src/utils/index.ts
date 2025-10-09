@@ -1,8 +1,12 @@
+import strkIcon from "../assets/images/strk.png";
+import usdcIcon from "../assets/images/usdc.png";
+import usdtIcon from "../assets/images/usdt.png";
+
 export const currencyIcons = {
-  USDT: "/images/usdt.png",
-  USDC: "/images/usdc.png",
-  STRK: "/images/strk.png",
-  UNKNOWN: "/images/default-currency.png",
+  USDT: usdtIcon,
+  USDC: usdcIcon,
+  STRK: strkIcon,
+  UNKNOWN: usdtIcon, // fallback to usdt icon
 };
 
 export const getNetworkName = (network: string) => {

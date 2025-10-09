@@ -1,6 +1,6 @@
 // components/EmptyStates.tsx
 import React from "react";
-import { EmptyState } from "./EmptyState";
+import { EmptyState } from "./emptyState";
 
 // Transaction Icon
 const TransactionIcon = () => (
@@ -61,3 +61,5 @@ export const NoAssets: React.FC = () => (
     description="You don't have any assets yet. Make a deposit to get started."
   />
 );
+
+

@@ -58,7 +58,9 @@ export const FiatDeposit: React.FC<FiatDepositProps> = ({
             <span className="text-red-500">Exchange Rate unavailable</span>
           ) : (
             <span>
-              Exchange Rate: ₦{rate.toLocaleString(undefined, { maximumFractionDigits: 2 })}/{currencyType}
+              Exchange Rate: ₦
+              {rate.toLocaleString(undefined, { maximumFractionDigits: 2 })}/
+              {currencyType}
             </span>
           )}
         </div>

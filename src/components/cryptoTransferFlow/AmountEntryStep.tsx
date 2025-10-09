@@ -1,16 +1,16 @@
-import { useEffect, useMemo, useState } from "react";
 import { AlertCircle } from "lucide-react";
-import type { AmountEntryStepProps } from "../../types/types";
+import { useEffect, useMemo, useState } from "react";
 import Button from "../../common/ui/button";
-import GlobalModal from "../../common/ui/modal/GlobalModal";
 import DepositModal from "../../common/ui/modal/DepositModal";
+import GlobalModal from "../../common/ui/modal/GlobalModal";
+import { useInitiateDeposit, useTokenRate } from "../../hooks";
+import type { AmountEntryStepProps } from "../../types/types";
+import { currencyIcons, getNetworkName } from "../../utils";
 import Tabs from "../Tabs";
-import { FiatDeposit } from "./FiatDeposit";
-import { FiatTransfer } from "./FiatTransfer";
 import { CryptoDeposit } from "./CryptoDeposit";
 import { CryptoTransfer } from "./CryptoTransfer";
-import { currencyIcons, getNetworkName } from "../../utils";
-import { fetchTokenRates, type RatePrices } from "../../api/rates";
+import { FiatDeposit } from "./FiatDeposit";
+import { FiatTransfer } from "./FiatTransfer";
 
 // Fallback component for unknown currencies
 const FallbackIcon = ({ currencyType }: { currencyType: string }) => (
@@ -59,13 +59,18 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   const [isSwapped, setIsSwapped] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
-  const [rates, setRates] = useState<RatePrices | null>(null);
-  const [isRateLoading, setIsRateLoading] = useState(false);
-  const [rateError, setRateError] = useState<string | null>(null);
+  // const [rates, setRates] = useState<RatePrices | null>(null);
+  // const [isRateLoading, setIsRateLoading] = useState(false);
+  // const [rateError, setRateError] = useState<string | null>(null);
+  const {
+    data: rates,
+    isLoading: isRateLoading,
+    error: rateError,
+  } = useTokenRate(currencyType);
+  const { mutate: initiateDeposit } = useInitiateDeposit();
 
   // Use currencyMode directly instead of deriving from transferType
   const [activeTab, setActiveTab] = useState<"fiat" | "crypto">(currencyMode);
-
   // Sync activeTab with currencyMode changes
   useEffect(() => {
     setActiveTab(currencyMode);
@@ -86,35 +91,6 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
     setAmount,
     setAmountNGN,
   ]);
-
-  useEffect(() => {
-    if (!currencyType) {
-      setRates(null);
-      return;
-    }
-
-    let cancelled = false;
-    setIsRateLoading(true);
-    fetchTokenRates(currencyType)
-      .then((data) => {
-        if (cancelled) return;
-        setRates(data);
-        setRateError(null);
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return;
-        setRates(null);
-        setRateError(err instanceof Error ? err.message : "Failed to fetch rate");
-      })
-      .finally(() => {
-        if (cancelled) return;
-        setIsRateLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [currencyType]);
 
   const quoteType = useMemo<"base" | "buy" | "sell">(() => {
     if (activeTab !== "fiat") return "base";
@@ -187,28 +163,46 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
 
   const handleProceedClick = () => {
     if (flowType === "deposit" && activeTab === "crypto") {
-      console.log("Crypto deposit completed - flow ends here");
       return;
     }
 
-    if (activeTab === "crypto") {
-      if (!cryptoAmount || !address || !selectedNetwork) {
-        alert("Please fill in all crypto transfer details");
-        return;
+    switch (activeTab) {
+      case "crypto": {
+        if (!cryptoAmount || !address || !selectedNetwork) {
+          alert("Please fill in all crypto transfer details");
+          return;
+        }
+        setIsModalOpen(true);
+        break;
       }
-      setIsModalOpen(true);
-    } else if (flowType === "deposit") {
-      if (!fiatAmount || !fiatAmountNGN) {
-        alert("Please enter both amount values");
-        return;
+      case "fiat":
+      default: {
+        switch (flowType) {
+          case "deposit": {
+            if (!fiatAmount || !fiatAmountNGN) {
+              alert("Please enter both amount values");
+              return;
+            }
+            initiateDeposit({
+              amountFiat: parseFloat(fiatAmountNGN),
+              tokenSymbol: currencyType,
+            });
+
+            setIsDepositModalOpen(true);
+            break;
+          }
+          case "transfer":
+          default: {
+            if (!fiatAmount || !fiatAmountNGN) {
+              alert("Please enter both USDC and NGN amounts");
+              return;
+            }
+            onNext();
+            break;
+          }
+        }
+        break;
       }
-      setIsDepositModalOpen(true);
-    } else {
-      if (!fiatAmount || !fiatAmountNGN) {
-        alert("Please enter both USDC and NGN amounts");
-        return;
-      }
-      onNext();
     }
   };
 
@@ -246,7 +240,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
               isSwapped={isSwapped}
               rate={currentRate}
               isRateLoading={isRateLoading}
-              rateError={rateError}
+              rateError={rateError?.message}
             />
           ) : (
             <FiatTransfer
@@ -259,7 +253,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
               isSwapped={isSwapped}
               rate={currentRate}
               isRateLoading={isRateLoading}
-              rateError={rateError}
+              rateError={rateError?.message}
             />
           )
         ) : flowType === "deposit" ? (
@@ -298,7 +292,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
         )}
       </div>
 
-      <div className="w-full bottom-0 mx-auto flex justify-center p-4 absolute">
+      <div className="w-full  bottom-0 mx-auto flex justify-center p-4 absolute">
         <Button
           variants="primary"
           handleClick={handleProceedClick}
@@ -343,9 +337,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
               </h2>
               <p className="text-sm text-gray-500">
                 ≈₦
-                {(
-                  (parseFloat(cryptoAmount) || 0) * baseRate
-                ).toLocaleString()}
+                {((parseFloat(cryptoAmount) || 0) * baseRate).toLocaleString()}
               </p>
             </div>
 
