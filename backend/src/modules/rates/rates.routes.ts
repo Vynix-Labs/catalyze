@@ -42,8 +42,8 @@ const ratesRoutes: FastifyPluginAsync = async (fastify) => {
                     priceNgnBase: { type: "string" },
                     priceNgnBuy: { type: "string" },
                     priceNgnSell: { type: "string" },
-                    source: { type: ["string", "null"] },
-                    updatedAt: { type: ["string", "null"] },
+                    source: { type: "string", nullable: true },
+                    updatedAt: { type: "string", nullable: true },
                   },
                   required: [
                     "tokenSymbol",
@@ -83,8 +83,8 @@ const ratesRoutes: FastifyPluginAsync = async (fastify) => {
               priceNgnBase: { type: "string" },
               priceNgnBuy: { type: "string" },
               priceNgnSell: { type: "string" },
-              source: { type: ["string", "null"] },
-              updatedAt: { type: ["string", "null"] },
+              source: { type: "string", nullable: true },
+              updatedAt: { type: "string", nullable: true },
             },
             required: [
               "tokenSymbol",
