@@ -7,6 +7,14 @@ import { TOKEN_MAP, type CryptoCurrency } from "../../config";
 const rpcUrl = env.STARKNET_RPC_URL || "https://starknet-mainnet.public.blastapi.io";
 const provider = new Provider({ nodeUrl: rpcUrl });
 
+export const TOKEN_DECIMALS: Record<CryptoCurrency, number> = {
+  usdt: 6,
+  usdc: 6,
+  strk: 18,
+  weth: 18,
+  wbtc: 8,
+};
+
 /**
  * Get token decimals for a specific currency
  */
@@ -18,14 +26,7 @@ export async function getTokenDecimals(currency: CryptoCurrency): Promise<number
   } catch (error) {
     console.error(`Error getting decimals for ${currency}:`, error);
     // Default decimals based on known token standards
-    const defaultDecimals: Record<CryptoCurrency, number> = {
-      usdt: 6,
-      usdc: 6,
-      strk: 18,
-      weth: 18,
-      wbtc: 8
-    };
-    return defaultDecimals[currency] || 18;
+    return TOKEN_DECIMALS[currency] || 18;
   }
 }
 

@@ -6,6 +6,7 @@ import usersRoutes from '../modules/users/users.routes'
 import cryptoRoutes from '../modules/crypto/crypto.routes'
 import stakingRoutes from '../modules/staking/staking.routes'
 import ratesRoutes from '../modules/rates/rates.routes'
+import assetsRoutes from '../modules/assets/assets.routes'
 
 /* 
 
@@ -22,6 +23,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
   fastify.register(cryptoRoutes, { prefix: '/crypto' })
   fastify.register(stakingRoutes, { prefix: '/staking' })
   fastify.register(ratesRoutes, { prefix: '/rates' })
+  fastify.register(assetsRoutes, { prefix: '/assets' })
   /*
   
   
