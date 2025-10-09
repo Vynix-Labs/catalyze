@@ -1,5 +1,5 @@
 import { currencyIcons } from "../utils";
-import EmptyState from "./emptyState";
+import { NoAssets } from "./EmptyStates";
 
 export interface Asset {
   id: string;
@@ -96,7 +96,7 @@ const Assets: React.FC<AssetsProps> = ({
           })}
         </div>
       ) : (
-        <EmptyState />
+        <NoAssets />
       )}
     </div>
   );

@@ -22,8 +22,8 @@ import {
   type Rate,
 } from "../../hooks";
 
+import { NoTransactions } from "../../components/EmptyStates";
 import { authAtom } from "../../store/jotai";
-import { NoAssets, NoTransactions } from "../../components/EmptyStates";
 
 const Home: React.FC = () => {
   const [showTransactionDetails, setShowTransactionDetails] = useState(false);
