@@ -47,15 +47,13 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
       },
     },
     async (request, reply) => {
+      const userId = request.currentUserId as string;
       const headers = new Headers();
       Object.entries(request.headers).forEach(([key, value]) => {
         if (value) headers.append(key, value.toString());
       });
-      const bearToken = await fastify.auth.api.getToken({
-        headers,
-      })
-      console.log("Bearer token:", bearToken);
-      const wallet = await ensureUserWallet(fastify, bearToken.token);
+      const bearToken = await fastify.auth.api.getToken({ headers });
+      const wallet = await ensureUserWallet(fastify, userId, "starknet", bearToken.token);
       const tokens: CryptoCurrency[] = ["usdt", "usdc", "strk", "weth", "wbtc"];
       const results = await Promise.all(
         tokens.map(async (t) => {
@@ -84,7 +82,12 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
       const userId = request.currentUserId as string;
       const { token } = request.params as { token: string };
       const symbol = token.toLowerCase();
-      const wallet = await ensureUserWallet(fastify, userId);
+      const headers = new Headers();
+      Object.entries(request.headers).forEach(([key, value]) => {
+        if (value) headers.append(key, value.toString());
+      });
+      const bearToken = await fastify.auth.api.getToken({ headers });
+      const wallet = await ensureUserWallet(fastify, userId, "starknet", bearToken.token);
       const b = await getNormalizedBalance(wallet.publicKey, symbol as CryptoCurrency);
       if (!b) return reply.code(404).send({ error: "Balance not found" });
       return reply.code(200).send({ tokenSymbol: symbol, balance: b.balance, decimals: b.decimals, rawBalance: b.rawBalance });

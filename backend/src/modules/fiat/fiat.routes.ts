@@ -147,7 +147,10 @@ const fiatRoutes: FastifyPluginAsync = async (fastify) => {
       try {
         const userId = req.currentUserId as string;
         const input = initiateFiatTransferSchema.parse(req.body);
-        const result = await monnify.createTransferIntent(fastify, userId, input);
+        const headers = new Headers();
+        Object.entries(req.headers).forEach(([k, v]) => { if (v) headers.append(k, v.toString()); });
+        const bearToken = await fastify.auth.api.getToken({ headers });
+        const result = await monnify.createTransferIntent(fastify, userId, input, bearToken.token);
         return reply.code(201).send(FiatTransferResponse.parse(result));
       } catch (err: unknown) {
         fastify.log.error(err);

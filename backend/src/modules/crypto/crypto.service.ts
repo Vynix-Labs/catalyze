@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { eq, and } from "drizzle-orm";
 import env from "../../config/env";
 import { userWallets, cryptoDeposits, balances, transactions } from "../../db/schema";
-import { ensureUserWallet, createWallet, transferWithChipi } from "../../utils/wallet/chipi";
+import { ensureUserWallet, transferWithChipi } from "../../utils/wallet/chipi";
 import { validateSufficientBalance } from "../../utils/wallet/tokens";
 import type { CryptoCurrency } from "../../config";
 import { validatePinToken } from "../../utils/pinToken";
@@ -29,33 +29,23 @@ export class CryptoService {
 
     if (existing) return existing;
 
-    const wallet = await createWallet(userId);
-    const row = {
-      id: randomUUID(),
-      userId,
-      network,
-      publicKey: wallet.publicKey,
-      encryptedPrivateKey: wallet.encryptedPrivateKey,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    await this.fastify.db.insert(userWallets).values(row);
-    return row;
+    const wallet = await ensureUserWallet(this.fastify, userId, network, bearerToken);
+    return wallet;
   }
 
   async createDepositIntent({
     userId,
     tokenSymbol,
     network = "starknet",
-    // addressType,
+    bearerToken,
   }: {
     userId: string;
     tokenSymbol: string;
     network?: string;
-    addressType?: string;
+    bearerToken: string;
   }) {
-    // Get user wallet
-    const wallet = await this.getOrCreateUserWallet(userId, "", network);
+    // TODO: won't work here
+    const wallet = await this.getOrCreateUserWallet(userId, bearerToken, network);
 
     // Create a pending deposit record
     const depositId = randomUUID();
@@ -64,7 +54,7 @@ export class CryptoService {
       id: depositId,
       userId,
       tokenSymbol,
-      network: wallet.network,
+      network: wallet.network!,
       depositAddress: wallet.publicKey,
       amountToken: "0",
       txHash: null,
@@ -83,19 +73,19 @@ export class CryptoService {
     };
   }
 
-  async getAddress(userId: string) {
-    const w = await ensureUserWallet(this.fastify, userId);
+  async getAddress(userId: string, bearerToken: string) {
+    const w = await ensureUserWallet(this.fastify, userId, "starknet", bearerToken);
     return { address: w.publicKey, network: w.network };
   }
 
-  async withdraw(userId: string, body: { tokenSymbol: string; amount: number; toAddress: string; pinToken: string }) {
+  async withdraw(userId: string, body: { tokenSymbol: string; amount: number; toAddress: string; pinToken: string }, bearerToken: string) {
     const symbol = body.tokenSymbol.toLowerCase() as CryptoCurrency;
     const { amount, toAddress, pinToken } = body;
 
     const pinValid = await validatePinToken(this.fastify, userId, pinToken, "crypto_withdraw");
     if (!pinValid) throw new Error("Invalid or expired PIN token");
 
-    const wallet = await ensureUserWallet(this.fastify, userId);
+    const wallet = await ensureUserWallet(this.fastify, userId, "starknet", bearerToken);
 
     const { isValid, message } = await validateSufficientBalance(wallet.publicKey, amount, symbol);
     if (!isValid) throw new Error(message);
@@ -115,7 +105,7 @@ export class CryptoService {
       metadata: { toAddress },
     });
 
-    const tx = await transferWithChipi(wallet as unknown as WalletData, toAddress, amount, symbol, userId);
+    const tx = await transferWithChipi(wallet as unknown as WalletData, toAddress, amount, symbol, bearerToken);
     const txHash = typeof tx === "string"
       ? tx
       : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";

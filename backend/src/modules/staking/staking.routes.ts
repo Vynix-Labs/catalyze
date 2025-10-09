@@ -53,8 +53,10 @@ const stakingRoutes: FastifyPluginAsync = async (fastify) => {
       if (!pinValid) {
         return reply.status(400).send({ error: PIN_ERROR_MESSAGE });
       }
-
-      const result = await svc.stake(userId, strategyId, amount);
+      const headers = new Headers();
+      Object.entries(request.headers).forEach(([k, v]) => { if (v) headers.append(k, v.toString()); });
+      const bearToken = await request.server.auth.api.getToken({ headers });
+      const result = await svc.stake(userId, strategyId, amount, bearToken.token);
       return reply.code(200).send(result);
     }
   );
@@ -74,8 +76,10 @@ const stakingRoutes: FastifyPluginAsync = async (fastify) => {
       if (!pinValid) {
         return reply.status(400).send({ error: PIN_ERROR_MESSAGE });
       }
-
-      const result = await svc.unstake(userId, strategyId, amount);
+      const headers = new Headers();
+      Object.entries(request.headers).forEach(([k, v]) => { if (v) headers.append(k, v.toString()); });
+      const bearToken = await request.server.auth.api.getToken({ headers });
+      const result = await svc.unstake(userId, strategyId, amount, bearToken.token);
       return reply.code(200).send(result);
     }
   );

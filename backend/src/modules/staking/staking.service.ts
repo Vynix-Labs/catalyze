@@ -66,7 +66,7 @@ export class StakingService {
   }
 
 
-  async stake(userId: string, strategyId: string, amount: number) {
+  async stake(userId: string, strategyId: string, amount: number, bearerToken: string) {
     // Get user wallet
     const wallet = await this.db.query.userWallets.findFirst({
         where: eq(userWallets.userId, userId),
@@ -105,7 +105,7 @@ export class StakingService {
     try {
       // Special-case: Vesu Fusion USDC — use Chipi specialized route for deposit
       if (tokenSymbol === "usdc" && strategy.id.toLowerCase().includes("vesu_fusion")) {
-        const tx = await stakeVesuUsdc(wallet as unknown as WalletData, amount, userId);
+        const tx = await stakeVesuUsdc(wallet as unknown as WalletData, amount, bearerToken);
         const txHash = typeof tx === "string"
           ? tx
           : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
@@ -126,7 +126,7 @@ export class StakingService {
         amountWei,
       });
 
-      const tx = await callContractWithChipi(wallet as unknown as WalletData, contractAddress, calls, userId);
+      const tx = await callContractWithChipi(wallet as unknown as WalletData, contractAddress, calls, bearerToken);
       const txHash = typeof tx === "string"
         ? tx
         : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
@@ -148,7 +148,7 @@ export class StakingService {
         const amountWei = await toTokenUnits(amount, tokenSymbol, decimals);
 
         // Approve via Chipi helper
-        await approveWithChipi(wallet as unknown as WalletData, contractAddress, amount, tokenSymbol, userId);
+        await approveWithChipi(wallet as unknown as WalletData, contractAddress, amount, tokenSymbol, bearerToken);
 
         // Then deposit only (construct call directly to avoid array index)
         const depositOnly = buildErc4626DepositCalls({
@@ -160,7 +160,7 @@ export class StakingService {
         .find(c => c.entrypoint === "deposit");
         if (!depositOnly) throw new Error("Failed to build deposit call");
 
-        const tx = await callContractWithChipi(wallet as unknown as WalletData, contractAddress, [depositOnly], userId);
+        const tx = await callContractWithChipi(wallet as unknown as WalletData, contractAddress, [depositOnly], bearerToken);
         const txHash = typeof tx === "string"
           ? tx
           : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
@@ -184,7 +184,7 @@ export class StakingService {
   }
 
 
-  async unstake(userId: string, strategyId: string, amount: number) {
+  async unstake(userId: string, strategyId: string, amount: number, bearerToken: string) {
     // Get user wallet
     const wallet = await this.db.query.userWallets.findFirst({ where: eq(userWallets.userId, userId) });
     if (!wallet) throw new Error("User wallet not found");
@@ -217,7 +217,7 @@ export class StakingService {
     try {
       // Special-case: Vesu USDC
       if (tokenSymbol === "usdc" && strategy.id.toLowerCase().includes("vesu_fusion")) {
-        const tx = await withdrawVesuUsdc(wallet as unknown as WalletData, amount, userId);
+        const tx = await withdrawVesuUsdc(wallet as unknown as WalletData, amount, bearerToken);
         const txHash = typeof tx === "string" ? tx : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
         await this.db.update(transactions).set({ status: "completed", txHash }).where(eq(transactions.id, txRow.id));
         return { status: true, message: "Unstake successful", txHash };

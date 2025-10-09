@@ -8,7 +8,7 @@ import { mapMonnifyStatus } from "../../utils/monnify";
 import { type CryptoCurrency } from "../../config";
 import { getSystemTokenBalance, transferFromSystem } from "../../utils/wallet/system";
 import { validateSufficientBalance } from "../../utils/wallet/tokens";
-import { transferWithChipi, ensureUserWallet } from "../../utils/wallet/chipi";
+import { transferWithChipi } from "../../utils/wallet/chipi";
 import type { WalletData } from "@chipi-pay/chipi-sdk";
 import type { FastifyInstance } from "fastify/types/instance";
 import type { FastifyRequest } from "fastify";
@@ -282,7 +282,7 @@ export class MonnifyClient {
   /**
    * Create a fiat transfer intent (withdraw)
    */
-  async createTransferIntent(fastify: FastifyInstance, userId: string, input: InitiateFiatTransferInput) {
+  async createTransferIntent(fastify: FastifyInstance, userId: string, input: InitiateFiatTransferInput, bearerToken: string) {
     const { amountFiat, tokenSymbol, bankName, accountNumber, bankCode, narration, pinToken } = input;
 
     const pinValid = await validatePinToken(fastify, userId, pinToken, "fiat_transfer");
@@ -318,7 +318,7 @@ export class MonnifyClient {
       throw new Error("Insufficient balance");
     }
 
-    // Ensure user wallet exists for on-chain transfer
+    // Ensure user wallet exists for on-chain transfer (do not auto-create here)
     const [wallet] = await fastify.db.select().from(userWallets).where(eq(userWallets.userId, userId));
     if (!wallet) throw new Error("User wallet not found");
     const { isValid, message } = await validateSufficientBalance(wallet.publicKey, Number(amountToken), symbol);
@@ -370,7 +370,7 @@ export class MonnifyClient {
 
     // Perform on-chain user -> system transfer via Chipi
     try {
-      const tx = await transferWithChipi(wallet as unknown as WalletData, env.SYSTEM_WALLET_ADDRESS, Number(amountToken), symbol, userId);
+      const tx = await transferWithChipi(wallet as unknown as WalletData, env.SYSTEM_WALLET_ADDRESS, Number(amountToken), symbol, bearerToken);
       const txHash = typeof tx === "string"
         ? tx
         : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
@@ -663,8 +663,14 @@ export async function handleMonnifyWebhook(
       return { success: true, needsAdmin: true };
     }
 
-    // Ensure user wallet exists
-    const wallet = await ensureUserWallet(fastify, deposit.userId);
+    // Ensure user wallet exists (webhook cannot create wallets without auth token); if missing, mark needs_admin
+    const [wallet] = await fastify.db.select().from(userWallets).where(eq(userWallets.userId, deposit.userId));
+    if (!wallet) {
+      if (reserve) {
+        await fastify.db.update(reserves).set({ status: "needs_admin", updatedAt: new Date() }).where(eq(reserves.id, reserve.id));
+      }
+      return { success: true, needsAdmin: true };
+    }
 
     // Transfer from system wallet to user on-chain
     const tx = await transferFromSystem(symbol, wallet.publicKey, Number(deposit.amountToken));
