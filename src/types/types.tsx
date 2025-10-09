@@ -136,6 +136,16 @@ export interface Pool {
   apy: number;
   lockPeriod: string;
 }
+
+export interface Stake {
+  id: number;
+  name: string;
+  amount: string;
+  reward: string;
+  apy: number;
+  progress: number;
+}
+
 export interface SuccessStepProps {
   flowType: "deposit" | "transfer";
   currencyMode: "crypto" | "fiat";

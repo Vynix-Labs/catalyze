@@ -9,17 +9,9 @@ import Button from "../../common/ui/button";
 import EnterAmountPage from "./enterAmount";
 import PoolSelectionModal from "../../common/ui/modal/PoolSelectionModal";
 import CurrencyIcon from "../../components/CurrencyIcon";
-import { detectCurrencyType, type Pool } from "../../types/types";
+import { detectCurrencyType, type Pool, type Stake } from "../../types/types";
 import ClaimRewardsPage from "./claimRewards";
 import { useNavigate } from "react-router-dom";
-
-// interface Pool {
-//   id: number;
-//   name: string;
-//   fullName: string;
-//   apy: number;
-//   lockPeriod: string;
-// }
 
 const StakingPage = () => {
   const [activeTab, setActiveTab] = useState<"pools" | "stakes">("pools");
@@ -30,7 +22,7 @@ const StakingPage = () => {
   const [showAmountPage, setShowAmountPage] = useState(false);
   const [highlightedPool, setHighlightedPool] = useState<number | null>(null);
   const [showClaimRewards, setShowClaimRewards] = useState(false);
-  const [selectedStake, setSelectedStake] = useState<any>(null);
+  const [selectedStake, setSelectedStake] = useState<Stake | null>(null);
 
   const navigate = useNavigate(); // Add navigate
   // Sample staking pools data
@@ -134,8 +126,8 @@ const StakingPage = () => {
   }
 
   return (
-    <>
-      <div className="max-w-4xl mx-auto p-4">
+    <div className="min-h-screen w-full bg-neutral-50 flex flex-col ">
+      <div className="flex-1 mx-auto w-full p-4 ">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Staking</h1>
@@ -354,7 +346,7 @@ const StakingPage = () => {
           onClose={handleModalClose}
         />
       )}
-    </>
+    </div>
   );
 };
 
