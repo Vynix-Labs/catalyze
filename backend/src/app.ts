@@ -60,6 +60,10 @@ export const buildApp = async () => {
         {
           url: 'http://localhost:3000/api',
           description: 'Development server'
+        },
+        {
+          url: 'https://catalyze-api.apps.ikem.dev/api',
+          description: 'Staging server'
         }
       ],
       externalDocs: {
