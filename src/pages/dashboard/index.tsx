@@ -14,7 +14,14 @@ import TransactionDetailsPage from "./transactionDetails";
 import { useAtom } from "jotai";
 import { useNavigate } from "react-router-dom";
 import GlobalModal from "../../common/ui/modal/GlobalModal";
-import { useTransactions, useBalances } from "../../hooks";
+import {
+  useAssets,
+  useBalances,
+  useRates,
+  useTransactions,
+  type Rate,
+} from "../../hooks";
+
 import { authAtom } from "../../store/jotai";
 
 const Home: React.FC = () => {
@@ -37,6 +44,12 @@ const Home: React.FC = () => {
     isLoading: balancesLoading,
     // error: balancesError,
   } = useBalances();
+  const { data: assetsDatas } = useAssets();
+  const {
+    data: rates,
+    // isLoading: isRateLoading,
+    // error: rateError,
+  } = useRates();
   const [user] = useAtom(authAtom);
   const navigate = useNavigate();
 
@@ -159,40 +172,30 @@ const Home: React.FC = () => {
   };
 
   // Convert balance data to Asset format
-  const assetsData: Asset[] = balanceData?.items?.map((balance, index) => ({
-    id: (index + 1).toString(),
-    symbol: balance.tokenSymbol,
-    name: getTokenName(balance.tokenSymbol),
-    balance: balance.balance,
-    value: balance.fiatEquivalent,
-    currency: "₦",
-  })) || [
-    // Fallback data when loading or no data
-    {
-      id: "1",
-      symbol: "USDT",
-      name: "Tether",
-      balance: "0.00",
-      value: "0.00",
-      currency: "₦",
-    },
-    {
-      id: "2",
-      symbol: "USDC",
-      name: "USD Coin",
-      balance: "0.00",
-      value: "0.00",
-      currency: "₦",
-    },
-    {
-      id: "3",
-      symbol: "STRK",
-      name: "Starknet",
-      balance: "0.00",
-      value: "0.00",
-      currency: "₦",
-    },
-  ];
+
+  const assetsData: Asset[] =
+    assetsDatas?.crypto && assetsDatas.crypto.length > 0
+      ? assetsDatas.crypto.map((balance, index) => {
+          // Find matching rate for this token symbol
+          const matchingRate = rates?.items?.find(
+            (rate: Rate) => rate.tokenSymbol === balance?.symbol
+          );
+          const balanceAmount = balance?.decimals || 0;
+          const rateValue = matchingRate
+            ? parseFloat(matchingRate.priceNgnBase?.toString() || "0") || 0
+            : 0;
+          const calculatedValue = balanceAmount * rateValue;
+
+          return {
+            id: (index + 1).toString(),
+            symbol: balance?.symbol,
+            name: getTokenName(balance?.symbol),
+            balance: balanceAmount.toString(),
+            value: calculatedValue.toFixed(2),
+            currency: "₦",
+          };
+        })
+      : [];
 
   // Render currency detail page
   if (showCurrencyDetail && selectedCurrency) {
@@ -236,7 +239,9 @@ const Home: React.FC = () => {
                 </div>
                 <div className="text-sm">
                   <p className=" text-gray-600 font-semibold">Good Morning</p>
-                  <h1 className=" font-black text-gray-800">{user?.name}</h1>
+                  <h1 className=" font-black capitalize text-gray-800">
+                    {user?.name}
+                  </h1>
                 </div>
               </div>
               <BellIcon className="w-6 h-6 cursor-pointer" />
@@ -316,7 +321,7 @@ const Home: React.FC = () => {
             <h2 className="text-sm font-bold text-gray-600 mb-4">Assets</h2>
 
             {/* Assets */}
-            <div className="max-w-md mx-auto overflow-hidden">
+            <div className="max-w-md h-auto max-h-120 overflow-y-auto no-scrollbar mx-auto overflow-hidden">
               <Assets assets={assetsData} onAssetClick={handleAssetClick} />
             </div>
           </div>

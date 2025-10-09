@@ -1,4 +1,5 @@
 import { currencyIcons } from "../utils";
+import EmptyState from "./emptyState";
 
 export interface Asset {
   id: string;
@@ -36,12 +37,14 @@ const Assets: React.FC<AssetsProps> = ({
   const displayAssets = assets.slice(0, maxDisplayItems);
 
   return (
-    <div className=" rounded-lg bg-white pt-4">
-      {assets.length < 0 ? (
-        <div className="space-y-4">
+    <div className=" rounded-lg  bg-white pt-4">
+      {assets.length > 0 ? (
+        <div className="space-y-4 ">
           {displayAssets.map((asset) => {
             const iconPath =
-              currencyIcons[asset.symbol as keyof typeof currencyIcons];
+              currencyIcons[
+                asset.symbol.toUpperCase() as keyof typeof currencyIcons
+              ];
 
             const isSelected = selectedAsset?.id === asset.id;
 
@@ -71,7 +74,7 @@ const Assets: React.FC<AssetsProps> = ({
                     )}
                   </div>
                   <div>
-                    <h3 className="font-bold text-black text-sm">
+                    <h3 className="font-bold uppercase text-black text-sm">
                       {asset.symbol}
                     </h3>
                     <p className="text-xs text-gray-500">{asset.name}</p>
@@ -93,7 +96,7 @@ const Assets: React.FC<AssetsProps> = ({
           })}
         </div>
       ) : (
-        <p className="text-red-400">testing</p>
+        <EmptyState />
       )}
     </div>
   );
