@@ -17,13 +17,13 @@ const Layout = () => {
   const activeTab = getActiveTab();
 
   return (
-    <div className="min-h-vh overflow-hidden">
-      <div className="flex-1 w-md max-h-[91vh] mx-auto max-w-md overflow-x-hidden no-scrollbar">
+    <div className="min-h-screen overflow-hidden">
+      <div className="flex-1 max-h-screen mx-auto   max-w-[420px] overflow-x-hidden no-scrollbar">
         <Outlet />
       </div>
 
       {/* Fixed Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-md w-md mx-auto overflow-hidden">
+      <div className="fixed bottom-0 left-0 right-0   max-w-[420px] w-md mx-auto overflow-hidden">
         <BottomNav activeTab={activeTab} />
       </div>
     </div>

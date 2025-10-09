@@ -112,7 +112,7 @@ function VerifyEmail() {
   };
 
   return (
-    <div className="py-6 h-svh flex-col max-w-md mx-auto flex justify-between px-5">
+    <div className="py-6 h-svh flex-col   max-w-[420px] mx-auto flex justify-between px-5">
       <div className="space-y-10">
         <AuthHeader
           title={isResetPassword ? "verify reset code" : "verify email address"}

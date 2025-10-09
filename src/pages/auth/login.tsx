@@ -97,7 +97,7 @@ function Login() {
   }
 
   return (
-    <div className="py-6 px-5 flex flex-col justify-between h-svh max-w-md  w-screen ">
+    <div className="py-6 px-5 flex flex-col justify-between h-svh   max-w-[420px]  w-screen ">
       <div className="space-y-10 w-full ">
         <AuthHeader
           title="log in to your account"

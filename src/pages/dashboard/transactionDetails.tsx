@@ -10,14 +10,10 @@ interface TransactionDetailsPageProps {
 
 // Currency icon mapping - using proper image paths
 
-
-
 const TransactionDetailsPage: React.FC<TransactionDetailsPageProps> = ({
   transactions,
   onBack,
 }) => {
-  
-
   // Group transactions by date
   const groupedTransactions = transactions.reduce((acc, transaction) => {
     const date = transaction.date;
@@ -43,7 +39,7 @@ const TransactionDetailsPage: React.FC<TransactionDetailsPageProps> = ({
 
   return (
     <div className="bg-neutral-50">
-      <div className="max-w-md mx-auto">
+      <div className="  max-w-[420px] mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
           <button

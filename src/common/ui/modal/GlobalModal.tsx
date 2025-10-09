@@ -42,14 +42,14 @@ export default function GlobalModal({
       onClick={handleBackdropClick}
     >
       <div
-        className="bg-white rounded-t-lg shadow-xl max-w-[420px] flex items-baseline justify-baseline absolute bottom-0 py-6 px-4 w-full max-h-[90vh] overflow-auto flex-col gap-8.5"
+        className="bg-white rounded-t-lg shadow-xl   max-w-[420px] max-h-[90vh] flex flex-col absolute bottom-0 py-6 px-4 w-full"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="w-full">
-          <p className="font-bold text-xl text-black">{headingText}</p>
-          {children}
-        </div>
-        
+        <p className="font-bold text-xl text-black mb-4">{headingText}</p>
+
+        {/* Scroll only children */}
+        <div className="flex-1 overflow-y-auto pr-2">{children}</div>
+
         <AuthFooter
           text={btnText}
           handleBtnClick={buttonClickHandler}

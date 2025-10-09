@@ -222,11 +222,11 @@ const Home: React.FC = () => {
   }
 
   return (
-    <div className="bg-neutral-50 w-full">
-      {/* Main content container with proper spacing for bottom nav */}
-      <div className="max-w-md mx-auto flex flex-col">
-        {/* Scrollable content area */}
-        <div className="flex-1 overflow-y-auto space-y-4">
+    <div className="bg-neutral-50 w-full h-screen flex flex-col">
+      {/* Main content container */}
+      <div className="  max-w-[420px] mx-auto flex flex-col flex-1">
+        {/* Fixed header + balance */}
+        <div className="sticky top-0 z-20 bg-neutral-50">
           {/* Header */}
           <div className="p-5">
             <div className="flex justify-between items-center">
@@ -239,8 +239,8 @@ const Home: React.FC = () => {
                   </span>
                 </div>
                 <div className="text-sm">
-                  <p className=" text-gray-600 font-semibold">Good Morning</p>
-                  <h1 className=" font-black capitalize text-gray-800">
+                  <p className="text-gray-600 font-semibold">Good Morning</p>
+                  <h1 className="font-black capitalize text-gray-800">
                     {user?.name}
                   </h1>
                 </div>
@@ -250,7 +250,7 @@ const Home: React.FC = () => {
           </div>
 
           {/* Total Balance Card */}
-          <div className="mx-5 mb-5">
+          <div className="mx-5 mb-3">
             <div className="bg-gradient-to-br from-primary-100 to-blue-700 rounded-2xl p-6 text-white relative overflow-hidden">
               {/* Background decoration */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -translate-y-16 translate-x-16"></div>
@@ -263,9 +263,8 @@ const Home: React.FC = () => {
                     <p className="text-white text-sm font-semibold">
                       Total Balance
                     </p>
-
                     <div className="flex items-center mt-2 justify-center">
-                      <p className="text-4xl font-bold min-w-36 max-w-36 truncate ">
+                      <p className="text-4xl font-bold min-w-36 max-w-36 truncate">
                         {balancesLoading
                           ? "Loading..."
                           : isBalanceVisible
@@ -286,17 +285,17 @@ const Home: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Action Buttons - Multi-currency operations */}
+                {/* Action Buttons */}
                 <div className="flex space-x-3">
                   <button
                     onClick={handleTransferClick}
-                    className="bg-[#04329C] text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
+                    className="bg-[#04329C] text-white font-semibold py-3 px-6 rounded-full hover:opacity-88 transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
                   >
                     <span>Transfer</span> <ArrowUpRightIcon />
                   </button>
                   <button
                     onClick={handleDepositClick}
-                    className="bg-[#04329C] text-white font-semibold py-3 px-6 rounded-full hover:opacity-88  transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
+                    className="bg-[#04329C] text-white font-semibold py-3 px-6 rounded-full hover:opacity-88 transition ease-out duration-300 flex-1 flex items-center justify-center space-x-2"
                   >
                     <span>Deposit</span> <ArrowDownRight />
                   </button>
@@ -304,41 +303,44 @@ const Home: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="p-5">
-            {/* Transactions */}
-            <div className="max-w-md mx-auto">
-              {transactionsData.length > 0 ? (
-                <Transactions
-                  transactions={transactionsData}
-                  title="Recent Transactions"
-                  showDivider={false}
-                  maxDisplayItems={2}
-                  onViewAll={handleViewAllTransactions}
-                  onTransactionClick={handleTransactionClick}
-                />
-              ) : (
-                <div className="mb-8">
-                  <h2 className="text-lg font-bold text-gray-800 mb-4">
-                    Recent Transactions
-                  </h2>
-                  <NoTransactions onDepositClick={handleDepositClick} />
-                </div>
-              )}
-            </div>
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 ">
+          {/* Transactions */}
 
-            {/* Divider */}
-            <h2 className="text-sm font-bold text-gray-900 mb-4">Assets</h2>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-bold text-gray-800">
+              Recent Transactions
+            </h2>
+            <button
+              onClick={handleViewAllTransactions}
+              className="text-sm text-blue-600 font-semibold cursor-pointer"
+            >
+              View all
+            </button>
+          </div>
 
-            {/* Assets */}
-            <div className="max-w-md h-auto max-h-120 overflow-y-auto no-scrollbar mx-auto overflow-hidden">
-              <Assets assets={assetsData} onAssetClick={handleAssetClick} />
-            </div>
+          {transactionsData.length > 0 ? (
+            <Transactions
+              transactions={transactionsData.slice(0, 3)} // show only 3
+              showDivider={false}
+              onTransactionClick={handleTransactionClick}
+            />
+          ) : (
+            <NoTransactions onDepositClick={handleDepositClick} />
+          )}
+
+          {/* Divider */}
+          <h2 className="text-sm font-bold text-gray-900 mb-4">Assets</h2>
+          {/* Assets */}
+          <div className="  max-w-[420px] max-h-72 overflow-y-auto mx-auto no-scrollbar">
+            <Assets assets={assetsData} onAssetClick={handleAssetClick} />
           </div>
         </div>
       </div>
 
-      {/* Modal for multi-currency selection */}
+      {/* Modal */}
       <GlobalModal
         onClose={() => {
           setIsModalOpen(false);
@@ -352,15 +354,14 @@ const Home: React.FC = () => {
         btnText="Proceed"
         onProceed={handleModalProceed}
         isProceedDisabled={!selectedAssetForModal}
-        children={
-          <Assets
-            assets={assetsData}
-            onAssetClick={handleModalAssetClick}
-            isModalMode={true}
-            selectedAsset={selectedAssetForModal}
-          />
-        }
-      />
+      >
+        <Assets
+          assets={assetsData}
+          onAssetClick={handleModalAssetClick}
+          isModalMode={true}
+          selectedAsset={selectedAssetForModal}
+        />
+      </GlobalModal>
     </div>
   );
 };

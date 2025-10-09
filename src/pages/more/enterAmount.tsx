@@ -5,8 +5,6 @@ import { SuccessIcon } from "../../assets/svg";
 import { currencyIcons } from "../../utils";
 import type { EnterAmountPageProps } from "../../types/types";
 
-
-
 // Reusable Components
 const Header = ({ title, onBack }: { title: string; onBack: () => void }) => (
   <div className="flex items-center p-4">
@@ -210,7 +208,7 @@ const EnterAmountPage = ({ pool, onBack }: EnterAmountPageProps) => {
   // Step 1: Enter Amount
   if (currentStep === 1) {
     return (
-      <div className="max-w-md mx-auto bg-white min-h-screen">
+      <div className="  max-w-[420px] mx-auto bg-white min-h-screen">
         <Header title="Enter Amount" onBack={goBack} />
         <div className="p-6 w-full">
           <CurrencyInfo pool={pool} />
@@ -231,7 +229,7 @@ const EnterAmountPage = ({ pool, onBack }: EnterAmountPageProps) => {
   // Step 2: Confirm with Rewards Preview
   if (currentStep === 2) {
     return (
-      <div className="max-w-md mx-auto bg-white min-h-screen">
+      <div className="  max-w-[420px] mx-auto bg-white min-h-screen">
         <Header title="Enter Amount" onBack={goBack} />
         <div className="p-6 space-y-4">
           <CurrencyInfo pool={pool} />
@@ -252,7 +250,7 @@ const EnterAmountPage = ({ pool, onBack }: EnterAmountPageProps) => {
 
   // Step 3: Success Screen
   return (
-    <div className="max-w-md mx-auto bg-neutral-50 min-h-screen">
+    <div className="  max-w-[420px] mx-auto bg-neutral-50 min-h-screen">
       <Header title="Confirm Stake" onBack={goHome} />
       <div className="p-6 text-center space-y-6">
         <div className="space-y-4 py-2">
