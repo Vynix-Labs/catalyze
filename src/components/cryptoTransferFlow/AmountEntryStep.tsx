@@ -216,83 +216,81 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-white">
-      <div className="h-full">
-        <Tabs
-          className="max-w-44 m-2"
-          tabs={[
-            { key: "fiat", label: "Fiat" },
-            { key: "crypto", label: "Cryptocurrency" },
-          ]}
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-        />
+    <div className="flex-1 flex flex-col bg-white h-screen max-w-[420px] mx-auto overflow-hidden relative">
+      <Tabs
+        className="max-w-44 m-2"
+        tabs={[
+          { key: "fiat", label: "Fiat" },
+          { key: "crypto", label: "Cryptocurrency" },
+        ]}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+      />
 
-        {activeTab === "fiat" ? (
-          flowType === "deposit" ? (
-            <FiatDeposit
-              amount={fiatAmount}
-              amountNGN={fiatAmountNGN}
-              currencyType={currencyType}
-              onAmountChange={handleFiatUSDCChange}
-              onAmountNGNChange={handleFiatNGNChange}
-              onSwap={handleSwap}
-              isSwapped={isSwapped}
-              rate={currentRate}
-              isRateLoading={isRateLoading}
-              rateError={rateError?.message}
-            />
-          ) : (
-            <FiatTransfer
-              amount={fiatAmount}
-              amountNGN={fiatAmountNGN}
-              currencyType={currencyType}
-              onAmountChange={handleFiatUSDCChange}
-              onAmountNGNChange={handleFiatNGNChange}
-              onSwap={handleSwap}
-              isSwapped={isSwapped}
-              rate={currentRate}
-              isRateLoading={isRateLoading}
-              rateError={rateError?.message}
-            />
-          )
-        ) : flowType === "deposit" ? (
-          <CryptoDeposit
-            selectedNetwork={selectedNetwork}
+      {activeTab === "fiat" ? (
+        flowType === "deposit" ? (
+          <FiatDeposit
+            amount={fiatAmount}
+            amountNGN={fiatAmountNGN}
             currencyType={currencyType}
-            onNetworkChange={setSelectedNetwork}
-            cryptoAmount={cryptoAmount}
-            address={address}
-            onCryptoAmountChange={handleCryptoAmountChange}
-            onAddressChange={setAddress}
+            onAmountChange={handleFiatUSDCChange}
+            onAmountNGNChange={handleFiatNGNChange}
+            onSwap={handleSwap}
+            isSwapped={isSwapped}
+            rate={currentRate}
+            isRateLoading={isRateLoading}
+            rateError={rateError?.message}
           />
         ) : (
-          <CryptoTransfer
-            cryptoAmount={cryptoAmount}
-            address={address}
-            selectedNetwork={selectedNetwork}
+          <FiatTransfer
+            amount={fiatAmount}
+            amountNGN={fiatAmountNGN}
             currencyType={currencyType}
-            onCryptoAmountChange={handleCryptoAmountChange}
-            onAddressChange={setAddress}
-            onNetworkChange={setSelectedNetwork}
+            onAmountChange={handleFiatUSDCChange}
+            onAmountNGNChange={handleFiatNGNChange}
+            onSwap={handleSwap}
+            isSwapped={isSwapped}
+            rate={currentRate}
+            isRateLoading={isRateLoading}
+            rateError={rateError?.message}
           />
-        )}
+        )
+      ) : flowType === "deposit" ? (
+        <CryptoDeposit
+          selectedNetwork={selectedNetwork}
+          currencyType={currencyType}
+          onNetworkChange={setSelectedNetwork}
+          cryptoAmount={cryptoAmount}
+          address={address}
+          onCryptoAmountChange={handleCryptoAmountChange}
+          onAddressChange={setAddress}
+        />
+      ) : (
+        <CryptoTransfer
+          cryptoAmount={cryptoAmount}
+          address={address}
+          selectedNetwork={selectedNetwork}
+          currencyType={currencyType}
+          onCryptoAmountChange={handleCryptoAmountChange}
+          onAddressChange={setAddress}
+          onNetworkChange={setSelectedNetwork}
+        />
+      )}
 
-        {activeTab === "fiat" && (
-          <div className="flex items-start flex-col space-x-2 text-sm text-secondary-100 bg-secondary-200 space-y-2 rounded-lg mx-4 p-3">
-            <div className="text-sm flex gap-2 items-center">
-              <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
-              <span className="font-medium">Info</span>
-            </div>
-            <div className="">
-              Estimated amount of naira with our current rate will be
-              transferred to beneficiary
-            </div>
+      {activeTab === "fiat" && (
+        <div className="flex items-start flex-col space-x-2 text-sm text-secondary-100 bg-secondary-200 space-y-2 rounded-lg mx-4 p-3">
+          <div className="text-sm flex gap-2 items-center">
+            <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+            <span className="font-medium">Info</span>
           </div>
-        )}
-      </div>
+          <div className="">
+            Estimated amount of naira with our current rate will be transferred
+            to beneficiary
+          </div>
+        </div>
+      )}
 
-      <div className="w-full  bottom-0 mx-auto flex justify-center p-4 absolute">
+      <div className="w-full bottom-0 mx-auto flex justify-center p-4 absolute">
         <Button
           variants="primary"
           handleClick={handleProceedClick}

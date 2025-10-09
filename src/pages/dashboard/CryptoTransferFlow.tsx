@@ -208,23 +208,24 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
   };
 
   return (
-    <div className="max-w-[420px] mx-auto relative min-h-screen bg-neutral-100 flex flex-col">
+    <div className="max-w-[420px] mx-auto h-screen bg-neutral-100 flex flex-col overflow-hidden relative">
       {/* Header */}
-      <div className="bg-white">
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
-          >
-            <ChevronLeftIcon />
-          </button>
-          <h1 className="text-lg font-semibold">{getPageTitle()}</h1>
-          <div className="w-9 h-9"></div>
-        </div>
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white shrink-0">
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
+        >
+          <ChevronLeftIcon />
+        </button>
+        <h1 className="text-lg font-semibold">{getPageTitle()}</h1>
+        <div className="w-9 h-9"></div>
       </div>
 
-      {/* Steps wrapper → this grows to fill remaining screen */}
-      <div className="flex-1 flex flex-col">{renderCurrentStep()}</div>
+      {/* Content area */}
+      <div className="flex-1 flex flex-col justify-between pb-20">
+        {/* pb-24 adds space above BottomNav */}
+        {renderCurrentStep()}
+      </div>
 
       {/* Deposit Modal */}
       {showDepositModal && (
