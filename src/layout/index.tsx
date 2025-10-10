@@ -18,20 +18,12 @@ const Layout = () => {
 
   return (
     <div className="min-h-vh overflow-hidden">
-<<<<<<< Updated upstream
-      <div className="flex-1 w-md max-h-[91vh] mx-auto max-w-md overflow-x-hidden no-scrollbar">
-=======
       <div className="flex-1 w-full max-h-[91vh] mx-auto max-w-[420px] overflow-x-hidden no-scrollbar">
->>>>>>> Stashed changes
         <Outlet />
       </div>
 
       {/* Fixed Bottom Navigation */}
-<<<<<<< Updated upstream
-      <div className="fixed bottom-0 left-0 right-0 max-w-md w-md mx-auto overflow-hidden">
-=======
       <div className="fixed bottom-0 left-0 right-0 max-w-[420px] w-full mx-auto overflow-hidden">
->>>>>>> Stashed changes
         <BottomNav activeTab={activeTab} />
       </div>
     </div>
