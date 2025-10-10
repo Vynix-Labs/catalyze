@@ -43,7 +43,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab = "home" }) => {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 flex justify-center">
-      <div className="w-full max-w-[420px] mx-auto">
+      <div className="w-full max-w-md w-full mx-auto">
         <div className="border-t bg-white border-gray-200 shadow-lg">
           <div className="flex justify-around items-center py-3">
             {navItems.map((item) => (

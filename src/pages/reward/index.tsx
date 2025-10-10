@@ -102,7 +102,7 @@ const RewardPage = () => {
   ];
 
   return (
-    <div className="max-w-[420px] h-screen w-full mx-auto flex flex-col">
+    <div className="max-w-md w-full h-screen w-full mx-auto flex flex-col">
       {/* Fixed Header */}
       <div className="flex-shrink-0 p-4 bg-white">
         <h1 className="text-3xl font-bold text-gray-800">Rewards</h1>
@@ -380,8 +380,6 @@ const RewardPage = () => {
             <h2 className="text-xl font-bold text-gray-800 mb-4">Rewards</h2>
 
             <div className="h-full overflow-y-auto">
-              {" "}
-              {/* Add this wrapper */}
               {/* Rewards Grid */}
               <div className="grid grid-cols-1 gap-4 pb-4">
                 {" "}
@@ -396,10 +394,10 @@ const RewardPage = () => {
                         isClaimed ? "bg-neutral-200" : "bg-white"
                       }`}
                     >
-                      <div className="shadow-md p-4 rounded-xl flex justify-between items-start">
-                        <div className="flex gap-3 flex-1">
+                      <div className="border-gray-100 px-2 py-4 rounded-xl flex justify-between items-start">
+                        <div className="flex gap-2 flex-1">
                           <div
-                            className={`w-12 h-12 flex items-center justify-center rounded-full font-bold flex-shrink-0 ${
+                            className={`w-10  h-10  flex items-center justify-center rounded-full font-bold flex-shrink-0 ${
                               isClaimed
                                 ? "bg-gray-400 text-white"
                                 : "bg-blue-500 text-white"

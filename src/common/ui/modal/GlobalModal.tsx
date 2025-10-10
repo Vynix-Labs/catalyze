@@ -42,7 +42,7 @@ export default function GlobalModal({
       onClick={handleBackdropClick}
     >
       <div
-        className="bg-white rounded-t-lg shadow-xl max-w-[420px] w-full absolute bottom-0 flex flex-col py-6 px-4 space-y-4 max-h-[25rem]"
+        className="bg-white rounded-t-lg shadow-xl max-w-md w-full w-full absolute bottom-0 flex flex-col py-6 px-4 space-y-4 max-h-[25rem]"
         onClick={(e) => e.stopPropagation()}
       >
         <p className="font-bold text-xl text-black mb-4">{headingText}</p>

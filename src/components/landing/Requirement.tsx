@@ -43,7 +43,7 @@ function Requirement() {
 
         <div className="flex justify-between flex-col space-y-4 md:flex-row md:max-w-6xl md:mx-auto">
           {/* Left side timeline */}
-          <div className="flex md:  max-w-[420px] gap-6 py-4 relative">
+          <div className="flex md:  max-w-md w-full gap-6 py-4 relative">
             <div className="w-1 bg-[#D1D1D1B2] flex flex-col justify-between relative max-h-[31rem]">
               {steps.map((_, index) => (
                 <div key={index} className="h-34 relative">

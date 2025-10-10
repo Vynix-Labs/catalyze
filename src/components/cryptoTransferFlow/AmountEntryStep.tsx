@@ -216,7 +216,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-white h-screen max-w-[420px] mx-auto overflow-hidden relative">
+    <div className="flex-1 flex flex-col bg-white h-screen max-w-md w-full mx-auto overflow-hidden relative">
       <Tabs
         className="max-w-44 m-2"
         tabs={[

@@ -320,7 +320,7 @@ const StakingPage = () => {
         ) : (
           /* No Active Stakes State */
           <div className="bg-white shadow-md h-full flex flex-col justify-center mx-auto items-center  p-4 text-center">
-            <div className="  max-w-[420px] mx-auto">
+            <div className="  max-w-md w-full mx-auto">
               <h2 className="text-2xl font-bold text-gray-800 mb-4">
                 No Active Stakes Yet
               </h2>

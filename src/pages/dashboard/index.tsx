@@ -224,7 +224,7 @@ const Home: React.FC = () => {
   return (
     <div className="bg-neutral-50 w-full h-screen flex flex-col">
       {/* Main content container */}
-      <div className=" max-w-[420px] mx-auto flex flex-col flex-1">
+      <div className=" max-w-md w-full mx-auto flex flex-col flex-1">
         {/* Fixed header + balance */}
         <div className="sticky top-0 z-20 bg-neutral-50">
           {/* Header */}
@@ -334,7 +334,7 @@ const Home: React.FC = () => {
           {/* Divider */}
           <h2 className="text-sm font-bold text-gray-900 mb-4">Assets</h2>
           {/* Assets */}
-          <div className="  max-w-[420px] max-h-72 overflow-y-auto mx-auto no-scrollbar">
+          <div className="  max-w-md w-full max-h-72 overflow-y-auto mx-auto no-scrollbar">
             <Assets assets={assetsData} onAssetClick={handleAssetClick} />
           </div>
         </div>
