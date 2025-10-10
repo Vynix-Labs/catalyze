@@ -53,7 +53,7 @@ type InitiateFiatTransferInput = {
 };
 
 export const useInitiateFiatTransfer = () => {
-  return useMutation<any, Error, InitiateFiatTransferInput>({
+  return useMutation({
     mutationFn: async (data: InitiateFiatTransferInput) => {
       const response = await axiosInstance.post(
         endpoints.fiat.fiatTransferInitiate,
@@ -67,11 +67,11 @@ export const useInitiateFiatTransfer = () => {
 // Confirm Fiat Transfer Hook
 type ConfirmFiatTransferInput = {
   reference: string;
-  otp?: string;
+  authorizationCode: string;
 };
 
 export const useConfirmFiatTransfer = () => {
-  return useMutation<any, Error, ConfirmFiatTransferInput>({
+  return useMutation({
     mutationFn: async (data: ConfirmFiatTransferInput) => {
       const response = await axiosInstance.post(
         endpoints.fiat.fiatTransferConfirm,
@@ -112,7 +112,7 @@ export const useMonnifyDisbursement = (reference: string, enabled = true) => {
 // Resend OTP (Monnify)
 type ResendOtpInput = { reference: string };
 export const useMonnifyResendOtp = () => {
-  return useMutation<any, Error, ResendOtpInput>({
+  return useMutation({
     mutationFn: async (data: ResendOtpInput) => {
       const response = await axiosInstance.post(
         endpoints.fiat.fiatMonifyResendOtp,
@@ -126,7 +126,7 @@ export const useMonnifyResendOtp = () => {
 // Validate Monnify Account
 type ValidateMonnifyInput = { accountNumber: string; bankCode: string };
 export const useValidateMonnifyAccount = () => {
-  return useMutation<any, Error, ValidateMonnifyInput>({
+  return useMutation({
     mutationFn: async (data: ValidateMonnifyInput) => {
       const response = await axiosInstance.post(
         endpoints.fiat.fiatValidateMonify,

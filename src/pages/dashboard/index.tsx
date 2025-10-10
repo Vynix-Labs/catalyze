@@ -17,9 +17,8 @@ import GlobalModal from "../../common/ui/modal/GlobalModal";
 import {
   useAssets,
   useBalances,
-  useRates,
+  // useRates,
   useTransactions,
-  type Rate,
 } from "../../hooks";
 
 import { NoTransactions } from "../../components/EmptyStates";
@@ -46,11 +45,11 @@ const Home: React.FC = () => {
     // error: balancesError,
   } = useBalances();
   const { data: assetsDatas } = useAssets();
-  const {
-    data: rates,
-    // isLoading: isRateLoading,
-    // error: rateError,
-  } = useRates();
+  // const {
+  //   data: rates,
+  //   isLoading: isRateLoading,
+  //   error: rateError,
+  // } = useRates();
   const [user] = useAtom(authAtom);
   const navigate = useNavigate();
 
@@ -176,23 +175,25 @@ const Home: React.FC = () => {
 
   const assetsData: Asset[] =
     assetsDatas?.crypto && assetsDatas.crypto.length > 0
-      ? assetsDatas.crypto.map((balance, index) => {
-          // Find matching rate for this token symbol
-          const matchingRate = rates?.items?.find(
-            (rate: Rate) => rate.tokenSymbol === balance?.symbol
+      ? assetsDatas.crypto.map((asset, index) => {
+          // Find matching balance for this asset symbol
+          const matchingBalance = balanceData?.items?.find(
+            (balance) => balance.tokenSymbol === asset.symbol
           );
-          const balanceAmount = balance?.decimals || 0;
-          const rateValue = matchingRate
-            ? parseFloat(matchingRate.priceNgnBase?.toString() || "0") || 0
+
+          const balanceAmount = matchingBalance
+            ? parseFloat(matchingBalance.balance || "0")
             : 0;
-          const calculatedValue = balanceAmount * rateValue;
+          const fiatValue = matchingBalance
+            ? parseFloat(matchingBalance.fiatEquivalent || "0")
+            : 0;
 
           return {
             id: (index + 1).toString(),
-            symbol: balance?.symbol,
-            name: getTokenName(balance?.symbol),
+            symbol: asset.symbol,
+            name: getTokenName(asset.symbol),
             balance: balanceAmount.toString(),
-            value: calculatedValue.toFixed(2),
+            value: fiatValue.toFixed(2),
             currency: "₦",
           };
         })
