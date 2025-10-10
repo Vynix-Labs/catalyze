@@ -102,7 +102,7 @@ const RewardPage = () => {
   ];
 
   return (
-    <div className="max-w-md w-full h-screen w-full mx-auto flex flex-col">
+    <div className="max-w-md w-full h-screen mx-auto flex flex-col">
       {/* Fixed Header */}
       <div className="flex-shrink-0 p-4 bg-white">
         <h1 className="text-3xl font-bold text-gray-800">Rewards</h1>
