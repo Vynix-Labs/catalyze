@@ -120,8 +120,9 @@ const fiatRoutes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        await handleMonnifyWebhook(fastify, request);
-        return reply.code(200).send(SuccessResponse.parse({ success: true }));
+        const result = await handleMonnifyWebhook(fastify, request);
+        console.log("Webhook handled:", result);
+        return reply.code(200).send(result);
       } catch (err) {
         fastify.log.error(err);
         return reply.code(400).send(ErrorResponse.parse({ error: (err as Error).message }));

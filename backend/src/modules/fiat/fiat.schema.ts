@@ -15,8 +15,13 @@ export const FiatDepositResponse = z.object({
   paymentInstructions: z.object({}).passthrough(),
 });
 
-export const SuccessResponse = z.object({ success: z.boolean() });
-export const ErrorResponse = z.object({ error: z.string() });
+export const SuccessResponse = z
+  .object({
+    success: z.boolean(),
+  })
+  .passthrough(); // allow extra fields
+
+export const ErrorResponse = z.object({ error: z.string() }).passthrough();;
 
 export type InitiateFiatDepositInput = z.infer<typeof initiateFiatDepositSchema>;
 

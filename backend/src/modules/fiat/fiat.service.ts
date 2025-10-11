@@ -323,6 +323,7 @@ export class MonnifyClient {
     if (!wallet) throw new Error("User wallet not found");
     const { isValid, message } = await validateSufficientBalance(wallet.publicKey, Number(amountToken), symbol);
     if (!isValid) throw new Error(message);
+    
 
     type WithdrawRow = typeof withdrawRequests.$inferSelect;
     let withdraw: WithdrawRow | null = null;
@@ -375,11 +376,12 @@ export class MonnifyClient {
         env.SYSTEM_WALLET_ADDRESS,
         Number(amountToken),
         toChainToken(symbol),
-        bearerToken
+        userId
       );
       const txHash = typeof tx === "string"
         ? tx
         : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
+
 
       await fastify.db
         .update(transactions)
