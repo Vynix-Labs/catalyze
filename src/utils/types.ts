@@ -1,14 +1,22 @@
-
 // Auth and Auth pin hook
 export type authPin = {
   pin: number;
 };
 
-
 // Transaction types based on API documentation
-export type TransactionType = "deposit" | "withdraw" | "transfer" | "stake" | "unstake" | "claim";
+export type TransactionType =
+  | "deposit"
+  | "withdraw"
+  | "transfer"
+  | "stake"
+  | "unstake"
+  | "claim";
 export type TransactionSubtype = "fiat" | "crypto";
-export type TransactionStatus = "pending" | "processing" | "completed" | "failed";
+export type TransactionStatus =
+  | "pending"
+  | "processing"
+  | "completed"
+  | "failed";
 
 export type transactions = {
   items: {
@@ -22,7 +30,7 @@ export type transactions = {
     status: TransactionStatus;
     reference: string | null;
     txHash: string | null;
-    metadata: any;
+    metadata: Record<string, unknown>;
     createdAt: string;
     updatedAt: string;
   }[];
@@ -42,8 +50,6 @@ export type balances = {
   }[];
   totalFiat: string;
 };
-
-
 
 // fiat hook
 export type fiatDeposit = {
@@ -68,4 +74,18 @@ export type conFirmDeposit = {
   additionalProp1: string;
   additionalProp2: string;
   additionalProp3: string;
+};
+
+// assets hook
+export type assets = {
+  crypto: {
+    symbol: string;
+    contractAddress: string;
+    decimals: number;
+    network: string;
+  }[];
+  fiat: {
+    currency: string;
+    decimals: number;
+  }[];
 };

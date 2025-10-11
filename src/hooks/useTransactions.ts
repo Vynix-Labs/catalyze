@@ -203,3 +203,75 @@ export const useAdminTransactions = (options?: {
     refetchOnWindowFocus: false,
   });
 };
+
+/**
+ * Hook to fetch user onchain balances
+ */
+export const useOnchainBalances = () => {
+  const { logout } = useAuthState();
+
+  return useQuery<balances, Error>({
+    queryKey: ["transactions", "onchain-balances"],
+    queryFn: async () => {
+      try {
+        const response = await axiosInstance.get(
+          endpoints.transactions.onchainBalance
+        );
+        return response.data;
+      } catch (error: unknown) {
+        // Handle 401 errors by checking if session is still valid
+        if (error && typeof error === "object" && "response" in error) {
+          const axiosError = error as { response?: { status?: number } };
+          if (axiosError.response?.status === 401) {
+            console.log(
+              "Onchain Balances API returned 401, checking session validity..."
+            );
+            try {
+              const { authClient } = await import("../lib/auth-client");
+              const session = await authClient.getSession();
+              if (!session?.data?.user) {
+                console.log("Session is invalid, logging out...");
+                logout();
+              }
+            } catch {
+              console.log("Session check failed, logging out...");
+              logout();
+            }
+          }
+        }
+        throw error;
+      }
+    },
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: true,
+    retry: (failureCount, error: unknown) => {
+      // Don't retry on 401 errors
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as { response?: { status?: number } };
+        if (axiosError.response?.status === 401) {
+          return false;
+        }
+      }
+      return failureCount < 3;
+    },
+  });
+};
+
+/**
+ * Hook to fetch onchain balance for a specific token
+ * @param tokenSymbol - The token symbol to fetch onchain balance for
+ */
+export const useOnchainTokenBalance = (tokenSymbol: string) => {
+  return useQuery<balances["items"][0], Error>({
+    queryKey: ["transactions", "onchain-balance", tokenSymbol],
+    queryFn: async () => {
+      const response = await axiosInstance.get(
+        endpoints.transactions.onchainBalanceWithToken(tokenSymbol)
+      );
+      return response.data;
+    },
+    enabled: !!tokenSymbol,
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: true,
+  });
+};
