@@ -34,4 +34,4 @@ export async function createWallet(bearerToken: string): Promise<WalletData> {
   }
 }
 
-createWallet("sk_prod_a7a9757f21220f6ee87ec96fe923fb688cad3f9f9009d8c5f5c81b84de5e5ecd");
+createWallet(env.CHIPI_API_SECRET_KEY!)
