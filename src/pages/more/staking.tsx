@@ -13,6 +13,7 @@ import { detectCurrencyType, type Pool } from "../../types/types";
 import { useGetStakes, useStrategies, useUnstake } from "../../hooks/useStake";
 import { UnstakeModal } from "./components";
 import { toast } from "sonner";
+import ClaimRewardsPage from "./claimRewards";
 
 const StakingPage = () => {
   const [activeTab, setActiveTab] = useState<"pools" | "stakes">("pools");
@@ -22,6 +23,18 @@ const StakingPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [showAmountPage, setShowAmountPage] = useState(false);
   const [highlightedPool, setHighlightedPool] = useState<string | null>(null);
+
+  // Claim modal state
+  const [showClaimPage, setShowClaimPage] = useState(false);
+  const [selectedStakeForClaim, setSelectedStakeForClaim] = useState<{
+    id: string;
+    name: string;
+    amount: string;
+    apy: number;
+    lockPeriod: string;
+    reward: string;
+    progress: number;
+  } | null>(null);
 
   // Unstake modal state
   const [showUnstakeModal, setShowUnstakeModal] = useState(false);
@@ -101,6 +114,26 @@ const StakingPage = () => {
     setSelectedStakeForUnstake(null);
   };
 
+  // Handle claim button click
+  const handleClaimClick = (stake: {
+    id: string;
+    name: string;
+    amount: string;
+    apy: number;
+    lockPeriod: string;
+    reward: string;
+    progress: number;
+  }) => {
+    setSelectedStakeForClaim(stake);
+    setShowClaimPage(true);
+  };
+
+  // Handle back from claim page
+  const handleBackFromClaimPage = () => {
+    setShowClaimPage(false);
+    setSelectedStakeForClaim(null);
+  };
+
   // If amount page should be shown, render it
   if (showAmountPage && selectedPool) {
     return (
@@ -164,6 +197,8 @@ const StakingPage = () => {
             My Stakes
           </button>
         </div>
+
+        {/* <StakingEmptyState showBottomNav={false} /> */}
 
         {/* Content Based on Active Tab */}
         {activeTab === "pools" ? (
@@ -279,7 +314,20 @@ const StakingPage = () => {
                       <span>{isUnstaking ? "Processing..." : "Unstake"}</span>
                     </button>
 
-                    <button className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors">
+                    <button
+                      className="w-full flex items-center justify-center cursor-pointer gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                      onClick={() =>
+                        handleClaimClick({
+                          amount: stake.amountStaked.toString(),
+                          apy: stake.apy,
+                          id: stake.id,
+                          lockPeriod: "Flexible",
+                          name: stake.strategyName,
+                          progress: 30,
+                          reward: "",
+                        })
+                      }
+                    >
                       <MedalIcon className="w-4 h-4" />
                       <span>Claim</span>
                     </button>

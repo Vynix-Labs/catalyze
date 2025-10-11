@@ -22,7 +22,7 @@ const Layout = () => {
       </div>
 
       {/* Fixed Bottom Navigation */}
-      <div className="fixed bottom-0 left-0  max-w-md w-full right-0 mx-auto overflow-hidden bg-white">
+      <div className="fixed bottom-0 left-0 max-w-md w-full right-0 mx-auto overflow-hidden bg-white">
         <BottomNav activeTab={activeTab} />
       </div>
     </div>
