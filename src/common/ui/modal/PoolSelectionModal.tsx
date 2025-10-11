@@ -5,11 +5,13 @@ import { currencyIcons } from "../../../utils";
 import GlobalModal from "./GlobalModal";
 
 interface Pool {
-  id: number;
+  id: string;
   name: string;
-  fullName: string;
   apy: number;
-  lockPeriod: string;
+  tokenSymbol: string;
+  tvlUsd: number;
+  contractAddress: string;
+  isAudited: true;
 }
 
 const PoolSelectionModal = ({
@@ -63,19 +65,21 @@ const PoolSelectionModal = ({
         <div className="flex items-center space-x-3 mb-4 p-3 bg-neutral-100 rounded-lg">
           <CurrencyIcon currencyType={currencyType} />
           <div>
-            <h4 className="font-semibold text-gray-800">{pool.name}</h4>
-            <p className="text-sm text-gray-600">{pool.fullName}</p>
+            <h4 className="font-semibold text-gray-800">{pool.tokenSymbol}</h4>
+            <p className="text-sm text-gray-600">{pool.name}</p>
           </div>
         </div>
 
         <div className="space-y-3 text-sm bg-neutral-100 p-3 rounded-lg">
           <div className="flex justify-between pb-2">
             <span className="text-gray-600">APY</span>
-            <span className="font-semibold text-green-500">{pool.apy}%</span>
+            <span className="font-semibold text-green-500">
+              {pool.apy.toFixed(3)}%
+            </span>
           </div>
           <div className="flex justify-between pb-2">
             <span className="text-gray-600">Lock Period</span>
-            <span className="font-semibold">{pool.lockPeriod}</span>
+            <span className="font-semibold">Flexible</span>
           </div>
           <div className="flex justify-between pb-2">
             <span className="text-gray-600">Minimum Stake</span>

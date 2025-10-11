@@ -89,3 +89,31 @@ export type assets = {
     decimals: number;
   }[];
 };
+
+// stake types
+
+export type strategies = {
+  status: boolean;
+  strategies: {
+    id: string;
+    name: string;
+    apy: number;
+    tokenSymbol: string;
+    tvlUsd: number;
+    contractAddress: string;
+    isAudited: true;
+  }[];
+
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+};
+
+export type stake = {
+  status: true;
+  message: string;
+  txHash: string;
+};

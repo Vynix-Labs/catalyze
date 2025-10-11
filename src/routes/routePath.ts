@@ -10,7 +10,7 @@ export const RoutePath = {
   // nested
   TRANSFER: "/dashboard/transfer",
   STAKING: "/dashboard/more/staking",
-  ENTERAMOUNTPAGE: "/dashboard/more/enter-amount",
+  ENTERAMOUNTPAGE: "/dashboard/more/staking/:crypto",
   SETTINGS: "/dashboard/more/settings",
 
   // nested under settings

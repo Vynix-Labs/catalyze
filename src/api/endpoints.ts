@@ -30,11 +30,10 @@ export const endpoints = {
     adminTransactions: "/admin/transactions",
     balance: "/users/balances",
     balanceWithToken: (token: string) => `/users/balances/${token}`,
-//new endpoints 09/10/2025
+    //new endpoints 09/10/2025
     onchainBalance: "/users/onchain-balance",
     onchainBalanceWithToken: (token: string) =>
       `/users/onchain-balance/${token}`,
-
   },
 
   rates: {
@@ -52,5 +51,11 @@ export const endpoints = {
     stakingStrategies: "/staking/strategies",
     stakingStake: "/staking/staking/stake",
     stakingUnstake: "/staking/staking/unstake",
+  },
+
+  staking: {
+    strategies: "/staking/strategies",
+    stake: "/staking/staking/stake",
+    unstake: "/staking/staking/unstake",
   },
 };

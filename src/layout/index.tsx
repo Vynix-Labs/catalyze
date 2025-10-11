@@ -17,7 +17,7 @@ const Layout = () => {
   const activeTab = getActiveTab();
 
   return (
-    <div className="min-h-vh overflow-hidden">
+    <div className="min-h-vh overflow-hidden  w-screen max-w-md">
       <div className="flex-1 w-full max-h-[91vh] mx-auto max-w-[420px] overflow-x-hidden no-scrollbar">
         <Outlet />
       </div>
