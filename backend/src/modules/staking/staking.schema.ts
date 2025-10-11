@@ -68,5 +68,29 @@ export const BalanceResponse = z.object({
   fiatValue: z.number().optional(),
 });
 
+// ---------------------- User Stakes ----------------------
+export const StakeRecord = z.object({
+  id: z.string().uuid(),
+  strategyId: z.string(),
+  strategyName: z.string(),
+  tokenSymbol: z.string(),
+  contractAddress: z.string(),
+  amountStaked: z.number(),
+  apy: z.number(),
+  status: z.string(),
+  txHash: z.string().nullable(),
+  startedAt: z.string(), 
+  updatedAt: z.string(),
+});
+
+
+export const UserStakesResponse = z.object({
+  status: z.boolean(),
+  stakes: z.array(StakeRecord),
+});
+
+// ---- Types ----
+export type StakeRecordType = z.infer<typeof StakeRecord>;
+export type UserStakesResponseType = z.infer<typeof UserStakesResponse>;
 export type StakeBodyType = z.infer<typeof StakeBody>;
 export type UnstakeBodyType = z.infer<typeof UnstakeBody>;

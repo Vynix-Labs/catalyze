@@ -5,7 +5,7 @@ import { TransactionsService } from "../transactions/transactions.service";
 import { db } from "../../plugins/db";
 import type { WalletData } from "@chipi-pay/chipi-sdk";
 import type { CryptoCurrency } from "../../config";
-import { transactions, userWallets } from "../../db";
+import { transactions, userWallets, stakes } from "../../db";
 import { eq } from "drizzle-orm";
 import { buildErc4626DepositCalls, buildErc4626WithdrawCalls, parseUnits } from "../../utils/troves/calls";
 import { toTokenUnits } from "../../utils/wallet/tokens";
@@ -20,50 +20,56 @@ export class StakingService {
     this.txSvc = new TransactionsService(db);
   }
 
-  async listStrategies(opts: { page?: number; limit?: number; tokenSymbol?: string; sortBy?: string; sortDir?: "asc" | "desc"; }) {
-    const page = Math.max(1, opts.page ?? 1);
+  async listStrategies(opts: {
+    page?: number; limit?: number; tokenSymbol?: string;
+    sortBy?: string; sortDir?: "asc" | "desc";
+  }) {
+    const page  = Math.max(1, opts.page ?? 1);
     const limit = Math.max(1, Math.min(opts.limit ?? 10, 50));
-
     const strategies = await getStrategies();
 
-    // Optionally filter by token
+    const safeNum = (v: unknown, fb = 0) =>
+      typeof v === "number" && Number.isFinite(v) ? v : fb;
+
+    // filter by token (null-safe)
     let filtered = strategies;
     if (opts.tokenSymbol) {
-        filtered = strategies.filter((s) =>
-            s.depositToken?.some((t) => t.symbol.toLowerCase() === opts.tokenSymbol!.toLowerCase())
-        );
+      const tok = opts.tokenSymbol.toLowerCase();
+      filtered = strategies.filter(s =>
+        s.depositToken?.some(t => t.symbol?.toLowerCase() === tok)
+      );
     }
 
-    // Sorting
+    // sort (null-safe)
+    const dir = opts.sortDir === "asc" ? 1 : -1;
+    const key = opts.sortBy || "tvlUsd";
     filtered.sort((a, b) => {
-        const dir = opts.sortDir === "asc" ? 1 : -1;
-        const key = opts.sortBy || "tvlUsd";
-        return key === "apy"
-            ? dir * (a.apy - b.apy)
-            : key === "name"
-            ? dir * a.name.localeCompare(b.name)
-            : dir * (a.tvlUsd - b.tvlUsd);
+      if (key === "name") return dir * (a.name || "").localeCompare(b.name || "");
+      if (key === "apy")  return dir * (safeNum(a.apy)  - safeNum(b.apy));
+      return dir * (safeNum(a.tvlUsd) - safeNum(b.tvlUsd)); // default
     });
 
-    // Pagination
+    // paginate
     const total = filtered.length;
-    const totalPages = Math.ceil(total / limit);
-    const paginated = filtered.slice((page - 1) * limit, page * limit);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const pageItems = filtered.slice((page - 1) * limit, page * limit);
 
+    // map (force numbers to satisfy schema)
     return {
-        status: true,
-        strategies: paginated.map((s) => ({
-            id: s.id,
-            name: s.name,
-            apy: s.apy,
-            tokenSymbol: s.depositToken?.[0]?.symbol || "UNKNOWN",
-            tvlUsd: s.tvlUsd,
-            contractAddress: s.contract?.[0]?.address || "",
-            isAudited: s.isAudited,
-        })),
-        meta: { page, limit, total, totalPages },
+      status: true,
+      strategies: pageItems.map(s => ({
+        id: s.id ?? "",
+        name: s.name ?? "Unknown",
+        apy: safeNum(s.apy, 0),
+        tokenSymbol: s.depositToken?.[0]?.symbol ?? "UNKNOWN",
+        tvlUsd: safeNum(s.tvlUsd, 0),
+        contractAddress: s.contract?.[0]?.address ?? "",
+        isAudited: Boolean(s.isAudited),
+      })),
+      meta: { page, limit, total, totalPages },
     };
   }
+
 
 
   async stake(userId: string, strategyId: string, amount: number, bearerToken: string) {
@@ -105,7 +111,7 @@ export class StakingService {
     try {
       // Special-case: Vesu Fusion USDC — use Chipi specialized route for deposit
       if (tokenSymbol === "usdc" && strategy.id.toLowerCase().includes("vesu_fusion")) {
-        const tx = await stakeVesuUsdc(wallet as unknown as WalletData, amount, bearerToken);
+        const tx = await stakeVesuUsdc(wallet as unknown as WalletData, amount, userId);
         const txHash = typeof tx === "string"
           ? tx
           : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
@@ -126,7 +132,8 @@ export class StakingService {
         amountWei,
       });
 
-      const tx = await callContractWithChipi(wallet as unknown as WalletData, contractAddress, calls, bearerToken);
+      
+      const tx = await callContractWithChipi(wallet as unknown as WalletData, contractAddress, calls, userId);
       const txHash = typeof tx === "string"
         ? tx
         : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
@@ -135,6 +142,18 @@ export class StakingService {
         .update(transactions)
         .set({ status: "completed", txHash })
         .where(eq(transactions.id, txRow.id));
+
+      await this.db.insert(stakes).values({
+        userId,
+        strategyId: strategy.id,
+        strategyName: strategy.name,
+        tokenSymbol,
+        contractAddress,
+        amountStaked: amount,
+        apy: strategy.apy,
+        txHash,
+        status: "active",
+      });
 
       return { status: true, message: "Stake successful", txHash };
     } catch (err: unknown) {
@@ -147,9 +166,12 @@ export class StakingService {
         const decimals = token0.decimals;
         const amountWei = await toTokenUnits(amount, tokenSymbol, decimals);
 
-        // Approve via Chipi helper
-        await approveWithChipi(wallet as unknown as WalletData, contractAddress, amount, tokenSymbol, bearerToken);
+        console.log("here")
 
+        // Approve via Chipi helper
+        await approveWithChipi(wallet as unknown as WalletData, contractAddress, amount, tokenSymbol, userId);
+
+        
         // Then deposit only (construct call directly to avoid array index)
         const depositOnly = buildErc4626DepositCalls({
           vault: contractAddress,
@@ -160,8 +182,8 @@ export class StakingService {
         .find(c => c.entrypoint === "deposit");
         if (!depositOnly) throw new Error("Failed to build deposit call");
 
-        const tx = await callContractWithChipi(wallet as unknown as WalletData, contractAddress, [depositOnly], bearerToken);
-        const txHash = typeof tx === "string"
+        const tx = await callContractWithChipi(wallet as unknown as WalletData, contractAddress, [depositOnly], userId);
+        let txHash = typeof tx === "string"
           ? tx
           : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
 
@@ -169,6 +191,18 @@ export class StakingService {
           .update(transactions)
           .set({ status: "completed", txHash })
           .where(eq(transactions.id, txRow.id));
+
+        await this.db.insert(stakes).values({
+          userId,
+          strategyId: strategy.id,
+          strategyName: strategy.name,
+          tokenSymbol,
+          contractAddress,
+          amountStaked: amount,
+          apy: strategy.apy,
+          txHash,
+          status: "active",
+        });
 
         return { status: true, message: "Stake successful", txHash };
       } catch (fallbackErr: unknown) {
@@ -182,7 +216,6 @@ export class StakingService {
       }
     }
   }
-
 
   async unstake(userId: string, strategyId: string, amount: number, bearerToken: string) {
     // Get user wallet
@@ -217,7 +250,7 @@ export class StakingService {
     try {
       // Special-case: Vesu USDC
       if (tokenSymbol === "usdc" && strategy.id.toLowerCase().includes("vesu_fusion")) {
-        const tx = await withdrawVesuUsdc(wallet as unknown as WalletData, amount, bearerToken);
+        const tx = await withdrawVesuUsdc(wallet as unknown as WalletData, amount, userId);
         const txHash = typeof tx === "string" ? tx : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
         await this.db.update(transactions).set({ status: "completed", txHash }).where(eq(transactions.id, txRow.id));
         return { status: true, message: "Unstake successful", txHash };
@@ -248,4 +281,22 @@ export class StakingService {
       throw new Error(`Unstake failed: ${msg}`);
     }
   }
+
+  async getUserStakes(userId: string) {
+    const records = await this.db.query.stakes.findMany({
+      where: eq(stakes.userId, userId),
+      orderBy: (stakes, { desc }) => [desc(stakes.startedAt)],
+    });
+
+    const normalized = records.map((s) => ({
+      ...s,
+      amountStaked: Number(s.amountStaked),
+      apy: Number(s.apy),
+      startedAt: s.startedAt.toISOString(),
+      updatedAt: s.updatedAt.toISOString(),
+    }));
+
+    return { status: true, stakes: normalized };
+  }
+
 }
