@@ -146,7 +146,7 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      <div className="max-w-md mx-auto min-h-screen">
+      <div className="  max-w-md w-full mx-auto min-h-screen">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
           <button
@@ -274,7 +274,7 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
             {/* Empty state */}
             {currencyTransactions.length === 0 && (
               <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-gray-50 shadow rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-gray-400 text-2xl">📝</span>
                 </div>
                 <h3 className="text-lg font-medium text-gray-600 mb-2">

@@ -20,7 +20,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   className = "",
 }) => {
   return (
-    <div className={`bg-white rounded-2xl p-8 text-center ${className}`}>
+    <div className={`bg-white rounded-2xl p-6 text-center ${className}`}>
       <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
         {icon}
       </div>

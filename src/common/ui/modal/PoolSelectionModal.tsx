@@ -61,7 +61,7 @@ const PoolSelectionModal = ({
       onProceed={onConfirm}
       isProceedDisabled={false}
     >
-      <div className="bg-white rounded-xl max-w-md w-full pt-4">
+      <div className="bg-white rounded-xl   max-w-md w-full w-full pt-4">
         <div className="flex items-center space-x-3 mb-4 p-3 bg-neutral-100 rounded-lg">
           <CurrencyIcon currencyType={currencyType} />
           <div>

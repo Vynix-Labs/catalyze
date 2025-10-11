@@ -22,6 +22,7 @@ import SetPin from "../pages/settings/setPin";
 import Settings from "../pages/settings/settings";
 import UpdatePassword from "../pages/settings/updatePassword";
 import { RoutePath } from "./routePath";
+import ClaimRewardsPageWrapper from "../components/ClaimRewardPageWrapper";
 
 export const routes = createBrowserRouter([
   {
@@ -46,6 +47,7 @@ export const routes = createBrowserRouter([
       { path: RoutePath.INVESTMENT, element: <InvestmentPage /> },
       { path: RoutePath.REWARD, element: <RewardPage /> },
       { path: RoutePath.STAKING, element: <StakingPage /> },
+      { path: RoutePath.CLAIMREWARDPAGE, element: <ClaimRewardsPageWrapper /> },
       {
         path: RoutePath.ENTERAMOUNTPAGE,
         element: <EnterAmountPageWrapper />, // Use the wrapper instead of direct component
