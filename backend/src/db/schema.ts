@@ -259,21 +259,13 @@ export const pools = createTable('pools', {
 export const stakes = createTable("stakes", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: text("user_id").references(() => user.id).notNull(),
-
-  // From dynamic strategies
   strategyId: text("strategy_id").notNull(),
   strategyName: text("strategy_name").notNull(),
   tokenSymbol: text("token_symbol").notNull(),
   contractAddress: text("contract_address").notNull(),
-
-  // Financial data
   amountStaked: decimal("amount_staked", { precision: 38, scale: 18 }).notNull(),
   apy: decimal("apy", { precision: 20, scale: 16 }).notNull(),
-
-  // Optional status tracking
   status: stakeStatusEnum("status").default("active").notNull(),
-
-  // On-chain metadata
   txHash: text("tx_hash"),
   startedAt: timestamp("started_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
