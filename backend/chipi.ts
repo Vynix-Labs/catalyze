@@ -34,4 +34,4 @@ export async function createWallet(bearerToken: string): Promise<WalletData> {
   }
 }
 
-createWallet(env.CHIPI_API_SECRET_KEY!)
+createWallet("Secret key here")
