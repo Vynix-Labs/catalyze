@@ -1,5 +1,6 @@
 import type { WalletData } from "@chipi-pay/chipi-sdk";
-import { ChipiSDK } from "@chipi-pay/chipi-sdk";
+// import { ChipiSDK } from "@chipi-pay/chipi-sdk";
+import { ChipiSDK, type ChainToken } from "@chipi-stack/backend"
 import env from "../../config/env";
 import { TOKEN_MAP, type CryptoCurrency } from "../../config";
 import { type Call } from "starknet";
@@ -12,16 +13,20 @@ import { eq } from "drizzle-orm";
 // Initialize ChipiSDK
 const chipiSDK = new ChipiSDK({
   apiPublicKey: env.CHIPI_API_PUBLIC_KEY,
+  environment: "production",
 });
 
 /**
  * Create a new wallet using ChipiSDK
  * @param bearerToken - A valid BetterAuth bearer token (from fastify.auth.api.getToken)
  */
-export async function createWallet(bearerToken: string): Promise<WalletData> {
+export async function createWallet(bearerToken: string, userId: string): Promise<WalletData> {
   try {
     const chipiWallet = await chipiSDK.createWallet({
-      encryptKey: process.env.CHIPI_ENCRYPT_KEY!,
+      params: {
+        encryptKey: env.CHIPI_ENCRYPT_KEY!,
+        externalUserId: userId,
+      },
       bearerToken,
     });
 
@@ -54,7 +59,7 @@ export async function ensureUserWallet(
   if (!bearerToken) {
     throw new Error("Missing bearerToken for wallet creation");
   }
-  const wallet = await createWallet(bearerToken);
+  const wallet = await createWallet(bearerToken, userId);
   const row: typeof userWallets.$inferInsert = {
     id: randomUUID(),
     userId,
@@ -74,21 +79,23 @@ export async function transferWithChipi(
   from: WalletData,
   to: string,
   amount: number,
-  currency: CryptoCurrency,
+  currency: ChainToken,
   bearerToken: string
 ) {
-    const decimals = await getTokenDecimals(currency);
+  // const decimals = await getTokenDecimals(currency);
 
-    const tx = await chipiSDK.transfer({
-        encryptKey: env.CHIPI_ENCRYPT_KEY,
-        wallet: from,
-        contractAddress: TOKEN_MAP[currency],
-        recipient: to,
-        amount,
-        decimals,
-        bearerToken,
-    });
-    return tx;
+  const tx = await chipiSDK.transfer({
+    params: {
+      encryptKey: env.CHIPI_ENCRYPT_KEY!,
+      wallet: from,
+      token: currency,
+      // contractAddress: TOKEN_MAP[currency],
+      recipient: to,
+      amount: amount.toString(),
+    },
+    bearerToken,
+  });
+  return tx;
 }
 
 export async function approveWithChipi(
@@ -98,16 +105,18 @@ export async function approveWithChipi(
   currency: CryptoCurrency,
   bearerToken: string
 ) {
-    const decimals = await getTokenDecimals(currency);
-    return await chipiSDK.approve({
-        encryptKey: env.CHIPI_ENCRYPT_KEY,
-        wallet,
-        contractAddress: TOKEN_MAP[currency],
-        spender,
-        amount,
-        decimals,
-        bearerToken,
-    });
+  const decimals = await getTokenDecimals(currency);
+  return await chipiSDK.approve({
+    params: {
+      encryptKey: env.CHIPI_ENCRYPT_KEY!,
+      wallet,
+      contractAddress: TOKEN_MAP[currency],
+      spender,
+      amount,
+      decimals,
+    },
+    bearerToken,
+  });
 }
 
 export async function callContractWithChipi(
@@ -116,33 +125,39 @@ export async function callContractWithChipi(
   calls: Call[],
   bearerToken: string
 ) {
-    return await chipiSDK.callAnyContract({
-        encryptKey: env.CHIPI_ENCRYPT_KEY,
-        wallet,
-        contractAddress,
-        calls,
-        bearerToken,
-    });
+  return await chipiSDK.callAnyContract({
+    params: {
+      encryptKey: env.CHIPI_ENCRYPT_KEY!,
+      wallet,
+      contractAddress,
+      calls,
+    },
+    bearerToken,
+  });
 }
 
 export async function stakeVesuUsdc(wallet: WalletData, amount: number, bearerToken: string) {
-    return await chipiSDK.stakeVesuUsdc({
-        encryptKey: env.CHIPI_ENCRYPT_KEY,
-        wallet,
-        amount,
-        receiverWallet: wallet.publicKey,
-        bearerToken,
-    });
+  return await chipiSDK.stakeVesuUsdc({
+    params: {
+      encryptKey: env.CHIPI_ENCRYPT_KEY!,
+      wallet,
+      amount,
+      receiverWallet: wallet.publicKey,
+    },
+    bearerToken,
+  });
 }
 
 export async function withdrawVesuUsdc(wallet: WalletData, amount: number, bearerToken: string) {
-    return await chipiSDK.withdrawVesuUsdc({
-        encryptKey: env.CHIPI_ENCRYPT_KEY,
-        wallet,
-        amount,
-        recipient: wallet.publicKey,
-        bearerToken,
-    });
+  return await chipiSDK.withdrawVesuUsdc({
+    params: {
+      encryptKey: env.CHIPI_ENCRYPT_KEY!,
+      wallet,
+      amount,
+      recipient: wallet.publicKey,
+    },
+    bearerToken,
+  });
 }
 
 export async function stakeWithChipi(

@@ -5,7 +5,7 @@ import env from "../../config/env";
 import { Buffer } from "buffer";
 import type { InitiateFiatDepositInput, InitiateFiatTransferInput } from "./fiat.schema";
 import { mapMonnifyStatus } from "../../utils/monnify";
-import { type CryptoCurrency } from "../../config";
+import { toChainToken, type CryptoCurrency } from "../../config";
 import { getSystemTokenBalance, transferFromSystem } from "../../utils/wallet/system";
 import { validateSufficientBalance } from "../../utils/wallet/tokens";
 import { transferWithChipi } from "../../utils/wallet/chipi";
@@ -370,7 +370,13 @@ export class MonnifyClient {
 
     // Perform on-chain user -> system transfer via Chipi
     try {
-      const tx = await transferWithChipi(wallet as unknown as WalletData, env.SYSTEM_WALLET_ADDRESS, Number(amountToken), symbol, bearerToken);
+      const tx = await transferWithChipi(
+        wallet as unknown as WalletData,
+        env.SYSTEM_WALLET_ADDRESS,
+        Number(amountToken),
+        toChainToken(symbol),
+        bearerToken
+      );
       const txHash = typeof tx === "string"
         ? tx
         : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
