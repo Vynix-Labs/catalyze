@@ -121,12 +121,13 @@ export interface EnterAmountPageProps {
 
 export interface ClaimRewardsPageProps {
   stake: {
-    id: number;
+    id: string;
     name: string;
     amount: string;
     reward: string;
     apy: number;
     progress: number;
+    lockPeriod: string;
   };
   onBack: () => void;
 }

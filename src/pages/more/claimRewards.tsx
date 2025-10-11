@@ -3,7 +3,6 @@ import { Wallet } from "lucide-react";
 import type { ClaimRewardsPageProps } from "../../types/types";
 import Header from "../../components/cryptoTransferFlow/Header";
 
-
 const ClaimRewardsPage = ({ stake, onBack }: ClaimRewardsPageProps) => {
   const [isClaiming, setIsClaiming] = useState(false);
   const [isClaimed, setIsClaimed] = useState(false);
