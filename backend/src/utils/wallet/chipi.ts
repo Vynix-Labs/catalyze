@@ -80,7 +80,7 @@ export async function transferWithChipi(
   to: string,
   amount: number,
   currency: ChainToken,
-  userId
+  userId: string
 ) {
   // const decimals = await getTokenDecimals(currency);
 
@@ -104,10 +104,12 @@ export async function approveWithChipi(
   spender: string,
   amount: number,
   currency: CryptoCurrency,
+  userId: string
 ) {
   const decimals = await getTokenDecimals(currency);
   return await chipiSDK.approve({
     params: {
+      externalUserId: userId,
       encryptKey: env.CHIPI_ENCRYPT_KEY!,
       wallet,
       contractAddress: TOKEN_MAP[currency],
@@ -123,9 +125,11 @@ export async function callContractWithChipi(
   wallet: WalletData,
   contractAddress: string,
   calls: Call[],
+  userId: string
 ) {
   return await chipiSDK.callAnyContract({
     params: {
+      externalUserId: userId,
       encryptKey: env.CHIPI_ENCRYPT_KEY!,
       wallet,
       contractAddress,
@@ -135,9 +139,10 @@ export async function callContractWithChipi(
   });
 }
 
-export async function stakeVesuUsdc(wallet: WalletData, amount: number) {
+export async function stakeVesuUsdc(wallet: WalletData, amount: number, userId: string) {
   return await chipiSDK.stakeVesuUsdc({
     params: {
+      externalUserId: userId,
       encryptKey: env.CHIPI_ENCRYPT_KEY!,
       wallet,
       amount,
@@ -147,15 +152,16 @@ export async function stakeVesuUsdc(wallet: WalletData, amount: number) {
   });
 }
 
-export async function withdrawVesuUsdc(wallet: WalletData, amount: number, bearerToken: string) {
+export async function withdrawVesuUsdc(wallet: WalletData, amount: number, userId: string) {
   return await chipiSDK.withdrawVesuUsdc({
     params: {
+      externalUserId: userId,
       encryptKey: env.CHIPI_ENCRYPT_KEY!,
       wallet,
       amount,
       recipient: wallet.publicKey,
     },
-    bearerToken,
+    bearerToken: env.CHIPI_API_SECRET_KEY!,
   });
 }
 
@@ -164,14 +170,15 @@ export async function stakeWithChipi(
   amount: number,
   bearerToken: string,
   tokenSymbol: string,
-  contractAddress: string
+  contractAddress: string,
+  userId: string
 ) {
   const symbol = tokenSymbol.toLowerCase();
   const currency = symbol as CryptoCurrency;
   const decimals = await getTokenDecimals(currency);
 
   if (symbol === "usdc") {
-    return await stakeVesuUsdc(wallet, amount, bearerToken);
+    return await stakeVesuUsdc(wallet, amount, userId);
   }
 
   const entrypoint = "deposit";
@@ -185,5 +192,5 @@ export async function stakeWithChipi(
   ];
 
   // Execute contract call via Chipi
-  return await callContractWithChipi(wallet, contractAddress, calls, bearerToken);
+  return await callContractWithChipi(wallet, contractAddress, calls, userId);
 }

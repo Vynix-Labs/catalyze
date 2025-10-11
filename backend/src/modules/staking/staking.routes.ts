@@ -7,6 +7,7 @@ import {
   StakingActionResponse,
   StrategiesResponse,
   listStrategiesQuery,
+  UserStakesResponse,
 } from "./staking.schema";
 import { validatePinToken } from "../../utils/pinToken";
 import { ErrorResponse } from "../../schemas/common";
@@ -40,7 +41,7 @@ const stakingRoutes: FastifyPluginAsync = async (fastify) => {
 
   // ------------------- POST /staking/stake -------------------
   fastify.post(
-    "/staking/stake",
+    "/stake",
     {
       preHandler: requireAuth(fastify),
       schema: { body: StakeBody, response: { 200: StakingActionResponse, 400: ErrorResponse } },
@@ -63,7 +64,7 @@ const stakingRoutes: FastifyPluginAsync = async (fastify) => {
 
   // ------------------- POST /staking/unstake -------------------
   fastify.post(
-    "/staking/unstake",
+    "/unstake",
     {
       preHandler: requireAuth(fastify),
       schema: { body: UnstakeBody, response: { 200: StakingActionResponse, 400: ErrorResponse } },
@@ -83,7 +84,24 @@ const stakingRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.code(200).send(result);
     }
   );
-}
-;
+
+  // ------------------- GET /staking/user-stakes -------------------
+  fastify.get(
+    "/user-stakes",
+    {
+      preHandler: requireAuth(fastify),
+      schema: {
+        response: {
+          200: UserStakesResponse,
+        },
+      },
+    },
+    async (request, reply) => {
+      const userId = request.currentUserId as string;
+      const result = await svc.getUserStakes(userId);
+      return reply.code(200).send(result);
+    }
+  );
+};
 
 export default stakingRoutes;
