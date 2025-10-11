@@ -145,7 +145,7 @@ export const buildApp = async () => {
   // register all other routes
   fastify.register(routes, { prefix: "/api" });
 
-  fastify.log.info("Registering interval for update_price_feeds", new Date().toISOString());
+  fastify.log.info(`Registering interval for update_price_feeds at ${new Date().toISOString()}`);
 
   // Start recurring background task after plugins/routes are ready
   setInterval(() => {

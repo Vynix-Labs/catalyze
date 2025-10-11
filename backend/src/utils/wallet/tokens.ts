@@ -4,7 +4,8 @@ import erc20Abi from "./erc20-abi";
 import { TOKEN_MAP, type CryptoCurrency } from "../../config";
 
 // Starknet provider
-const rpcUrl = env.STARKNET_RPC_URL || "https://starknet-mainnet.public.blastapi.io";
+const rpcUrl =
+  env.STARKNET_RPC_URL || "https://starknet-mainnet.public.blastapi.io";
 const provider = new Provider({ nodeUrl: rpcUrl });
 
 export const TOKEN_DECIMALS: Record<CryptoCurrency, number> = {
@@ -21,28 +22,47 @@ export const TOKEN_DECIMALS: Record<CryptoCurrency, number> = {
 export async function getTokenDecimals(currency: CryptoCurrency): Promise<number> {
   try {
     const contract = new Contract(erc20Abi, TOKEN_MAP[currency], provider);
-    const decimals = await contract.functions.decimals?.();
-    return Number(decimals);
+    const decimalsResult = await contract.functions.decimals?.();
+  
+    if (decimalsResult === undefined) {
+      return TOKEN_DECIMALS[currency] ?? 18;
+    }
+    
+    if ("result" in decimalsResult && Array.isArray(decimalsResult.result)) {
+      return Number(decimalsResult.result[0]);
+    }
+
+    return Number(decimalsResult);
   } catch (error) {
     console.error(`Error getting decimals for ${currency}:`, error);
-    // Default decimals based on known token standards
-    return TOKEN_DECIMALS[currency] || 18;
+    return TOKEN_DECIMALS[currency] ?? 18;
   }
 }
+
 
 /**
  * Convert human-readable amount to token units (multiply by 10^decimals)
  */
-export async function toTokenUnits(amount: number, currency: CryptoCurrency, decimals?: number): Promise<bigint> {
-  return BigInt(Math.floor(amount * 10 ** (decimals || await getTokenDecimals(currency))));
+export async function toTokenUnits(
+  amount: number,
+  currency: CryptoCurrency,
+  decimals?: number
+): Promise<bigint> {
+  const tokenDecimals = decimals ?? (await getTokenDecimals(currency));
+  return BigInt(Math.floor(amount * 10 ** tokenDecimals));
 }
 
 /**
  * Convert token units to human-readable amount (divide by 10^decimals)
  */
-export async function fromTokenUnits(amount: bigint | string, currency: CryptoCurrency, decimals?: number): Promise<number> {
+export async function fromTokenUnits(
+  amount: bigint | string,
+  currency: CryptoCurrency,
+  decimals?: number
+): Promise<number> {
+  const tokenDecimals = decimals ?? (await getTokenDecimals(currency));
   const bigIntAmount = typeof amount === "string" ? BigInt(amount) : amount;
-  return Number(bigIntAmount) / 10 ** (decimals || await getTokenDecimals(currency));
+  return Number(bigIntAmount) / 10 ** tokenDecimals;
 }
 
 /**
@@ -55,12 +75,23 @@ export async function validateSufficientBalance(
 ): Promise<{ isValid: boolean; currentBalance: number; message: string }> {
   try {
     const contract = new Contract(erc20Abi, TOKEN_MAP[currency], provider);
+    const balanceFn = contract.functions?.balanceOf;
+    const decimalsFn = contract.functions?.decimals;
+
     const [rawBalance, decimals] = await Promise.all([
-      contract.functions.balanceOf(walletAddress),
-      contract.functions.decimals?.(),
+      typeof balanceFn === "function"
+        ? balanceFn(walletAddress)
+        : contract.call("balanceOf", [walletAddress]),
+      typeof decimalsFn === "function"
+        ? decimalsFn()
+        : contract.call("decimals"),
     ]);
 
-    const currentBalance = await fromTokenUnits(rawBalance, currency, Number(decimals));
+    const currentBalance = await fromTokenUnits(
+      rawBalance,
+      currency,
+      Number(decimals)
+    );
 
     if (currentBalance < amount) {
       return {
@@ -94,13 +125,23 @@ export async function getNormalizedBalance(
 ): Promise<{ balance: number; decimals: number; rawBalance: string } | null> {
   try {
     const contract = new Contract(erc20Abi, TOKEN_MAP[currency], provider);
+    const balanceFn = contract.functions?.balanceOf;
+    const decimalsFn = contract.functions?.decimals;
+
     const [rawBalance, decimals] = await Promise.all([
-      contract.functions.balanceOf?.([walletAddress]),
-      contract.functions.decimals?.(),
+      typeof balanceFn === "function"
+        ? balanceFn(walletAddress)
+        : contract.call("balanceOf", [walletAddress]),
+      typeof decimalsFn === "function"
+        ? decimalsFn()
+        : contract.call("decimals"),
     ]);
 
-    // use fromTokenUnits and modify to take decimals so it doesn't redo that call
-    const normalizedBalance = await fromTokenUnits(rawBalance, currency, Number(decimals));
+    const normalizedBalance = await fromTokenUnits(
+      rawBalance,
+      currency,
+      Number(decimals)
+    );
 
     return {
       balance: normalizedBalance,
@@ -116,10 +157,10 @@ export async function getNormalizedBalance(
 /**
  * Validate transaction amount (must be positive and have reasonable decimal places)
  */
-export function validateTransactionAmount(amount: number, currency: CryptoCurrency): {
-  isValid: boolean;
-  message: string;
-} {
+export function validateTransactionAmount(
+  amount: number,
+  currency: CryptoCurrency
+): { isValid: boolean; message: string } {
   if (amount <= 0) {
     return {
       isValid: false,
@@ -127,13 +168,12 @@ export function validateTransactionAmount(amount: number, currency: CryptoCurren
     };
   }
 
-  // Check for reasonable decimal places based on token
   const maxDecimals: Record<CryptoCurrency, number> = {
     usdt: 6,
     usdc: 6,
     strk: 8,
     weth: 8,
-    wbtc: 6
+    wbtc: 6,
   };
 
   const decimalPlaces = (amount.toString().split(".")[1] || "").length;
@@ -144,19 +184,25 @@ export function validateTransactionAmount(amount: number, currency: CryptoCurren
     };
   }
 
-  return {
-    isValid: true,
-    message: "Valid amount",
-  };
-} 
-
-export async function balance(address: string, token: CryptoCurrency) {
-  const contract = new Contract(erc20Abi, TOKEN_MAP[token], provider);
-  const [balance, decimals] = await Promise.all([
-    contract.functions.balanceOf(address),
-    contract.functions.decimals(),
-  ]);
-
-  return fromTokenUnits(balance, token, Number(decimals));
+  return { isValid: true, message: "Valid amount" };
 }
 
+/**
+ * Lightweight balance fetcher
+ */
+export async function balance(address: string, token: CryptoCurrency) {
+  const contract = new Contract(erc20Abi, TOKEN_MAP[token], provider);
+  const balanceFn = contract.functions?.balanceOf;
+  const decimalsFn = contract.functions?.decimals;
+
+  const [rawBalance, decimals] = await Promise.all([
+    typeof balanceFn === "function"
+      ? balanceFn(address)
+      : contract.call("balanceOf", [address]),
+    typeof decimalsFn === "function"
+      ? decimalsFn()
+      : contract.call("decimals"),
+  ]);
+
+  return fromTokenUnits(rawBalance, token, Number(decimals));
+}

@@ -2,20 +2,21 @@ import { getStrategies } from "../../utils/troves/strategies";
 import { approveWithChipi, withdrawVesuUsdc, callContractWithChipi, stakeVesuUsdc } from "../../utils/wallet/chipi";
 import { validateSufficientBalance } from "../../utils/wallet/tokens";
 import { TransactionsService } from "../transactions/transactions.service";
-import { db } from "../../plugins/db";
+// import { db } from "../../plugins/db";
 import type { WalletData } from "@chipi-pay/chipi-sdk";
 import type { CryptoCurrency } from "../../config";
-import { transactions, userWallets, stakes } from "../../db";
-import { eq } from "drizzle-orm";
+import { transactions, userWallets, stakes } from "../../db/schema";
+import { eq, desc } from "drizzle-orm";
 import { buildErc4626DepositCalls, buildErc4626WithdrawCalls, parseUnits } from "../../utils/troves/calls";
 import { toTokenUnits } from "../../utils/wallet/tokens";
+import fastify from "fastify";
 
-type Database = typeof db;
+// type Database = typeof db;
 
 export class StakingService {
-  db: Database;
+  db: any;
   txSvc: TransactionsService;
-  constructor(db: Database) {
+  constructor(db: any) {
     this.db = db;
     this.txSvc = new TransactionsService(db);
   }
@@ -202,7 +203,7 @@ export class StakingService {
           apy: strategy.apy,
           txHash,
           status: "active",
-        });
+        }as any);
 
         return { status: true, message: "Stake successful", txHash };
       } catch (fallbackErr: unknown) {
@@ -300,17 +301,17 @@ export class StakingService {
   }
 
   async getUserStakes(userId: string) {
-    const records = await this.db.query.stakes.findMany({
+    const records: (typeof stakes.$inferSelect)[] = await this.db.query.stakes.findMany({
       where: eq(stakes.userId, userId),
-      orderBy: (stakes, { desc }) => [desc(stakes.startedAt)],
+      orderBy: [desc(stakes.startedAt)],
     });
 
     const normalized = records.map((s) => ({
       ...s,
       amountStaked: Number(s.amountStaked),
       apy: Number(s.apy),
-      startedAt: s.startedAt.toISOString(),
-      updatedAt: s.updatedAt.toISOString(),
+      startedAt: s.startedAt ? s.startedAt.toISOString() : null,
+      updatedAt: s.updatedAt ? s.updatedAt.toISOString() : null,
     }));
 
     return { status: true, stakes: normalized };

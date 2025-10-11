@@ -43,7 +43,7 @@ export function getRawBodyString(request: FastifyRequest): string {
 export async function markDepositStatus(
   fastify: FastifyInstance,
   depositId: string,
-  status: "pending" | "processing" | "completed" | "failed"
+  status: "awaiting_payment" | "processing" | "completed" | "failed"
 ) {
   await fastify.db
     .update(depositIntents)

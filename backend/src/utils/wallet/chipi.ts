@@ -86,7 +86,7 @@ export async function transferWithChipi(
 
   const tx = await chipiSDK.transfer({
     params: {
-      externalUserId: userId,
+      /* externalUserId: userId, */
       encryptKey: env.CHIPI_ENCRYPT_KEY!,
       wallet: from,
       token: currency,
@@ -109,7 +109,7 @@ export async function approveWithChipi(
   const decimals = await getTokenDecimals(currency);
   return await chipiSDK.approve({
     params: {
-      externalUserId: userId,
+      /* externalUserId: userId, */
       encryptKey: env.CHIPI_ENCRYPT_KEY!,
       wallet,
       contractAddress: TOKEN_MAP[currency],
@@ -129,7 +129,7 @@ export async function callContractWithChipi(
 ) {
   return await chipiSDK.callAnyContract({
     params: {
-      externalUserId: userId,
+      /* externalUserId: userId, */
       encryptKey: env.CHIPI_ENCRYPT_KEY!,
       wallet,
       contractAddress,
@@ -142,7 +142,7 @@ export async function callContractWithChipi(
 export async function stakeVesuUsdc(wallet: WalletData, amount: number, userId: string) {
   return await chipiSDK.stakeVesuUsdc({
     params: {
-      externalUserId: userId,
+      /* externalUserId: userId, */
       encryptKey: env.CHIPI_ENCRYPT_KEY!,
       wallet,
       amount,
@@ -155,7 +155,7 @@ export async function stakeVesuUsdc(wallet: WalletData, amount: number, userId: 
 export async function withdrawVesuUsdc(wallet: WalletData, amount: number, userId: string) {
   return await chipiSDK.withdrawVesuUsdc({
     params: {
-      externalUserId: userId,
+      /* externalUserId: userId, */
       encryptKey: env.CHIPI_ENCRYPT_KEY!,
       wallet,
       amount,
