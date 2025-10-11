@@ -114,7 +114,7 @@ const EnterAmountPage = ({ pool, onBack }: EnterAmountPageProps) => {
   // ---------- Step 1: Enter Amount ----------
   if (currentStep === 1) {
     return (
-      <div className="max-w-md mx-auto bg-white min-h-screen">
+      <div className="  max-w-md w-full mx-auto bg-white min-h-screen">
         <Header title="Enter Amount" onBack={goBack} />
         <div className="p-6 w-full">
           <CurrencyInfo pool={pool} />
@@ -166,7 +166,7 @@ const EnterAmountPage = ({ pool, onBack }: EnterAmountPageProps) => {
 
   // ---------- Step 3 ----------
   return (
-    <div className="max-w-md mx-auto bg-neutral-50 min-h-screen">
+    <div className="  max-w-md w-full mx-auto bg-neutral-50 min-h-screen">
       <Header title="Confirm Stake" onBack={goHome} />
       <div className="p-6 text-center space-y-6">
         <div className="space-y-4 py-2">

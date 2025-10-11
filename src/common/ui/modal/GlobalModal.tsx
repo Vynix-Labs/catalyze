@@ -38,7 +38,7 @@ export default function GlobalModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 "
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       onClick={handleBackdropClick}
     >
       <motion.div
@@ -58,8 +58,10 @@ export default function GlobalModal({
         }}
         exit={{ y: "10vh", opacity: 0 }}
       >
-        <div className="w-full">
-          <p className="font-bold text-xl text-black">{headingText}</p>
+        <p className="font-bold text-xl text-black mb-4">{headingText}</p>
+
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto no-scrollbar pr-2 min-h-0">
           {children}
         </div>
 

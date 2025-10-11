@@ -119,6 +119,18 @@ export interface EnterAmountPageProps {
   onBack: () => void;
 }
 
+export interface ClaimRewardsPageProps {
+  stake: {
+    id: number;
+    name: string;
+    amount: string;
+    reward: string;
+    apy: number;
+    progress: number;
+  };
+  onBack: () => void;
+}
+
 export interface Pool {
   id: string;
   name: string;
@@ -128,6 +140,16 @@ export interface Pool {
   contractAddress: string;
   isAudited: true;
 }
+
+export interface Stake {
+  id: number;
+  name: string;
+  amount: string;
+  reward: string;
+  apy: number;
+  progress: number;
+}
+
 export interface SuccessStepProps {
   flowType: "deposit" | "transfer";
   currencyMode: "crypto" | "fiat";
