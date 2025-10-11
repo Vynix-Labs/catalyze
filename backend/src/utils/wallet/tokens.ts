@@ -56,7 +56,7 @@ export async function validateSufficientBalance(
   try {
     const contract = new Contract(erc20Abi, TOKEN_MAP[currency], provider);
     const [rawBalance, decimals] = await Promise.all([
-      contract.functions.balanceOf?.([walletAddress]),
+      contract.functions.balanceOf(walletAddress),
       contract.functions.decimals?.(),
     ]);
 
@@ -153,9 +153,10 @@ export function validateTransactionAmount(amount: number, currency: CryptoCurren
 export async function balance(address: string, token: CryptoCurrency) {
   const contract = new Contract(erc20Abi, TOKEN_MAP[token], provider);
   const [balance, decimals] = await Promise.all([
-    contract.functions.balanceOf?.([address]),
-    contract.functions.decimals?.(),
+    contract.functions.balanceOf(address),
+    contract.functions.decimals(),
   ]);
 
   return fromTokenUnits(balance, token, Number(decimals));
 }
+

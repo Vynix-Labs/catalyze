@@ -108,11 +108,13 @@ export interface PinEntryStepProps {
 
 export interface EnterAmountPageProps {
   pool: {
-    id: number;
+    id: string;
     name: string;
-    fullName: string;
     apy: number;
-    lockPeriod: string;
+    tokenSymbol: string;
+    tvlUsd: number;
+    contractAddress: string;
+    isAudited: true;
   };
   onBack: () => void;
 }
@@ -130,11 +132,13 @@ export interface ClaimRewardsPageProps {
 }
 
 export interface Pool {
-  id: number;
+  id: string;
   name: string;
-  fullName: string;
   apy: number;
-  lockPeriod: string;
+  tokenSymbol: string;
+  tvlUsd: number;
+  contractAddress: string;
+  isAudited: true;
 }
 
 export interface Stake {

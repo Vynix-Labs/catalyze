@@ -5,3 +5,4 @@ export * from "./useFiat";
 export * from "./useRates";
 export * from "./useTransactions";
 export * from "./assets";
+export * from "./useStake";

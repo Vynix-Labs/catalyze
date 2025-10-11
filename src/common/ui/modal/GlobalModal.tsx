@@ -1,6 +1,6 @@
 import { type ReactNode, type Dispatch, type SetStateAction } from "react";
 import AuthFooter from "../../auth/AuthFooter";
-
+import { motion } from "framer-motion";
 interface Props {
   onClose: () => void;
   children: ReactNode;
@@ -41,9 +41,22 @@ export default function GlobalModal({
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       onClick={handleBackdropClick}
     >
-      <div
-        className="bg-white rounded-t-lg shadow-xl max-w-md w-full w-full absolute bottom-0 flex flex-col py-6 px-4 space-y-4 max-h-[25rem]"
+      <motion.div
+        className="bg-white rounded-t-lg shadow-xl max-w-md flex items-baseline justify-baseline absolute bottom-0 py-6 px-4 w-full max-h-[90vh] overflow-auto flex-col gap-8.5"
         onClick={(e) => e.stopPropagation()}
+        initial={{
+          y: "10vh",
+          opacity: 0,
+        }}
+        animate={{
+          y: "0",
+          opacity: 1,
+        }}
+        transition={{
+          duration: 0.3,
+          ease: "easeInOut",
+        }}
+        exit={{ y: "10vh", opacity: 0 }}
       >
         <p className="font-bold text-xl text-black mb-4">{headingText}</p>
 
@@ -57,7 +70,7 @@ export default function GlobalModal({
           handleBtnClick={buttonClickHandler}
           disabled={isProceedDisabled}
         />
-      </div>
+      </motion.div>
     </div>
   );
 }

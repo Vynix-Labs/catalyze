@@ -5,6 +5,7 @@ import env from "../../config/env";
 import { userWallets, cryptoDeposits, balances, transactions } from "../../db/schema";
 import { ensureUserWallet, transferWithChipi } from "../../utils/wallet/chipi";
 import { validateSufficientBalance } from "../../utils/wallet/tokens";
+import { toChainToken } from "../../config";
 import type { CryptoCurrency } from "../../config";
 import { validatePinToken } from "../../utils/pinToken";
 import type { WalletData } from "@chipi-pay/chipi-sdk";
@@ -105,7 +106,7 @@ export class CryptoService {
       metadata: { toAddress },
     });
 
-    const tx = await transferWithChipi(wallet as unknown as WalletData, toAddress, amount, symbol, bearerToken);
+    const tx = await transferWithChipi(wallet as unknown as WalletData, toAddress, amount, toChainToken(symbol), bearerToken);
     const txHash = typeof tx === "string"
       ? tx
       : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
