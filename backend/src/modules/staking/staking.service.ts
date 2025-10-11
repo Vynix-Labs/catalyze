@@ -246,27 +246,32 @@ export class StakingService {
       status: "pending",
       metadata: { strategyId },
     });
+    console.log("✅");
 
     try {
       // Special-case: Vesu USDC
-      if (tokenSymbol === "usdc" && strategy.id.toLowerCase().includes("vesu_fusion")) {
+      /* if (tokenSymbol === "usdc" && strategy.id.toLowerCase().includes("vesu_fusion")) {
         const tx = await withdrawVesuUsdc(wallet as unknown as WalletData, amount, userId);
         const txHash = typeof tx === "string" ? tx : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
         await this.db.update(transactions).set({ status: "completed", txHash }).where(eq(transactions.id, txRow.id));
         return { status: true, message: "Unstake successful", txHash };
-      }
+      } */
 
       // Generic ERC4626 withdraw
       const token0 = strategy.depositToken?.[0];
       if (!token0) throw new Error("Strategy deposit token missing");
       const decimals = token0.decimals;
       const amountWei = parseUnits(amount, decimals);
+  
       const calls = buildErc4626WithdrawCalls({
         vault: contractAddress,
         receiver: wallet.publicKey,
         owner: wallet.publicKey,
         amountWei,
       });
+      console.log("❌")
+
+      
       const tx = await callContractWithChipi(wallet as unknown as WalletData, contractAddress, calls, userId);
       const txHash = typeof tx === "string" ? tx : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
 
