@@ -246,7 +246,6 @@ export class StakingService {
       status: "pending",
       metadata: { strategyId },
     });
-    console.log("✅");
 
     try {
       // Special-case: Vesu USDC
@@ -254,6 +253,12 @@ export class StakingService {
         const tx = await withdrawVesuUsdc(wallet as unknown as WalletData, amount, userId);
         const txHash = typeof tx === "string" ? tx : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
         await this.db.update(transactions).set({ status: "completed", txHash }).where(eq(transactions.id, txRow.id));
+
+        // Update user stake as completed
+        await this.db.update(stakes)
+          .set({ status: "completed", updatedAt: new Date() })
+          .where(eq(stakes.userId, userId))
+          .where(eq(stakes.strategyId, strategyId));
         return { status: true, message: "Unstake successful", txHash };
       } */
 
@@ -269,13 +274,20 @@ export class StakingService {
         owner: wallet.publicKey,
         amountWei,
       });
-      console.log("❌")
 
       
       const tx = await callContractWithChipi(wallet as unknown as WalletData, contractAddress, calls, userId);
       const txHash = typeof tx === "string" ? tx : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
 
       await this.db.update(transactions).set({ status: "completed", txHash }).where(eq(transactions.id, txRow.id));
+      await this.db.update(stakes)
+        .set({
+          status: "completed",
+          updatedAt: new Date(),
+        })
+        .where(eq(stakes.userId, userId))
+        .where(eq(stakes.strategyId, strategyId));
+
       return { status: true, message: "Unstake successful", txHash };
     } catch (err: unknown) {
       await this.db
