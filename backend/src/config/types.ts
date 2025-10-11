@@ -9,20 +9,21 @@ const CHAIN_TOKEN_MAP = {
 } as const;
 
 type ChainTokenMap = typeof CHAIN_TOKEN_MAP;
+type ChainTokenValues = ChainTokenMap[keyof ChainTokenMap];
 
 export type CryptoCurrency = keyof ChainTokenMap;
-export type SupportedChainToken = ChainTokenMap[keyof ChainTokenMap];
+export type SupportedChainToken = Extract<ChainToken, ChainTokenValues>;
 
 const REVERSE_CHAIN_TOKEN_MAP = Object.fromEntries(
   Object.entries(CHAIN_TOKEN_MAP).map(([lower, upper]) => [upper, lower])
 ) as Record<SupportedChainToken, CryptoCurrency>;
 
-export function toChainToken(token: CryptoCurrency): ChainToken {
+export function toChainToken(token: CryptoCurrency): SupportedChainToken {
   const chainToken = CHAIN_TOKEN_MAP[token];
   if (!chainToken) {
     throw new Error(`Unsupported crypto currency: ${token}`);
   }
-  return chainToken as ChainToken;
+  return chainToken as SupportedChainToken;
 }
 
 export function fromChainToken(token: ChainToken): CryptoCurrency {
