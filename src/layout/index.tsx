@@ -17,7 +17,7 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen flex flex-col overflow-hidden bg-neutral-50">
-      <div className="flex-1 max-w-md w-full mx-auto overflow-x-hidden no-scrollbar">
+      <div className="flex-1 max-w-md w-screen mx-auto overflow-x-hidden no-scrollbar">
         <Outlet />
       </div>
 

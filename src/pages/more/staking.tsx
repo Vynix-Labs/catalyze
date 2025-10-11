@@ -10,13 +10,12 @@ import EnterAmountPage from "./enterAmount";
 import PoolSelectionModal from "../../common/ui/modal/PoolSelectionModal";
 import CurrencyIcon from "../../components/CurrencyIcon";
 import { detectCurrencyType, type Pool } from "../../types/types";
-import { useStrategies, useUnstake } from "../../hooks/useStake";
+import { useGetStakes, useStrategies, useUnstake } from "../../hooks/useStake";
 import { UnstakeModal } from "./components";
 import { toast } from "sonner";
 
 const StakingPage = () => {
   const [activeTab, setActiveTab] = useState<"pools" | "stakes">("pools");
-  const [hasStakes] = useState(true);
   const { mutateAsync: unstake, isPending: isUnstaking } = useUnstake();
 
   const [selectedPool, setSelectedPool] = useState<Pool | null>(null);
@@ -34,6 +33,10 @@ const StakingPage = () => {
   } | null>(null);
 
   const { data: pools, isLoading: poolIsLoading } = useStrategies();
+  const { data: userStakes, isLoading: userStakeLoading } = useGetStakes();
+
+  // Derive hasStakes from actual data
+  const hasStakes = userStakes?.stakes && userStakes.stakes.length > 0;
 
   // Handle pool selection with highlight effect
   const handlePoolClick = (pool: Pool) => {
@@ -44,8 +47,6 @@ const StakingPage = () => {
 
   // Handle modal confirmation
   const handleModalConfirm = () => {
-    console.log("testing");
-
     setShowModal(false);
     setShowAmountPage(true);
   };
@@ -79,7 +80,6 @@ const StakingPage = () => {
       toast.success(`Successfully unstaked ${amount} tokens`);
       setShowUnstakeModal(false);
       setSelectedStakeForUnstake(null);
-      // You might want to refetch stakes or update the UI here
     } catch (error) {
       console.error("❌ Unstake failed:", error);
       toast.error("Failed to unstake. Please try again.");
@@ -108,42 +108,8 @@ const StakingPage = () => {
     );
   }
 
-  // Sample active stakes data
-  const activeStakes = [
-    {
-      id: "1",
-      name: "USDC Stake",
-      amount: "1.5 ETH",
-      apy: 5.2,
-      lockPeriod: "7 days",
-      reward: "+0.08 ETH",
-      progress: 75,
-      strategyId: "strategy-1",
-    },
-    {
-      id: "2",
-      name: "STRK Stake",
-      amount: "2.3 ETH",
-      apy: 4.8,
-      lockPeriod: "14 days",
-      reward: "+0.10 ETH",
-      progress: 40,
-      strategyId: "strategy-2",
-    },
-    {
-      id: "3",
-      name: "USDT Stake",
-      amount: "0.9 ETH",
-      apy: 6.0,
-      lockPeriod: "30 days",
-      reward: "+0.05 ETH",
-      progress: 35,
-      strategyId: "strategy-3",
-    },
-  ];
-
   return (
-    <>
+    <div className=" w-screen max-w-md">
       <div className="mx-auto p-4 w-full">
         {/* Header */}
         <div className="mb-8">
@@ -255,10 +221,14 @@ const StakingPage = () => {
               })}
             </div>
           )
+        ) : userStakeLoading ? (
+          <div className="text-center py-12 text-gray-500">
+            Loading stakes...
+          </div>
         ) : hasStakes ? (
           <div className="space-y-4">
-            {activeStakes.map((stake) => {
-              const currencyType = detectCurrencyType(stake.name);
+            {userStakes?.stakes.map((stake) => {
+              const currencyType = detectCurrencyType(stake.strategyName);
               return (
                 <div
                   key={stake.id}
@@ -274,47 +244,34 @@ const StakingPage = () => {
                       </div>
                       <div>
                         <h3 className="font-bold text-gray-800">
-                          {stake.name}
+                          {stake.strategyName}
                         </h3>
                         <div className="flex items-center gap-2 text-xs text-neutral-500 mt-1">
-                          <span>{stake.amount}</span>
+                          <span>{stake.amountStaked}</span>
                           <div className="w-1 h-1 bg-gray-400 rounded-full" />
                           <span>{stake.apy}% APY</span>
                         </div>
                         <p className="text-neutral-400 text-xs mt-1">
                           Lock Period:{" "}
-                          <span className="text-gray-800">
-                            {stake.lockPeriod}
-                          </span>
+                          <span className="text-gray-800">Flexible</span>
                         </p>
                       </div>
                     </div>
                     <span className="text-green-500 font-medium">
-                      {stake.reward}
+                      {stake.apy}%
                     </span>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between w-full">
-                      <p className="text-gray-500 text-sm font-medium">
-                        Progress
-                      </p>
-                      <span className="text-gray-500 text-xs">
-                        {stake.progress}%
-                      </span>
-                    </div>
-
-                    <div className="h-2 w-full bg-neutral-200 rounded-full overflow-hidden mt-2">
-                      <div
-                        className="h-full bg-neutral-900 transition-all duration-300"
-                        style={{ width: `${stake.progress}%` }}
-                      />
-                    </div>
                   </div>
 
                   <div className="flex gap-2 w-full pt-2">
                     <button
-                      onClick={() => handleUnstakeClick(stake)}
+                      onClick={() =>
+                        handleUnstakeClick({
+                          amount: stake.amountStaked.toString(),
+                          id: stake.strategyId,
+                          name: stake.strategyName,
+                          strategyId: stake.strategyId,
+                        })
+                      }
                       disabled={isUnstaking}
                       className="px-3 w-full flex items-center justify-center gap-2 py-2 text-sm border border-blue-600 text-blue-600 rounded-full hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -332,7 +289,7 @@ const StakingPage = () => {
             })}
           </div>
         ) : (
-          <div className="bg-white shadow-md h-full flex flex-col justify-center mx-auto items-center p-4 text-center">
+          <div className="bg-white rounded-lg shadow-md h-full flex flex-col justify-center mx-auto items-center p-8 text-center">
             <div className="max-w-md mx-auto">
               <h2 className="text-2xl font-bold text-gray-800 mb-4">
                 No Active Stakes Yet
@@ -342,7 +299,12 @@ const StakingPage = () => {
                 beginner-friendly, and flexible.
               </p>
               <div className="flex w-full gap-2 text-sm">
-                <Button variants="primary">Available Pools</Button>
+                <Button
+                  variants="primary"
+                  handleClick={() => setActiveTab("pools")}
+                >
+                  Available Pools
+                </Button>
                 <Button variants="primary">Learn Staking</Button>
               </div>
             </div>
@@ -371,7 +333,7 @@ const StakingPage = () => {
           isLoading={isUnstaking}
         />
       )}
-    </>
+    </div>
   );
 };
 

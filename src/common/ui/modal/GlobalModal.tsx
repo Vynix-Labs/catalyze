@@ -42,7 +42,7 @@ export default function GlobalModal({
       onClick={handleBackdropClick}
     >
       <motion.div
-        className="bg-white rounded-t-lg shadow-xl max-w-md flex items-baseline justify-baseline absolute bottom-0 py-6 px-4 w-full max-h-[90vh] overflow-auto flex-col gap-8.5"
+        className="bg-white rounded-t-lg shadow-xl max-w-md flex items-baseline justify-baseline absolute bottom-0 py-6 px-4 w-full max-h-[90vh] overflow-auto flex-col gap-8.5 "
         onClick={(e) => e.stopPropagation()}
         initial={{
           y: "10vh",
@@ -61,7 +61,7 @@ export default function GlobalModal({
         <p className="font-bold text-xl text-black mb-4">{headingText}</p>
 
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto no-scrollbar pr-2 min-h-0">
+        <div className="flex-1 overflow-y-auto no-scrollbar pr-2 min-h-0 w-full ">
           {children}
         </div>
 

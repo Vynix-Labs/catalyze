@@ -130,7 +130,6 @@ export interface ClaimRewardsPageProps {
   };
   onBack: () => void;
 }
-
 export interface Pool {
   id: string;
   name: string;
@@ -179,3 +178,19 @@ export interface AuthFooterProps {
   handleBtnClick?: () => void;
   disabled?: boolean; // Add this line
 }
+export type userStakes = {
+  status: boolean;
+  stakes: {
+    id: string;
+    strategyId: string;
+    strategyName: string;
+    tokenSymbol: string;
+    contractAddress: string;
+    amountStaked: number;
+    apy: number;
+    status: string;
+    txHash: string;
+    startedAt: string;
+    updatedAt: string;
+  }[];
+};
