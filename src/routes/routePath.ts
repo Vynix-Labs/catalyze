@@ -17,6 +17,7 @@ export const RoutePath = {
   PERSONAL_INFO: "/dashboard/more/settings/personal-info",
   TRANSACTION_PIN: "/dashboard/more/settings/transaction-pin",
   UPDATE_PASSWORD: "/dashboard/more/settings/update-password",
+  CLAIMREWARDPAGE: "/dashboard/more/staking/claim-reward",
 
   // auth routes (standalone, can keep absolute or move under "auth")
   CREATE_ACCOUNT: "/auth/create-account",
