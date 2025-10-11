@@ -9,6 +9,7 @@ interface SetPinData {
 
 interface VerifyPinData {
   pin: string;
+  scope?:string
 }
 
 interface SetPinResponse {
@@ -19,6 +20,9 @@ interface SetPinResponse {
 interface VerifyPinResponse {
   success: boolean;
   message: string;
+  token: string;
+  expiresIn: number;
+  scope: string;
 }
 
 // Set PIN Hook
@@ -36,6 +40,8 @@ export const useVerifyPin = () => {
   return useMutation<VerifyPinResponse, Error, VerifyPinData>({
     mutationFn: async (data: VerifyPinData) => {
       const response = await axiosInstance.post(endpoints.auth.verifyPin, data);
+      console.log(response.data);
+
       return response.data;
     },
   });

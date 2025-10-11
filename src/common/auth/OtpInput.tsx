@@ -16,9 +16,10 @@ const OtpInput = forwardRef<
   {
     onComplete?: (otp: string) => void;
     onResend?: () => void;
+    showCounter?: boolean;
+    otpLength?: number;
   }
->(({ onComplete, onResend }, ref) => {
-  const otpLength = 6;
+>(({ onComplete, onResend, showCounter = true, otpLength = 6 }, ref) => {
   const [otp, setOtp] = useState(Array(otpLength).fill(""));
   const [mask, setMask] = useState(Array(otpLength).fill(false));
   const [countdown, setCountdown] = useState(300);
@@ -163,21 +164,23 @@ const OtpInput = forwardRef<
         ))}
       </div>
 
-      <div className="flex items-end justify-center pt-4">
-        <button
-          type="button"
-          disabled={isResendDisabled}
-          onClick={onResend}
-          className="text-sm font-bold transition duration-300 ease-in-out cursor-pointer text-primary-100  hover:text-primary-100/90 disabled:text-gray-200 dark:disabled:text-gray-300"
-        >
-          Resend code{" "}
-          {countdown > 0 && (
-            <span className="text-primary-100">
-              {Math.floor(countdown / 60)}:{countdown % 60}
-            </span>
-          )}
-        </button>
-      </div>
+      {showCounter && (
+        <div className="flex items-end justify-center pt-4">
+          <button
+            type="button"
+            disabled={isResendDisabled}
+            onClick={onResend}
+            className="text-sm font-bold transition duration-300 ease-in-out cursor-pointer text-primary-100  hover:text-primary-100/90 disabled:text-gray-200 dark:disabled:text-gray-300"
+          >
+            Resend code{" "}
+            {countdown > 0 && (
+              <span className="text-primary-100">
+                {Math.floor(countdown / 60)}:{countdown % 60}
+              </span>
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 });
