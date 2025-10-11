@@ -29,6 +29,7 @@ const envSchema = z.object({
   // ChipiPay JWKS Configuration (NEW)
   CHIPI_API_PUBLIC_KEY: z.string().min(1),
   CHIPI_ENCRYPT_KEY: z.string().min(1),
+  CHIPI_API_SECRET_KEY: z.string().min(1),
   STARKNET_RPC_URL: z.string().url().optional().default("https://starknet-mainnet.public.blastapi.io"),
   DEPOSIT_CONFIRMATIONS: z.coerce.number().optional().default(12),
 

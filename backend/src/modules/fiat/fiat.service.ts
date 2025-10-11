@@ -4,7 +4,12 @@ import { depositIntents, balances, transactions, withdrawRequests, priceFeeds, r
 import env from "../../config/env";
 import { Buffer } from "buffer";
 import type { InitiateFiatDepositInput, InitiateFiatTransferInput } from "./fiat.schema";
-import { mapMonnifyStatus } from "../../utils/monnify";
+import { 
+  mapMonnifyStatus, getRawBodyString,
+  markDepositStatus, hasSufficientLiquidity,
+  flagReserveNeedsAdmin, ensureUserWallet,
+  creditUserBalance, mapMonnifyStatus, 
+} from "../../utils/monnify";
 import { type CryptoCurrency } from "../../config";
 import { getSystemTokenBalance, transferFromSystem } from "../../utils/wallet/system";
 import { validateSufficientBalance } from "../../utils/wallet/tokens";
@@ -319,9 +324,9 @@ export class MonnifyClient {
 
     // Ensure user wallet exists for on-chain transfer
     const [wallet] = await fastify.db.select().from(userWallets).where(eq(userWallets.userId, userId));
-    if (!wallet) throw new Error("User wallet not found");
+   /*  if (!wallet) throw new Error("User wallet not found");
     const { isValid, message } = await validateSufficientBalance(wallet.publicKey, Number(amountToken), symbol);
-    if (!isValid) throw new Error(message);
+    if (!isValid) throw new Error(message); */
 
     type WithdrawRow = typeof withdrawRequests.$inferSelect;
     let withdraw: WithdrawRow | null = null;
@@ -570,172 +575,125 @@ export async function handleMonnifyWebhook(
   fastify: FastifyInstance,
   request: FastifyRequest
 ) {
-  const maybeRaw = (request as unknown as { rawBody?: string | Buffer }).rawBody;
-  const rawBodyStr: string =
-    (typeof maybeRaw === "string" ? maybeRaw : (maybeRaw as Buffer | undefined)?.toString("utf8")) ??
-    (typeof request.body === "string" ? (request.body as string) : JSON.stringify(request.body));
+  const log = fastify.log.child({ scope: "monnifyWebhook" });
 
-  fastify.log.info({ rawBodyStr }, "Raw body used for signature");
-
+  // -------------------- Signature Validation --------------------
+  const rawBody = getRawBodyString(request);
   const signatureHeader =
-    (request.headers["monnify-signature"] as string) ||
-    (request.headers["x-monnify-signature"] as string);
+    request.headers["monnify-signature"] ||
+    request.headers["x-monnify-signature"];
 
-  if (!signatureHeader) {
-    throw new Error("Missing signature header");
-  }
+  if (!signatureHeader) throw new Error("Missing signature header");
 
   const computed = createHash("sha512")
-    .update(rawBodyStr + (MONNIFY_SECRET_KEY ?? ""))
+    .update(rawBody + (MONNIFY_SECRET_KEY ?? ""))
     .digest("hex");
 
   if (computed !== signatureHeader) {
-    fastify.log.warn({ computed, signatureHeader }, "Invalid Monnify webhook signature");
+    log.warn({ computed, signatureHeader }, "Invalid Monnify signature");
     throw new Error("Invalid signature");
   }
 
-  const { eventType, eventData } = (request.body as { eventType?: string; eventData?: unknown }) ?? {};
+  // -------------------- Event Validation --------------------
+  const { eventType, eventData } = request.body as {
+    eventType?: string;
+    eventData?: any;
+  };
 
   if (eventType !== "SUCCESSFUL_TRANSACTION" || !eventData) {
+    log.info({ eventType }, "Ignoring non-success event");
     return { success: true, ignored: true };
   }
 
-  const data = eventData as { paymentReference?: string; amountPaid?: number | string; transactionReference?: string };
-  const paymentReference = data.paymentReference;
-  const amountPaid = Number(data.amountPaid ?? 0);
-  const transactionReference = data.transactionReference ?? null;
+  const { paymentReference, amountPaid, transactionReference } = eventData;
+  if (!paymentReference) throw new Error("Missing paymentReference");
 
-  if (!paymentReference) {
-    throw new Error("Missing paymentReference");
-  }
-
-  // Lookup deposit intent
+  // -------------------- Deposit Lookup --------------------
   const [deposit] = await fastify.db
     .select()
     .from(depositIntents)
     .where(eq(depositIntents.providerRef, paymentReference));
 
-  if (!deposit) {
-    throw new Error("Deposit intent not found");
-  }
+  if (!deposit) throw new Error("Deposit intent not found");
 
   if (deposit.status === "completed") {
+    log.info({ depositId: deposit.id }, "Deposit already completed");
     return { success: true, alreadyCompleted: true };
   }
 
-  // Verify amounts
-  if (Number(deposit.amountFiat) !== amountPaid) {
-    fastify.log.warn(
+  if (Number(deposit.amountFiat) !== Number(amountPaid)) {
+    log.warn(
       { depositId: deposit.id, expected: deposit.amountFiat, got: amountPaid },
-      "Amount mismatch"
+      "Fiat amount mismatch"
     );
   }
 
-  // Mark processing
-  await fastify.db
-    .update(depositIntents)
-    .set({ status: "processing", updatedAt: new Date() })
-    .where(eq(depositIntents.id, deposit.id));
+  // -------------------- Mark Processing --------------------
+  await markDepositStatus(fastify, deposit.id, "processing");
 
   try {
-    // Reserve-first fulfillment
-    const reserveId = deposit.reserveId;
-    const [reserve] = reserveId
-      ? await fastify.db.select().from(reserves).where(eq(reserves.id, reserveId))
-      : [];
-
-    // Check liquidity (in case reserve expired or we bypassed)
+    // -------------------- Liquidity Check --------------------
     const symbol = deposit.tokenSymbol as CryptoCurrency;
-    const systemBal = await getSystemTokenBalance(symbol);
-    const now = new Date();
-    const activeRes = await fastify.db
-      .select()
-      .from(reserves)
-      .where(and(eq(reserves.tokenSymbol, symbol), eq(reserves.status, "pending"), gt(reserves.expiresAt, now)));
-    const sumActive = activeRes.reduce((acc, r: typeof reserves.$inferSelect) => acc + Number(r.amountToken ?? 0), 0);
+    const hasLiquidity = await hasSufficientLiquidity(
+      fastify,
+      symbol,
+      Number(deposit.amountToken)
+    );
 
-    if (systemBal - sumActive < Number(deposit.amountToken)) {
-      // Not enough liquidity; flag for admin
-      if (reserve) {
-        await fastify.db.update(reserves).set({ status: "needs_admin", updatedAt: new Date() }).where(eq(reserves.id, reserve.id));
-      }
+    if (!hasLiquidity) {
+      await flagReserveNeedsAdmin(fastify, deposit.reserveId);
       return { success: true, needsAdmin: true };
     }
 
-    // Ensure user wallet exists
-    let [wallet] = await fastify.db.select().from(userWallets).where(eq(userWallets.userId, deposit.userId));
-    if (!wallet) {
-      const w = await createWallet(deposit.userId);
-      const row: typeof userWallets.$inferInsert = {
-        id: randomUUID(),
-        userId: deposit.userId,
-        network: "starknet",
-        publicKey: w.publicKey,
-        encryptedPrivateKey: w.encryptedPrivateKey,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      await fastify.db.insert(userWallets).values(row);
-      wallet = row as unknown as typeof userWallets.$inferSelect;
-    }
+    // -------------------- Wallet Handling --------------------
+    const wallet = await ensureUserWallet(fastify, deposit.userId);
 
-    // Transfer from system wallet to user on-chain
+    // -------------------- On-chain Transfer --------------------
     const tx = await transferFromSystem(symbol, wallet.publicKey, Number(deposit.amountToken));
     const txHash = tx.transactionHash;
 
-    // Credit off-chain balance for platform accounting
-    const [existingBalance] = await fastify.db
-      .select()
-      .from(balances)
-      .where(and(eq(balances.userId, deposit.userId), eq(balances.tokenSymbol, deposit.tokenSymbol)));
+    // -------------------- Off-chain Accounting --------------------
+    await creditUserBalance(fastify, deposit.userId, deposit.tokenSymbol, deposit.amountToken);
 
-    if (existingBalance) {
-      const newBalance = (Number(existingBalance.balance) + Number(deposit.amountToken)).toString();
-      await fastify.db.update(balances).set({ balance: newBalance, updatedAt: new Date() }).where(eq(balances.id, existingBalance.id));
-    } else {
-      await fastify.db.insert(balances).values({
+    // -------------------- Transaction Ledger --------------------
+    const existingTx = await fastify.db
+      .select()
+      .from(transactions)
+      .where(eq(transactions.reference, transactionReference ?? paymentReference));
+
+    if (existingTx.length === 0) {
+      await fastify.db.insert(transactions).values({
         id: randomUUID(),
         userId: deposit.userId,
+        type: "deposit",
+        subtype: "fiat",
         tokenSymbol: deposit.tokenSymbol,
-        balance: deposit.amountToken,
+        amountToken: deposit.amountToken,
+        amountFiat: deposit.amountFiat,
+        status: "completed",
+        reference: transactionReference ?? paymentReference,
+        txHash,
+        metadata: { monnify: eventData },
+        createdAt: new Date(),
         updatedAt: new Date(),
       });
+    } else {
+      log.info({ reference: transactionReference ?? paymentReference }, "Transaction already recorded");
     }
 
-    // Insert into transactions ledger with on-chain txHash
-    await fastify.db.insert(transactions).values({
-      id: randomUUID(),
-      userId: deposit.userId,
-      type: "deposit",
-      subtype: "fiat",
-      tokenSymbol: deposit.tokenSymbol,
-      amountToken: deposit.amountToken,
-      amountFiat: deposit.amountFiat,
-      status: "completed",
-      reference: transactionReference ?? paymentReference,
-      txHash: txHash,
-      metadata: JSON.stringify({ monnify: eventData }),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    // Mark reserve and deposit intent completed
-    if (reserve) {
-      await fastify.db.update(reserves).set({ status: "succeeded", txHash, updatedAt: new Date() }).where(eq(reserves.id, reserve.id));
+    // -------------------- Mark Completed --------------------
+    if (deposit.reserveId) {
+      await fastify.db.update(reserves)
+        .set({ status: "succeeded", txHash, updatedAt: new Date() })
+        .where(eq(reserves.id, deposit.reserveId));
     }
-    await fastify.db
-      .update(depositIntents)
-      .set({ status: "completed", updatedAt: new Date() })
-      .where(eq(depositIntents.id, deposit.id));
+
+    await markDepositStatus(fastify, deposit.id, "completed");
 
     return { success: true };
   } catch (err) {
-    await fastify.db
-      .update(depositIntents)
-      .set({ status: "failed", updatedAt: new Date() })
-      .where(eq(depositIntents.id, deposit.id));
-
-    fastify.log.error(err, "Error processing Monnify webhook");
+    log.error(err, "Error processing Monnify webhook");
+    await markDepositStatus(fastify, deposit.id, "failed");
     throw new Error("processing error");
   }
 }
