@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import AuthFooter from "../../common/auth/AuthFooter";
@@ -6,8 +6,10 @@ import Divider from "../../common/auth/Divider";
 import ThirdPartyAuth from "../../common/auth/ThirdPartyAuth";
 import AuthHeader from "../../components/auth/header";
 import SignUpForm from "../../components/auth/signup/form";
+import { useAuthState } from "../../hooks/useAuthState";
 import { authClient } from "../../lib/auth-client";
 import { RoutePath } from "../../routes/routePath";
+import { AuthLoader } from "../../common/ui/Loader";
 
 interface SignUpFormData {
   email: string;
@@ -22,8 +24,27 @@ const link = {
 function SignUp() {
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const formRef = useRef<HTMLFormElement>(null);
   const navigate = useNavigate();
+  const { isAuthenticated, initializeAuth } = useAuthState();
+
+  // Initialize auth and redirect if already authenticated
+  useEffect(() => {
+    const checkAuth = async () => {
+      await initializeAuth();
+      setIsCheckingAuth(false);
+    };
+
+    checkAuth();
+  }, [initializeAuth]);
+
+  // Redirect if authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(RoutePath.DASHBOARD, { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
   const handleFormSubmit = async (data: SignUpFormData) => {
     if (!isTermsAccepted) {
       alert("Please accept the Terms of Use and Privacy Policies to continue.");
@@ -36,10 +57,12 @@ function SignUp() {
       password: data.password,
     };
     setIsLoading(true);
+    console.log("testing");
+
     authClient.signUp.email(payload, {
       onSuccess: async () => {
         setIsLoading(false);
-        await authClient.sendVerificationEmail({ email: payload.email });
+        // await authClient.sendVerificationEmail({ email: payload.email });
         toast.success("Verification email sent");
         navigate(
           RoutePath.RESET_OTP.replace(
@@ -60,6 +83,11 @@ function SignUp() {
       formRef.current.requestSubmit();
     }
   };
+
+  // Show loading while checking authentication
+  if (isCheckingAuth) {
+    return <AuthLoader />;
+  }
 
   return (
     <div className="py-6 px-5 flex flex-col justify-between h-svh">

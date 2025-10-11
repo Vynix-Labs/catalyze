@@ -7,6 +7,7 @@ import {
   BalanceResponse,
   BalanceQuery,
 } from "./users.schema";
+import { ErrorResponse } from "../../schemas/common";
 import { getNormalizedBalance } from "../../utils/wallet/tokens";
 import { ensureUserWallet } from "../../utils/wallet/chipi";
 import { z } from "zod";
@@ -47,8 +48,13 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       const userId = request.currentUserId as string;
-      const wallet = await ensureUserWallet(fastify, userId);
-      const tokens: CryptoCurrency[] = ["usdt", "usdc", "strk", "eth", "weth", "wbtc"];
+      const headers = new Headers();
+      Object.entries(request.headers).forEach(([key, value]) => {
+        if (value) headers.append(key, value.toString());
+      });
+      const bearToken = await fastify.auth.api.getToken({ headers });
+      const wallet = await ensureUserWallet(fastify, userId, "starknet", bearToken.token);
+      const tokens: CryptoCurrency[] = ["usdt", "usdc", "strk", "weth", "wbtc"];
       const results = await Promise.all(
         tokens.map(async (t) => {
           const b = await getNormalizedBalance(wallet.publicKey, t);
@@ -76,7 +82,12 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
       const userId = request.currentUserId as string;
       const { token } = request.params as { token: string };
       const symbol = token.toLowerCase();
-      const wallet = await ensureUserWallet(fastify, userId);
+      const headers = new Headers();
+      Object.entries(request.headers).forEach(([key, value]) => {
+        if (value) headers.append(key, value.toString());
+      });
+      const bearToken = await fastify.auth.api.getToken({ headers });
+      const wallet = await ensureUserWallet(fastify, userId, "starknet", bearToken.token);
       const b = await getNormalizedBalance(wallet.publicKey, symbol as CryptoCurrency);
       if (!b) return reply.code(404).send({ error: "Balance not found" });
       return reply.code(200).send({ tokenSymbol: symbol, balance: b.balance, decimals: b.decimals, rawBalance: b.rawBalance });
@@ -92,7 +103,7 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
         params: BalanceParam,
         response: {
           200: BalanceResponse,
-          404: { type: "object", properties: { error: { type: "string" } } },
+          404: ErrorResponse,
         },
       },
     },

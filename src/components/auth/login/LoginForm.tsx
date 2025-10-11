@@ -21,7 +21,7 @@ const LoginForm = forwardRef<HTMLFormElement, LoginFormProps>(
     const {
       register,
       handleSubmit,
-      formState: { errors, isSubmitting },
+      formState: { errors },
     } = useForm<LoginFormData>({
       defaultValues: {
         email: "",
@@ -33,7 +33,7 @@ const LoginForm = forwardRef<HTMLFormElement, LoginFormProps>(
       <form
         ref={ref}
         onSubmit={handleSubmit(onSubmit)}
-        className="gap-y-6 flex b items-center w-full flex-col"
+        className="gap-y-6 flex  items-center w-full flex-col"
       >
         <div className="form-control w-full">
           <label htmlFor="email">Email</label>
@@ -96,14 +96,6 @@ const LoginForm = forwardRef<HTMLFormElement, LoginFormProps>(
             forgot password?
           </Link>
         </div>
-
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="btn btn-primary w-full mt-4"
-        >
-          {isSubmitting ? "Signing In..." : "Sign In"}
-        </button>
       </form>
     );
   }

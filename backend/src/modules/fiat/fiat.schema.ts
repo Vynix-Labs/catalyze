@@ -21,7 +21,7 @@ export const SuccessResponse = z
   })
   .passthrough(); // allow extra fields
 
-export const ErrorResponse = z.object({ error: z.string() });
+export const ErrorResponse = z.object({ error: z.string() }).passthrough();;
 
 export type InitiateFiatDepositInput = z.infer<typeof initiateFiatDepositSchema>;
 

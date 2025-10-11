@@ -1,8 +1,10 @@
-import { MagicWandIcon, SettingsIcon, VideoIcon } from "../../assets/svg";
-import { ChevronRightIcon } from "lucide-react";
-import { RoutePath } from "../../routes/routePath";
-import { useNavigate } from "react-router-dom";
+import { ChevronRightIcon, LogOutIcon } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { MagicWandIcon, SettingsIcon, VideoIcon } from "../../assets/svg";
+import { useAuthState } from "../../hooks/useAuthState";
+import { RoutePath } from "../../routes/routePath";
 
 interface MenuItem {
   id: string;
@@ -18,6 +20,7 @@ const MorePage = () => {
   const [activeItem, setActiveItem] = useState<string>("learning-hub");
 
   const navigate = useNavigate(); // ✅ React Router hook
+  const { logout } = useAuthState();
 
   // Navigation helper function
   const handleNavigation = (itemId: string, path?: string) => {
@@ -26,6 +29,13 @@ const MorePage = () => {
     if (path) {
       navigate(path); // ✅ navigate instead of router.push
     }
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    logout();
+    toast.success("Logged out successfully");
+    navigate(RoutePath.SIGNIN, { replace: true });
   };
 
   const menuItems: MenuItem[] = [
@@ -64,6 +74,13 @@ const MorePage = () => {
       description: "Lorem ipsum dolor sit amet consectetur.",
       icon: <SettingsIcon className="h-6 w-6" />,
       onClick: () => handleNavigation("settings", RoutePath.SETTINGS),
+    },
+    {
+      id: "logout",
+      title: "Logout",
+      description: "Sign out of your account",
+      icon: <LogOutIcon className="h-6 w-6" />,
+      onClick: handleLogout,
     },
   ];
 

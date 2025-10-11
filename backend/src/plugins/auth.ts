@@ -81,8 +81,10 @@ export const auth = betterAuth({
   trustedOrigins: [
     "http://localhost:3000",
     `${env.APP_URL}`,
+    "https://catalyze.vynixlabs.com",
     "http://localhost:5173",
     "http://localhost:5174",
+    "https://catalyze.finance"
   ],
 
   advanced: {

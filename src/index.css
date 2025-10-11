@@ -12,11 +12,21 @@ body {
   min-height: 100vh;
 }
 
-/* #root {
-  width: 100%;
-  max-width: 420px; 
-  min-height: 100vh;
-  background: #fff;} */
+#root {
+  background: #fff;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
 
 .manrope {
   font-family: "Manrope", sans-serif;

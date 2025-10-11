@@ -23,12 +23,15 @@ const depositRoutes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       const userId = request.currentUserId as string;
       const body = initiateCryptoDepositBody.parse(request.body);
+      const headers = new Headers();
+      Object.entries(request.headers).forEach(([k, v]) => { if (v) headers.append(k, v.toString()); });
+      const bearToken = await request.server.auth.api.getToken({ headers });
 
       const intent = await svc.createDepositIntent({
         userId,
         tokenSymbol: body.tokenSymbol,
         network: body.network,
-        addressType: body.addressType,
+        bearerToken: bearToken.token,
       });
 
       return reply.code(200).send(InitiateCryptoDepositResponse.parse(intent));
@@ -44,7 +47,10 @@ const depositRoutes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       const userId = request.currentUserId as string;
-      const addr = await svc.getAddress(userId);
+      const headers = new Headers();
+      Object.entries(request.headers).forEach(([k, v]) => { if (v) headers.append(k, v.toString()); });
+      const bearToken = await request.server.auth.api.getToken({ headers });
+      const addr = await svc.getAddress(userId, bearToken.token);
       return reply.code(200).send(CryptoAddressResponse.parse(addr));
     }
   );
@@ -60,7 +66,10 @@ const depositRoutes: FastifyPluginAsync = async (fastify) => {
       try {
         const userId = request.currentUserId as string;
         const body = cryptoWithdrawBody.parse(request.body);
-        const res = await svc.withdraw(userId, body);
+        const headers = new Headers();
+        Object.entries(request.headers).forEach(([k, v]) => { if (v) headers.append(k, v.toString()); });
+        const bearToken = await request.server.auth.api.getToken({ headers });
+        const res = await svc.withdraw(userId, body, bearToken.token);
         return reply.code(200).send(CryptoWithdrawResponse.parse(res));
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);

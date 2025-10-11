@@ -6,9 +6,12 @@ import {
   UnstakeBody,
   StakingActionResponse,
   StrategiesResponse,
-  BalanceResponse,
   listStrategiesQuery,
 } from "./staking.schema";
+import { validatePinToken } from "../../utils/pinToken";
+import { ErrorResponse } from "../../schemas/common";
+
+const PIN_ERROR_MESSAGE = "Invalid or expired PIN token";
 
 const stakingRoutes: FastifyPluginAsync = async (fastify) => {
   const svc = new StakingService(fastify.db);
@@ -40,50 +43,47 @@ const stakingRoutes: FastifyPluginAsync = async (fastify) => {
     "/staking/stake",
     {
       preHandler: requireAuth(fastify),
-      schema: { body: StakeBody, response: { 200: StakingActionResponse } },
+      schema: { body: StakeBody, response: { 200: StakingActionResponse, 400: ErrorResponse } },
     },
     async (request, reply) => {
       const userId = request.currentUserId as string;
       const body = StakeBody.parse(request.body);
-
-      const result = await svc.stake(userId, body.strategyId, body.amount);
+      const { strategyId, amount, pinToken } = body;
+      const pinValid = await validatePinToken(fastify, userId, pinToken, "crypto_stake");
+      if (!pinValid) {
+        return reply.status(400).send({ error: PIN_ERROR_MESSAGE });
+      }
+      const headers = new Headers();
+      Object.entries(request.headers).forEach(([k, v]) => { if (v) headers.append(k, v.toString()); });
+      const bearToken = await request.server.auth.api.getToken({ headers });
+      const result = await svc.stake(userId, strategyId, amount, bearToken.token);
       return reply.code(200).send(result);
     }
   );
 
-  /*// ------------------- POST /staking/unstake -------------------
+  // ------------------- POST /staking/unstake -------------------
   fastify.post(
     "/staking/unstake",
     {
       preHandler: requireAuth(fastify),
-      schema: { body: UnstakeBody, response: { 200: StakingActionResponse } },
+      schema: { body: UnstakeBody, response: { 200: StakingActionResponse, 400: ErrorResponse } },
     },
     async (request, reply) => {
       const userId = request.currentUserId as string;
-      const wallet = await fastify.db.query.userWallet.findFirst({ where: { userId } });
       const body = UnstakeBody.parse(request.body);
-
-      const result = await svc.unstake(userId, wallet, body.strategyId, body.amount);
+      const { strategyId, amount, pinToken } = body;
+      const pinValid = await validatePinToken(fastify, userId, pinToken, "crypto_unstake");
+      if (!pinValid) {
+        return reply.status(400).send({ error: PIN_ERROR_MESSAGE });
+      }
+      const headers = new Headers();
+      Object.entries(request.headers).forEach(([k, v]) => { if (v) headers.append(k, v.toString()); });
+      const bearToken = await request.server.auth.api.getToken({ headers });
+      const result = await svc.unstake(userId, strategyId, amount, bearToken.token);
       return reply.code(200).send(result);
     }
   );
-
-  // ------------------- GET /staking/balance -------------------
-  fastify.get(
-    "/staking/balance",
-    {
-      preHandler: requireAuth(fastify),
-      schema: { response: { 200: BalanceResponse } },
-    },
-    async (request, reply) => {
-      const userId = request.currentUserId as string;
-      const wallet = await fastify.db.query.userWallet.findFirst({ where: { userId } });
-      const { strategyId } = request.query as any;
-
-      const result = await svc.getUserBalance(wallet.publicKey, strategyId);
-      return reply.code(200).send(result);
-    }
-  ); */
-};
+}
+;
 
 export default stakingRoutes;

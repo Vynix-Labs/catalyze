@@ -15,6 +15,7 @@ import {
   jsonSchemaTransform,
 } from "fastify-type-provider-zod";
 import { addBackgroundTaskJob } from './utils/queue';
+import { shutdownTelegramBot } from "./utils/telegram/bot";
 import "./utils/telegram/bot";
 
 export const buildApp = async () => {
@@ -60,6 +61,10 @@ export const buildApp = async () => {
         {
           url: 'http://localhost:3000/api',
           description: 'Development server'
+        },
+        {
+          url: 'https://catalyze-api.apps.ikem.dev/api',
+          description: 'Staging server'
         }
       ],
       externalDocs: {
@@ -159,6 +164,10 @@ export const buildApp = async () => {
       priority: 'high',
     }).catch(err => fastify.log.error('Failed to enqueue expire_reserves task:', err));
   }, 60 * 1000);
+
+  fastify.addHook("onClose", async () => {
+    await shutdownTelegramBot();
+  });
 
   return fastify;
 };

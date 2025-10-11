@@ -1,5 +1,5 @@
 import { getStrategies } from "../../utils/troves/strategies";
-import { approveWithChipi, withdrawVesuUsdc, stakeWithChipi } from "../../utils/wallet/chipi";
+import { approveWithChipi, withdrawVesuUsdc, callContractWithChipi, stakeVesuUsdc } from "../../utils/wallet/chipi";
 import { validateSufficientBalance } from "../../utils/wallet/tokens";
 import { TransactionsService } from "../transactions/transactions.service";
 import { db } from "../../plugins/db";
@@ -7,6 +7,8 @@ import type { WalletData } from "@chipi-pay/chipi-sdk";
 import type { CryptoCurrency } from "../../config";
 import { transactions, userWallets } from "../../db";
 import { eq } from "drizzle-orm";
+import { buildErc4626DepositCalls, buildErc4626WithdrawCalls, parseUnits } from "../../utils/troves/calls";
+import { toTokenUnits } from "../../utils/wallet/tokens";
 
 type Database = typeof db;
 
@@ -64,7 +66,7 @@ export class StakingService {
   }
 
 
-  async stake(userId: string, strategyId: string, amount: number) {
+  async stake(userId: string, strategyId: string, amount: number, bearerToken: string) {
     // Get user wallet
     const wallet = await this.db.query.userWallets.findFirst({
         where: eq(userWallets.userId, userId),
@@ -77,7 +79,7 @@ export class StakingService {
     if (!strategy) throw new Error("Invalid strategy selected");
 
     const lower = strategy.depositToken?.[0]?.symbol?.toLowerCase() || "";
-    const allowed: ReadonlyArray<CryptoCurrency> = ["usdt", "usdc", "strk", "eth", "weth", "wbtc"] as const;
+    const allowed: ReadonlyArray<CryptoCurrency> = ["usdt", "usdc", "strk", "weth", "wbtc"];
     if (!allowed.includes(lower as CryptoCurrency)) {
       throw new Error("Unsupported token for strategy");
     }
@@ -101,54 +103,149 @@ export class StakingService {
     });
 
     try {
-        // Approve tokens for contract to spend
-        await approveWithChipi(wallet as unknown as WalletData, contractAddress, amount, tokenSymbol, userId);
+      // Special-case: Vesu Fusion USDC — use Chipi specialized route for deposit
+      if (tokenSymbol === "usdc" && strategy.id.toLowerCase().includes("vesu_fusion")) {
+        const tx = await stakeVesuUsdc(wallet as unknown as WalletData, amount, bearerToken);
+        const txHash = typeof tx === "string"
+          ? tx
+          : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
+        await this.db.update(transactions).set({ status: "completed", txHash }).where(eq(transactions.id, txRow.id));
+        return { status: true, message: "Stake successful", txHash };
+      }
 
-        // Perform staking using Chipi SDK
-        const tx = await stakeWithChipi(wallet as unknown as WalletData, amount, userId, tokenSymbol, contractAddress, strategyId);
+      // Generic ERC4626: attempt batched approve + deposit in a single Chipi call
+      const token0 = strategy.depositToken?.[0];
+      if (!token0) throw new Error("Strategy deposit token missing");
+      const tokenAddr = token0.address;
+      const decimals = token0.decimals;
+      const amountWei = await toTokenUnits(amount, tokenSymbol, decimals);
+      const calls = buildErc4626DepositCalls({
+        vault: contractAddress,
+        tokenAddr,
+        receiver: wallet.publicKey,
+        amountWei,
+      });
+
+      const tx = await callContractWithChipi(wallet as unknown as WalletData, contractAddress, calls, bearerToken);
+      const txHash = typeof tx === "string"
+        ? tx
+        : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
+
+      await this.db
+        .update(transactions)
+        .set({ status: "completed", txHash })
+        .where(eq(transactions.id, txRow.id));
+
+      return { status: true, message: "Stake successful", txHash };
+    } catch (err: unknown) {
+      console.warn("Batched approve+deposit failed, falling back to two-step:", err);
+      // Fallback path: if batched multi-address call is not supported, do two-step
+      try {
+        const token0 = strategy.depositToken?.[0];
+        if (!token0) throw new Error("Strategy deposit token missing");
+        const tokenAddr = token0.address;
+        const decimals = token0.decimals;
+        const amountWei = await toTokenUnits(amount, tokenSymbol, decimals);
+
+        // Approve via Chipi helper
+        await approveWithChipi(wallet as unknown as WalletData, contractAddress, amount, tokenSymbol, bearerToken);
+
+        // Then deposit only (construct call directly to avoid array index)
+        const depositOnly = buildErc4626DepositCalls({
+          vault: contractAddress,
+          tokenAddr,
+          receiver: wallet.publicKey,
+          amountWei,
+        })
+        .find(c => c.entrypoint === "deposit");
+        if (!depositOnly) throw new Error("Failed to build deposit call");
+
+        const tx = await callContractWithChipi(wallet as unknown as WalletData, contractAddress, [depositOnly], bearerToken);
         const txHash = typeof tx === "string"
           ? tx
           : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
 
-        // Update transaction as completed
         await this.db
-            .update(transactions)
-            .set({ status: "completed", txHash })
-            .where(eq(transactions.id, txRow.id));
+          .update(transactions)
+          .set({ status: "completed", txHash })
+          .where(eq(transactions.id, txRow.id));
 
-        return {
-            status: true,
-            message: "Stake successful",
-            txHash,
-        };
-    } catch (err: unknown) {
-        // Handle failures gracefully
+        return { status: true, message: "Stake successful", txHash };
+      } catch (fallbackErr: unknown) {
         await this.db
-            .update(transactions)
-            .set({ status: "failed", metadata: { error: err instanceof Error ? err.message : String(err) } })
-            .where(eq(transactions.id, txRow.id));
+          .update(transactions)
+          .set({ status: "failed", metadata: { error: fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr) } })
+          .where(eq(transactions.id, txRow.id));
 
-        const msg = err instanceof Error ? err.message : String(err);
+        const msg = fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr);
         throw new Error(`Stake failed: ${msg}`);
+      }
     }
   }
 
 
-  async unstake(userId: string, wallet: WalletData, strategyId: string, amount: number) {
-    const tx = await withdrawVesuUsdc(wallet, amount, userId);
-    const txHash = typeof tx === "string"
-      ? tx
-      : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
-    await this.txSvc.createTransaction({
+  async unstake(userId: string, strategyId: string, amount: number, bearerToken: string) {
+    // Get user wallet
+    const wallet = await this.db.query.userWallets.findFirst({ where: eq(userWallets.userId, userId) });
+    if (!wallet) throw new Error("User wallet not found");
+
+    // Fetch strategy
+    const strategies = await getStrategies();
+    const strategy = strategies.find((s) => s.id === strategyId);
+    if (!strategy) throw new Error("Invalid strategy selected");
+
+    const lower = strategy.depositToken?.[0]?.symbol?.toLowerCase() || "";
+    const allowed: ReadonlyArray<CryptoCurrency> = ["usdt", "usdc", "strk", "weth", "wbtc"] as const;
+    if (!allowed.includes(lower as CryptoCurrency)) {
+      throw new Error("Unsupported token for strategy");
+    }
+    const tokenSymbol = lower as CryptoCurrency;
+    const contractAddress = strategy.contract?.[0]?.address;
+    if (!contractAddress) throw new Error("Strategy contract not found");
+
+    // Record pending tx
+    const txRow = await this.txSvc.createTransaction({
       userId,
       type: "unstake",
       subtype: "crypto",
-      tokenSymbol: "usdc",
+      tokenSymbol,
       amountToken: amount,
-      status: "completed",
-      txHash,
+      status: "pending",
       metadata: { strategyId },
     });
-    return { status: true, message: "Unstake successful", txHash };
+
+    try {
+      // Special-case: Vesu USDC
+      if (tokenSymbol === "usdc" && strategy.id.toLowerCase().includes("vesu_fusion")) {
+        const tx = await withdrawVesuUsdc(wallet as unknown as WalletData, amount, bearerToken);
+        const txHash = typeof tx === "string" ? tx : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
+        await this.db.update(transactions).set({ status: "completed", txHash }).where(eq(transactions.id, txRow.id));
+        return { status: true, message: "Unstake successful", txHash };
+      }
+
+      // Generic ERC4626 withdraw
+      const token0 = strategy.depositToken?.[0];
+      if (!token0) throw new Error("Strategy deposit token missing");
+      const decimals = token0.decimals;
+      const amountWei = parseUnits(amount, decimals);
+      const calls = buildErc4626WithdrawCalls({
+        vault: contractAddress,
+        receiver: wallet.publicKey,
+        owner: wallet.publicKey,
+        amountWei,
+      });
+      const tx = await callContractWithChipi(wallet as unknown as WalletData, contractAddress, calls, userId);
+      const txHash = typeof tx === "string" ? tx : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
+
+      await this.db.update(transactions).set({ status: "completed", txHash }).where(eq(transactions.id, txRow.id));
+      return { status: true, message: "Unstake successful", txHash };
+    } catch (err: unknown) {
+      await this.db
+        .update(transactions)
+        .set({ status: "failed", metadata: { error: err instanceof Error ? err.message : String(err) } })
+        .where(eq(transactions.id, txRow.id));
+      const msg = err instanceof Error ? err.message : String(err);
+      throw new Error(`Unstake failed: ${msg}`);
+    }
   }
 }

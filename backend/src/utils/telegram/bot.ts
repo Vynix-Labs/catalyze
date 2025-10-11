@@ -4,6 +4,7 @@ import env from "../../config/env";
 const { TELEGRAM_TOKEN, ADMIN_CHAT_ID, MONNIFY_API_KEY, MONNIFY_SECRET_KEY, MONNIFY_BASE_URL } = env;
 
 const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: true });
+let botStopped = false;
 
 // Send message helper
 export function notifyAdminOfWithdrawal(reference: string, amount: number, bank: string) {
@@ -13,6 +14,21 @@ export function notifyAdminOfWithdrawal(reference: string, amount: number, bank:
   )
   .then(() => console.log("Telegram message sent"))
   .catch((err) => console.error("Telegram sendMessage failed:", err));
+}
+
+export async function shutdownTelegramBot() {
+  if (botStopped) return;
+  botStopped = true;
+  try {
+    if (bot.isPolling()) {
+      await bot.stopPolling();
+      console.log("Telegram bot polling stopped");
+    }
+    await bot.close();
+    console.log("Telegram bot connection closed");
+  } catch (err) {
+    console.error("Telegram bot shutdown failed:", err);
+  }
 }
 
 bot.on("polling_error", (err) => console.error("Polling error:", err));

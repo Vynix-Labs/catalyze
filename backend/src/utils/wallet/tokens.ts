@@ -7,6 +7,14 @@ import { TOKEN_MAP, type CryptoCurrency } from "../../config";
 const rpcUrl = env.STARKNET_RPC_URL || "https://starknet-mainnet.public.blastapi.io";
 const provider = new Provider({ nodeUrl: rpcUrl });
 
+export const TOKEN_DECIMALS: Record<CryptoCurrency, number> = {
+  usdt: 6,
+  usdc: 6,
+  strk: 18,
+  weth: 18,
+  wbtc: 8,
+};
+
 /**
  * Get token decimals for a specific currency
  */
@@ -18,15 +26,7 @@ export async function getTokenDecimals(currency: CryptoCurrency): Promise<number
   } catch (error) {
     console.error(`Error getting decimals for ${currency}:`, error);
     // Default decimals based on known token standards
-    const defaultDecimals: Record<CryptoCurrency, number> = {
-      usdt: 6,
-      usdc: 6,
-      strk: 18,
-      eth: 18,
-      weth: 18,
-      wbtc: 18
-    };
-    return defaultDecimals[currency] || 18;
+    return TOKEN_DECIMALS[currency] || 18;
   }
 }
 
@@ -56,7 +56,7 @@ export async function validateSufficientBalance(
   try {
     const contract = new Contract(erc20Abi, TOKEN_MAP[currency], provider);
     const [rawBalance, decimals] = await Promise.all([
-      contract.functions.balanceOf?.([walletAddress]),
+      contract.functions.balanceOf(walletAddress),
       contract.functions.decimals?.(),
     ]);
 
@@ -132,9 +132,8 @@ export function validateTransactionAmount(amount: number, currency: CryptoCurren
     usdt: 6,
     usdc: 6,
     strk: 8,
-    eth: 8,
     weth: 8,
-    wbtc: 8
+    wbtc: 6
   };
 
   const decimalPlaces = (amount.toString().split(".")[1] || "").length;

@@ -19,7 +19,7 @@ const SignUpForm = forwardRef<HTMLFormElement, SignUpFormProps>(
     const {
       register,
       handleSubmit,
-      formState: { errors, isSubmitting },
+      formState: { errors },
     } = useForm<SignUpFormData>({
       defaultValues: {
         email: "",
@@ -31,7 +31,7 @@ const SignUpForm = forwardRef<HTMLFormElement, SignUpFormProps>(
       <form
         ref={ref}
         onSubmit={handleSubmit(onSubmit)}
-        className="gap-y-6 flex b items-center w-full flex-col"
+        className="gap-y-6 flex  items-center w-full flex-col"
       >
         <div className="form-control w-full">
           <label htmlFor="email">Email</label>
@@ -95,14 +95,6 @@ const SignUpForm = forwardRef<HTMLFormElement, SignUpFormProps>(
             </p>
           )}
         </div>
-
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="btn btn-primary w-full mt-4"
-        >
-          {isSubmitting ? "Creating Account..." : "Create Account"}
-        </button>
       </form>
     );
   }

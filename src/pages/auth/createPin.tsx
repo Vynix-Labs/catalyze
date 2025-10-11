@@ -1,7 +1,14 @@
+import { useAtom } from "jotai";
 import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import Button from "../../common/ui/button";
 import AuthHeader from "../../components/auth/header";
 import TransactionPinForm from "../../components/auth/signup/TransactionPinForm";
+import { useSetPin } from "../../hooks/useAuth";
+import { authClient } from "../../lib/auth-client";
+import { RoutePath } from "../../routes/routePath";
+import { authAtom, type User } from "../../store/jotai";
 
 interface TransactionPinFormData {
   pin: string;
@@ -11,13 +18,31 @@ interface TransactionPinFormData {
 function CreatePin() {
   const [isLoading, setIsLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-
+  const { mutateAsync: setPin } = useSetPin();
+  const [, setUser] = useAtom(authAtom);
+  const navigate = useNavigate();
   const handleFormSubmit = async (data: TransactionPinFormData) => {
     setIsLoading(true);
     const payload = {
       pin: data.pin,
     };
-    console.log(payload);
+    setPin(payload, {
+      onSuccess: () => {
+        toast.success("PIN set successfully");
+        authClient.getSession(undefined, {
+          onSuccess: (data) => {
+            setUser(data?.data?.user as User);
+          },
+        });
+        setIsLoading(false);
+        navigate(RoutePath.DASHBOARD);
+      },
+      onError: (error) => {
+        toast.error(error?.message ?? "Failed to set PIN");
+        setIsLoading(false);
+      },
+    });
+
     setIsLoading(false);
   };
 

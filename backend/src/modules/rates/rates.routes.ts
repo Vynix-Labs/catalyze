@@ -13,6 +13,7 @@ const RateItem = z.object({
 });
 
 const RateListResponse = z.object({ items: RateItem.array() });
+const NotFoundResponse = z.object({ error: z.string() });
 
 const serializeRate = (row: (typeof priceFeeds)["$inferSelect"]) => ({
   tokenSymbol: row.tokenSymbol,
@@ -30,34 +31,7 @@ const ratesRoutes: FastifyPluginAsync = async (fastify) => {
     {
       schema: {
         response: {
-          200: {
-            type: "object",
-            properties: {
-              items: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    tokenSymbol: { type: "string" },
-                    priceNgnBase: { type: "string" },
-                    priceNgnBuy: { type: "string" },
-                    priceNgnSell: { type: "string" },
-                    source: { type: ["string", "null"] },
-                    updatedAt: { type: ["string", "null"] },
-                  },
-                  required: [
-                    "tokenSymbol",
-                    "priceNgnBase",
-                    "priceNgnBuy",
-                    "priceNgnSell",
-                    "source",
-                    "updatedAt",
-                  ],
-                },
-              },
-            },
-            required: ["items"],
-          },
+          200: RateListResponse,
         },
       },
     },
@@ -76,32 +50,8 @@ const ratesRoutes: FastifyPluginAsync = async (fastify) => {
     {
       schema: {
         response: {
-          200: {
-            type: "object",
-            properties: {
-              tokenSymbol: { type: "string" },
-              priceNgnBase: { type: "string" },
-              priceNgnBuy: { type: "string" },
-              priceNgnSell: { type: "string" },
-              source: { type: ["string", "null"] },
-              updatedAt: { type: ["string", "null"] },
-            },
-            required: [
-              "tokenSymbol",
-              "priceNgnBase",
-              "priceNgnBuy",
-              "priceNgnSell",
-              "source",
-              "updatedAt",
-            ],
-          },
-          404: {
-            type: "object",
-            properties: {
-              error: { type: "string" },
-            },
-            required: ["error"],
-          },
+          200: RateItem,
+          404: NotFoundResponse,
         },
       },
     },
