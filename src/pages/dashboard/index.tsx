@@ -17,6 +17,7 @@ import GlobalModal from "../../common/ui/modal/GlobalModal";
 import {
   useAssets,
   useBalances,
+  // useMonnifyBanks,
   // useRates,
   useTransactions,
 } from "../../hooks";
@@ -335,7 +336,7 @@ const Home: React.FC = () => {
           {/* Divider */}
           <h2 className="text-sm font-bold text-gray-900 mb-4">Assets</h2>
           {/* Assets */}
-          <div className="  max-w-md w-full max-h-72 overflow-y-auto mx-auto no-scrollbar">
+          <div className="  max-w-md w-full max-h-90 overflow-y-auto mx-auto no-scrollbar">
             <Assets assets={assetsData} onAssetClick={handleAssetClick} />
           </div>
         </div>

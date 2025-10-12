@@ -208,7 +208,7 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
   };
 
   return (
-    <div className="max-w-[420px] mx-auto h-screen bg-neutral-100 flex flex-col overflow-hidden relative">
+    <div className="max-w-md w-full mx-auto h-screen bg-neutral-100 flex flex-col overflow-hidden relative">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white shrink-0">
         <button
