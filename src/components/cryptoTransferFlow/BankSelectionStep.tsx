@@ -1,7 +1,11 @@
-import { useState } from "react";
-import type { BankSelectionStepProps } from "../../types/types";
+import { useEffect, useState } from "react";
 import Button from "../../common/ui/button";
 import GlobalModal from "../../common/ui/modal/GlobalModal";
+import {
+  useMonnifyBanks,
+  useValidateMonnifyAccount,
+} from "../../hooks/useFiat";
+import type { BankResponse, BankSelectionStepProps } from "../../types/types";
 
 // Currency icon mapping
 const currencyIcons = {
@@ -16,12 +20,35 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
   accountNumber,
   setAccountNumber,
   username,
+  setUsername,
   onNext,
   amount,
   amountNGN,
   currencyType = "USDC",
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { data: allBank } = useMonnifyBanks();
+  const { mutateAsync: validateAccount } = useValidateMonnifyAccount();
+  console.log(allBank);
+
+  // Extract banks from the API response structure
+  const banks = allBank?.responseBody || [];
+
+  // Auto-validate account when account number reaches 10 digits
+  useEffect(() => {
+    if (accountNumber.length === 10 && selectedBank) {
+      validateAccount({
+        accountNumber: accountNumber,
+        bankCode: selectedBank,
+      })
+        .then((response) => {
+          setUsername?.(response.data.accountName);
+        })
+        .catch((error) => {
+          console.error("Account validation failed:", error);
+        });
+    }
+  }, [accountNumber, selectedBank, validateAccount, setUsername]);
 
   const handleProceedClick = () => {
     // Validate form before showing modal
@@ -42,13 +69,8 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
 
   // Get bank name for display
   const getBankName = (bankCode: string) => {
-    const banks = {
-      access: "Access Bank",
-      gtb: "GT Bank",
-      zenith: "Zenith Bank",
-      uba: "UBA",
-    };
-    return banks[bankCode as keyof typeof banks] || bankCode;
+    const bank = banks.find((b: BankResponse) => b.code === bankCode);
+    return bank?.name || bankCode;
   };
 
   // Format amounts safely
@@ -91,7 +113,7 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-white min-h-screen relative">
+    <div className="flex-1 flex flex-col bg-white min-h-screen w-md relative">
       {/* Form content */}
       <div className="flex-1 w-full p-4 space-y-4">
         <div className="w-full">
@@ -103,11 +125,12 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
             onChange={(e) => setSelectedBank(e.target.value)}
             className="w-full p-3 border border-gray-200 rounded-lg text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="">Select Bank</option>
-            <option value="access">Access Bank</option>
-            <option value="gtb">GTBank</option>
-            <option value="zenith">Zenith Bank</option>
-            <option value="uba">UBA</option>
+            <option value="">Select a bank</option>
+            {banks.map((bank: BankResponse, index: number) => (
+              <option key={index} value={bank.code}>
+                {bank.name}
+              </option>
+            ))}
           </select>
         </div>
 
