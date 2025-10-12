@@ -80,12 +80,23 @@ export interface CurrencyTabProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
 }
+export interface BankResponse {
+  name: string;
+  code: string;
+  ussdTemplate: string | null;
+  baseUssdCode: string | null;
+  transferUssdTemplate: string | null;
+  bankId: string | null;
+  nipBankCode: string;
+}
+
 export interface BankSelectionStepProps {
   selectedBank: string;
   setSelectedBank: React.Dispatch<React.SetStateAction<string>>;
   accountNumber: string;
   setAccountNumber: React.Dispatch<React.SetStateAction<string>>;
   username: string;
+  setUsername?: React.Dispatch<React.SetStateAction<string>>;
   onNext?: () => void;
   onBack?: () => void;
   transferType?: string;

@@ -1,6 +1,6 @@
-import { type ReactNode, type Dispatch, type SetStateAction } from "react";
-import AuthFooter from "../../auth/AuthFooter";
 import { motion } from "framer-motion";
+import { type Dispatch, type ReactNode, type SetStateAction } from "react";
+import AuthFooter from "../../auth/AuthFooter";
 interface Props {
   onClose: () => void;
   children: ReactNode;
@@ -61,7 +61,7 @@ export default function GlobalModal({
         <p className="font-bold text-xl text-black mb-4">{headingText}</p>
 
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto no-scrollbar pr-2 min-h-0">
+        <div className="flex-1 w-full overflow-y-auto no-scrollbar pr-2 min-h-0">
           {children}
         </div>
 
