@@ -50,6 +50,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   currencyMode = "fiat",
   onCurrencyModeChange,
   currencyType = "USDC",
+  selectedAsset,
 }) => {
   const [cryptoAmount, setCryptoAmount] = useState("");
   const [fiatAmount, setFiatAmount] = useState(amount || "");
@@ -230,7 +231,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
       {activeTab === "fiat" ? (
         flowType === "deposit" ? (
           <FiatDeposit
-            availableAmount={"10000"}
+            availableAmount={fiatAmountNGN}
             amount={fiatAmount}
             amountNGN={fiatAmountNGN}
             currencyType={currencyType}
@@ -275,6 +276,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
           onCryptoAmountChange={handleCryptoAmountChange}
           onAddressChange={setAddress}
           onNetworkChange={setSelectedNetwork}
+          balance={fiatAmountNGN}
         />
       )}
 

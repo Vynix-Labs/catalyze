@@ -57,5 +57,6 @@ export const endpoints = {
     strategies: "/staking/strategies",
     stake: "/staking/staking/stake",
     unstake: "/staking/staking/unstake",
+    user_stakes: "/staking/user-stakes",
   },
 };

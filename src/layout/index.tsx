@@ -7,9 +7,9 @@ const Layout = () => {
 
   const getActiveTab = () => {
     if (location.pathname === RoutePath.DASHBOARD) return "home";
-    if (location.pathname.startsWith(RoutePath.INVESTMENT)) return "investment";
-    if (location.pathname.startsWith(RoutePath.REWARD)) return "rewards";
-    if (location.pathname.startsWith(RoutePath.MORE)) return "more";
+    if (location.pathname === RoutePath.STAKING) return "staking";
+    if (location.pathname === RoutePath.TRANSACTIONS) return "transactions";
+    if (location.pathname === RoutePath.MORE) return "more";
     return "home";
   };
 
@@ -17,7 +17,7 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen flex flex-col overflow-hidden bg-neutral-50">
-      <div className="flex-1 w-md max-w-md mx-auto overflow-x-hidden no-scrollbar">
+      <div className="flex-1 max-w-md w-screen mx-auto overflow-x-hidden no-scrollbar">
         <Outlet />
       </div>
 

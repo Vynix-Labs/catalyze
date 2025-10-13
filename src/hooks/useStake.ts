@@ -3,6 +3,7 @@ import type { strategies, stake } from "../utils/types";
 import { axiosInstance } from "../api/axios";
 import { endpoints } from "../api/endpoints";
 import { useAuthState } from "./useAuthState";
+import type { userStakes } from "../types/types";
 
 export const useStrategies = () => {
   const { logout } = useAuthState();
@@ -83,5 +84,28 @@ export const useUnstake = () => {
         throw error;
       }
     },
+  });
+};
+export const useGetStakes = () => {
+  return useQuery<userStakes, Error>({
+    queryKey: ["user-stakes"],
+    queryFn: async () => {
+      try {
+        const response = await axiosInstance.get(endpoints.staking.user_stakes);
+        return response.data;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        console.error(
+          "❌ Failed to fetch user stakes:",
+          error?.message || error
+        );
+        throw new Error(
+          error?.response?.data?.message || "Failed to fetch user stakes"
+        );
+      }
+    },
+    retry: 3, // Retry up to 3 times on failure
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 8000),
+    staleTime: 1000 * 60,
   });
 };
