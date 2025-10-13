@@ -268,7 +268,7 @@ const Home: React.FC = () => {
                     <div className="flex items-center mt-2 justify-center">
                       <p className="text-4xl font-bold min-w-36 max-w-36 truncate">
                         {balancesLoading
-                          ? "Loading..."
+                          ? "0.00"
                           : isBalanceVisible
                           ? `₦${balanceData?.totalFiat || "0.00"}`
                           : "****"}
