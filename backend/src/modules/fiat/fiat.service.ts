@@ -279,7 +279,7 @@ export class MonnifyClient {
   /**
    * Create a fiat transfer intent (withdraw)
    */
-  async createTransferIntent(fastify: FastifyInstance, userId: string, input: InitiateFiatTransferInput, bearerToken: string) {
+  async createTransferIntent(fastify: FastifyInstance, userId: string, input: InitiateFiatTransferInput) {
     const { amountFiat, tokenSymbol, bankName, accountNumber, bankCode, narration, pinToken } = input;
 
     const pinValid = await validatePinToken(fastify, userId, pinToken, "fiat_transfer");
@@ -372,8 +372,7 @@ export class MonnifyClient {
         wallet as unknown as WalletData,
         env.SYSTEM_WALLET_ADDRESS,
         Number(amountToken),
-        toChainToken(symbol),
-        userId
+        toChainToken(symbol)
       );
       const txHash = typeof tx === "string"
         ? tx
