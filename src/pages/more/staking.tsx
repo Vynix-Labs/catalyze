@@ -140,7 +140,15 @@ const StakingPage = () => {
       <EnterAmountPage pool={selectedPool} onBack={handleBackFromAmountPage} />
     );
   }
-
+  // If claim page should be shown, render it
+  if (showClaimPage && selectedStakeForClaim) {
+    return (
+      <ClaimRewardsPage
+        stake={selectedStakeForClaim}
+        onBack={handleBackFromClaimPage}
+      />
+    );
+  }
   return (
     <div className=" w-screen max-w-md">
       <div className="mx-auto p-4 w-full">
