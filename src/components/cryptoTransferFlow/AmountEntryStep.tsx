@@ -50,6 +50,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   currencyMode = "fiat",
   onCurrencyModeChange,
   currencyType = "USDC",
+  selectedAsset,
 }) => {
   const [cryptoAmount, setCryptoAmount] = useState("");
   const [fiatAmount, setFiatAmount] = useState(amount || "");
@@ -185,7 +186,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
             }
             initiateDeposit({
               amountFiat: parseFloat(fiatAmountNGN),
-              tokenSymbol: currencyType,
+              tokenSymbol: currencyType.toUpperCase(),
             });
 
             setIsDepositModalOpen(true);
@@ -216,7 +217,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-white h-screen max-w-md w-full mx-auto overflow-hidden relative">
+    <div className="flex-1 flex flex-col bg-white h-screen w-full  overflow-hidden relative">
       <Tabs
         className="max-w-44 m-2"
         tabs={[
@@ -230,7 +231,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
       {activeTab === "fiat" ? (
         flowType === "deposit" ? (
           <FiatDeposit
-            availableAmount={"10000"}
+            availableAmount={fiatAmountNGN}
             amount={fiatAmount}
             amountNGN={fiatAmountNGN}
             currencyType={currencyType}
@@ -275,6 +276,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
           onCryptoAmountChange={handleCryptoAmountChange}
           onAddressChange={setAddress}
           onNetworkChange={setSelectedNetwork}
+          balance={fiatAmountNGN}
         />
       )}
 

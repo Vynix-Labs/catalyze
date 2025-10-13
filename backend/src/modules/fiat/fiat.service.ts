@@ -267,10 +267,7 @@ export class MonnifyClient {
   }
 
   async validateAccount(bankCode: string, accountNumber: string): Promise<MonnifyGenericResponse> {
-    return this.post<MonnifyGenericResponse>(`/api/v1/disbursements/account/validate`, {
-      bankCode,
-      accountNumber,
-    });
+    return this.get<MonnifyGenericResponse>(`/api/v1/disbursements/account/validate?bankCode=${bankCode}&accountNumber=${accountNumber}`);
   }
 
   async resendOtp(reference: string): Promise<MonnifyGenericResponse> {

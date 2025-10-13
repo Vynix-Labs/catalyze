@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ChevronLeftIcon } from "../../assets/svg";
+import DepositModal from "../../common/ui/modal/DepositModal";
 import AmountEntryStep from "../../components/cryptoTransferFlow/AmountEntryStep";
 import BankSelectionStep from "../../components/cryptoTransferFlow/BankSelectionStep";
 import PinEntryStep from "../../components/cryptoTransferFlow/PinEntryStep";
 import SuccessStep from "../../components/cryptoTransferFlow/SuccessStep";
-import { ChevronLeftIcon } from "../../assets/svg";
-import { useLocation, useNavigate } from "react-router-dom";
-import type { CurrencyDetailPageProps } from "../../types/types";
-import DepositModal from "../../common/ui/modal/DepositModal";
+import type { BankResponse, CurrencyDetailPageProps } from "../../types/types";
 
 // Define proper types
 type FlowType = "deposit" | "transfer";
@@ -21,7 +21,7 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
   const [currentStep, setCurrentStep] = useState(1);
   const [amount, setAmount] = useState("");
   const [amountNGN, setAmountNGN] = useState("");
-  const [selectedBank, setSelectedBank] = useState("");
+  const [selectedBank, setSelectedBank] = useState<BankResponse | null>(null);
   const [accountNumber, setAccountNumber] = useState("");
   const [pin, setPin] = useState("");
   const [username] = useState("Username");
@@ -31,14 +31,15 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
   const { selectedAsset, transferType: stateTransferType } =
     location.state || {};
 
+  console.log(selectedAsset);
+
   // Separate flow type from currency mode
   const [flowType, setFlowType] = useState<FlowType>(
     stateTransferType === "deposit" ? "deposit" : "transfer"
   );
 
-  const [currencyMode, setCurrencyMode] = useState<CurrencyMode>(
-    stateTransferType === "crypto" ? "crypto" : "fiat"
-  );
+  // Fix currency mode detection - it should default to crypto for crypto assets
+  const [currencyMode, setCurrencyMode] = useState<CurrencyMode>("crypto");
 
   const [currencyType, setCurrencyType] = useState(
     propCurrencyType || selectedAsset?.symbol || "Crypto"
@@ -46,22 +47,26 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
 
   // Update currency type when component mounts or when selectedAsset changes
   useEffect(() => {
+    console.log("CryptoTransferFlow - selectedAsset:", selectedAsset);
+    console.log("CryptoTransferFlow - propCurrencyType:", propCurrencyType);
+    console.log("CryptoTransferFlow - transferType from state:", stateTransferType);
+    
     if (selectedAsset?.symbol) {
       setCurrencyType(selectedAsset.symbol);
     } else if (propCurrencyType) {
       setCurrencyType(propCurrencyType);
     }
-  }, [selectedAsset, propCurrencyType]);
+  }, [selectedAsset, propCurrencyType, stateTransferType]);
 
   const resetForm = () => {
     setCurrentStep(1);
     setAmount("");
     setAmountNGN("");
-    setSelectedBank("");
+    setSelectedBank(null);
     setAccountNumber("");
     setPin("");
     setFlowType(stateTransferType === "deposit" ? "deposit" : "transfer");
-    setCurrencyMode(stateTransferType === "crypto" ? "crypto" : "fiat");
+    setCurrencyMode("crypto"); // Default to crypto mode
   };
 
   const goToNextStep = () => {
@@ -169,12 +174,16 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
             pin={pin}
             setPin={setPin}
             flowType={flowType}
+            bankName={selectedBank?.name}
+            bankCode={selectedBank?.code}
+            accountNumber={accountNumber}
             currencyMode={currencyMode}
             onNext={goToNextStep}
             onBack={goToPrevStep}
             currencyType={currencyType}
             amount={amount}
             amountNGN={amountNGN}
+            tokenSymbol={currencyType}
           />
         );
       case 4:
@@ -208,11 +217,11 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
   };
 
   return (
-    <div className="max-w-[420px] mx-auto h-screen bg-neutral-100 flex flex-col overflow-hidden relative">
+    <div className="max-w-md w-full mx-auto h-screen bg-neutral-100 flex flex-col overflow-hidden relative">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white shrink-0">
         <button
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate(-1)}
           className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
         >
           <ChevronLeftIcon />
