@@ -91,8 +91,8 @@ export interface BankResponse {
 }
 
 export interface BankSelectionStepProps {
-  selectedBank: string;
-  setSelectedBank: React.Dispatch<React.SetStateAction<string>>;
+  selectedBank: BankResponse | null;
+  setSelectedBank: React.Dispatch<React.SetStateAction<BankResponse | null>>;
   accountNumber: string;
   setAccountNumber: React.Dispatch<React.SetStateAction<string>>;
   username: string;
@@ -109,6 +109,10 @@ export interface PinEntryStepProps {
   flowType: "deposit" | "transfer";
   currencyMode: "crypto" | "fiat";
   pin: string;
+  bankCode?: string;
+  accountNumber?: string;
+  bankName?: string;
+  tokenSymbol?: string;
   setPin: React.Dispatch<React.SetStateAction<string>>;
   onNext: () => void;
   onBack?: () => void;

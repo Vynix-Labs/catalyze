@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ChevronLeftIcon } from "../../assets/svg";
+import DepositModal from "../../common/ui/modal/DepositModal";
 import AmountEntryStep from "../../components/cryptoTransferFlow/AmountEntryStep";
 import BankSelectionStep from "../../components/cryptoTransferFlow/BankSelectionStep";
 import PinEntryStep from "../../components/cryptoTransferFlow/PinEntryStep";
 import SuccessStep from "../../components/cryptoTransferFlow/SuccessStep";
-import { ChevronLeftIcon } from "../../assets/svg";
-import { useLocation, useNavigate } from "react-router-dom";
-import type { CurrencyDetailPageProps } from "../../types/types";
-import DepositModal from "../../common/ui/modal/DepositModal";
+import type { BankResponse, CurrencyDetailPageProps } from "../../types/types";
 
 // Define proper types
 type FlowType = "deposit" | "transfer";
@@ -21,7 +21,7 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
   const [currentStep, setCurrentStep] = useState(1);
   const [amount, setAmount] = useState("");
   const [amountNGN, setAmountNGN] = useState("");
-  const [selectedBank, setSelectedBank] = useState("");
+  const [selectedBank, setSelectedBank] = useState<BankResponse | null>(null);
   const [accountNumber, setAccountNumber] = useState("");
   const [pin, setPin] = useState("");
   const [username] = useState("Username");
@@ -57,7 +57,7 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
     setCurrentStep(1);
     setAmount("");
     setAmountNGN("");
-    setSelectedBank("");
+    setSelectedBank(null);
     setAccountNumber("");
     setPin("");
     setFlowType(stateTransferType === "deposit" ? "deposit" : "transfer");
@@ -169,12 +169,16 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
             pin={pin}
             setPin={setPin}
             flowType={flowType}
+            bankName={selectedBank?.name}
+            bankCode={selectedBank?.code}
+            accountNumber={accountNumber}
             currencyMode={currencyMode}
             onNext={goToNextStep}
             onBack={goToPrevStep}
             currencyType={currencyType}
             amount={amount}
             amountNGN={amountNGN}
+            tokenSymbol={currencyType}
           />
         );
       case 4:
