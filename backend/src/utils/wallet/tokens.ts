@@ -56,30 +56,14 @@ export async function toTokenUnits(
  * Convert token units to human-readable amount (divide by 10^decimals)
  */
 export async function fromTokenUnits(
-  amount: bigint | string | any,
+  amount: bigint | string,
   currency: CryptoCurrency,
   decimals?: number
 ): Promise<number> {
   const tokenDecimals = decimals ?? (await getTokenDecimals(currency));
-
-  let valueStr: string = "0";
-
-  if (typeof amount === "bigint") {
-    valueStr = amount.toString();
-  } else if (typeof amount === "object" && amount !== null) {
-    valueStr = String(amount.balance ?? amount.amount ?? 0);
-  } else if (amount !== undefined && amount !== null) {
-    valueStr = String(amount);
-  }
-
-  if (valueStr.includes(".")) {
-    valueStr = valueStr.split(".")[0] ?? "0";
-  }
-
-  const bigIntAmount = BigInt(valueStr);
+  const bigIntAmount = typeof amount === "string" ? BigInt(amount) : amount;
   return Number(bigIntAmount) / 10 ** tokenDecimals;
 }
-
 
 /**
  * Validate if user has sufficient balance for a transaction
