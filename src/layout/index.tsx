@@ -7,9 +7,9 @@ const Layout = () => {
 
   const getActiveTab = () => {
     if (location.pathname === RoutePath.DASHBOARD) return "home";
-    if (location.pathname.startsWith(RoutePath.INVESTMENT)) return "investment";
-    if (location.pathname.startsWith(RoutePath.REWARD)) return "rewards";
-    if (location.pathname.startsWith(RoutePath.MORE)) return "more";
+    if (location.pathname === RoutePath.STAKING) return "staking";
+    if (location.pathname === RoutePath.TRANSACTIONS) return "transactions";
+    if (location.pathname === RoutePath.MORE) return "more";
     return "home";
   };
 

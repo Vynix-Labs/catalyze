@@ -52,7 +52,13 @@ export interface AmountEntryStepProps {
   currencyMode: "crypto" | "fiat";
   onCurrencyModeChange: (mode: "crypto" | "fiat") => void;
   currencyType?: string;
-  selectedAsset?: string;
+  selectedAsset?: {
+    symbol: string;
+    name: string;
+    balance: string;
+    value: string;
+    currency: string;
+  };
 }
 
 export interface BaseComponentProps {
@@ -71,6 +77,7 @@ export interface CryptoComponentProps {
   address: string;
   selectedNetwork: string;
   currencyType: string;
+  balance?: string;
   onCryptoAmountChange: (amount: string) => void;
   onAddressChange: (address: string) => void;
   onNetworkChange: (network: string) => void;
@@ -80,12 +87,23 @@ export interface CurrencyTabProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
 }
+export interface BankResponse {
+  name: string;
+  code: string;
+  ussdTemplate: string | null;
+  baseUssdCode: string | null;
+  transferUssdTemplate: string | null;
+  bankId: string | null;
+  nipBankCode: string;
+}
+
 export interface BankSelectionStepProps {
-  selectedBank: string;
-  setSelectedBank: React.Dispatch<React.SetStateAction<string>>;
+  selectedBank: BankResponse | null;
+  setSelectedBank: React.Dispatch<React.SetStateAction<BankResponse | null>>;
   accountNumber: string;
   setAccountNumber: React.Dispatch<React.SetStateAction<string>>;
   username: string;
+  setUsername?: React.Dispatch<React.SetStateAction<string>>;
   onNext?: () => void;
   onBack?: () => void;
   transferType?: string;
@@ -98,6 +116,10 @@ export interface PinEntryStepProps {
   flowType: "deposit" | "transfer";
   currencyMode: "crypto" | "fiat";
   pin: string;
+  bankCode?: string;
+  accountNumber?: string;
+  bankName?: string;
+  tokenSymbol?: string;
   setPin: React.Dispatch<React.SetStateAction<string>>;
   onNext: () => void;
   onBack?: () => void;

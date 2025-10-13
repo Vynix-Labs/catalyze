@@ -50,6 +50,11 @@ export const useConfirmDeposit = () => {
 type InitiateFiatTransferInput = {
   amountFiat: number;
   tokenSymbol: string;
+  bankName: string;
+  bankCode: string;
+  accountNumber: string;
+  narration?: "string";
+  pinToken: string;
 };
 
 export const useInitiateFiatTransfer = () => {
