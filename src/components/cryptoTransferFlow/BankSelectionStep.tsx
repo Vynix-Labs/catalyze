@@ -19,8 +19,6 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
   setSelectedBank,
   accountNumber,
   setAccountNumber,
-  username,
-  setUsername,
   onNext,
   amount,
   amountNGN,
@@ -29,8 +27,8 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { data: allBank } = useMonnifyBanks();
   const { mutateAsync: validateAccount } = useValidateMonnifyAccount();
-  console.log(allBank);
-
+  // console.log(allBank);
+  const [username, setUsername] = useState("Account Name");
   // Extract banks from the API response structure
   const banks = allBank?.responseBody || [];
 
@@ -39,16 +37,17 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
     if (accountNumber.length === 10 && selectedBank) {
       validateAccount({
         accountNumber: accountNumber,
-        bankCode: selectedBank,
+        bankCode: selectedBank.code,
       })
         .then((response) => {
-          setUsername?.(response.data.accountName);
+          console.log(response);
+          setUsername(response.responseBody.accountName);
         })
         .catch((error) => {
           console.error("Account validation failed:", error);
         });
     }
-  }, [accountNumber, selectedBank, validateAccount, setUsername]);
+  }, [accountNumber, selectedBank, validateAccount]);
 
   const handleProceedClick = () => {
     // Validate form before showing modal
@@ -68,9 +67,8 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
   };
 
   // Get bank name for display
-  const getBankName = (bankCode: string) => {
-    const bank = banks.find((b: BankResponse) => b.code === bankCode);
-    return bank?.name || bankCode;
+  const getBankName = (bank: BankResponse | null) => {
+    return bank?.name || "";
   };
 
   // Format amounts safely
@@ -121,8 +119,14 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
             Bank
           </label>
           <select
-            value={selectedBank}
-            onChange={(e) => setSelectedBank(e.target.value)}
+            value={selectedBank?.code || ""}
+            onChange={(e) => {
+              const selectedBankCode = e.target.value;
+              const bank = banks.find(
+                (b: BankResponse) => b.code === selectedBankCode
+              );
+              setSelectedBank(bank || null);
+            }}
             className="w-full p-3 border border-gray-200 rounded-lg text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">Select a bank</option>
@@ -142,6 +146,7 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
             type="text"
             placeholder="Enter Account Number"
             value={accountNumber}
+            maxLength={10}
             onChange={(e) => setAccountNumber(e.target.value)}
             className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
@@ -172,9 +177,9 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
       >
         <div className="py-6">
           <div className="flex justify-center mb-6">
-            <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-xs text-center">
-                {selectedBank ? getBankName(selectedBank) : ""}
+            <div className="w-25 h-25  rounded-full bg-gray-50 flex items-center justify-center">
+              <span className="text-black text-sm font-bold text-center">
+                {getBankName(selectedBank)}
               </span>
             </div>
           </div>
@@ -199,7 +204,7 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
             <div className="flex justify-between">
               <span className="text-sm text-gray-600">Bank</span>
               <span className="text-sm font-medium text-black">
-                {selectedBank ? getBankName(selectedBank) : ""}
+                {getBankName(selectedBank)}
               </span>
             </div>
             <div className="flex justify-between">

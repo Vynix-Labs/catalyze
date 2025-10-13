@@ -185,7 +185,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
             }
             initiateDeposit({
               amountFiat: parseFloat(fiatAmountNGN),
-              tokenSymbol: currencyType,
+              tokenSymbol: currencyType.toUpperCase(),
             });
 
             setIsDepositModalOpen(true);
