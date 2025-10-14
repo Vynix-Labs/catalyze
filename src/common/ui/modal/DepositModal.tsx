@@ -1,6 +1,6 @@
 import { useState } from "react";
-import GlobalModal from "./GlobalModal";
 import { CopyIcon } from "../../../assets/svg";
+import GlobalModal from "./GlobalModal";
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -9,6 +9,8 @@ interface DepositModalProps {
   amountNGN: string;
   amount: string;
   currencyType: string;
+  bankName?: string;
+  accountNumber?: string;
 }
 
 const DepositModal: React.FC<DepositModalProps> = ({
@@ -16,10 +18,12 @@ const DepositModal: React.FC<DepositModalProps> = ({
   onClose,
   onConfirm,
   amountNGN,
+  bankName,
+  accountNumber,
 }) => {
   const bankDetails = {
-    bankName: "WEMABOD Bank",
-    accountNumber: "1234567890",
+    bankName: bankName ?? "WEMABOD Bank",
+    accountNumber: accountNumber ?? "1234567890",
     amount: `₦${amountNGN}`,
   };
 
@@ -72,7 +76,11 @@ const DepositModal: React.FC<DepositModalProps> = ({
                     onClick={() => handleCopy("1234567890", "account")}
                     className="text-blue-600 text-sm hover:text-blue-800"
                   >
-                    {copiedField === "account" ? <CopyIcon className="text-gray-600" /> : <CopyIcon />}
+                    {copiedField === "account" ? (
+                      <CopyIcon className="text-gray-600" />
+                    ) : (
+                      <CopyIcon />
+                    )}
                   </button>
                 )}
               </div>

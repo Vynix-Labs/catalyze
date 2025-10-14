@@ -233,6 +233,7 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
 
       {/* Deposit Modal */}
       {showDepositModal && (
+    
         <DepositModal
           isOpen={showDepositModal}
           onClose={handleDepositModalClose}

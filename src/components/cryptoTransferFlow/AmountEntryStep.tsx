@@ -1,9 +1,14 @@
 import { AlertCircle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import Button from "../../common/ui/button";
 import DepositModal from "../../common/ui/modal/DepositModal";
 import GlobalModal from "../../common/ui/modal/GlobalModal";
-import { useInitiateDeposit, useTokenRate } from "../../hooks";
+import {
+  useConfirmDeposit,
+  useInitiateDeposit,
+  useTokenRate,
+} from "../../hooks";
 import type { AmountEntryStepProps } from "../../types/types";
 import { currencyIcons, getNetworkName } from "../../utils";
 import Tabs from "../Tabs";
@@ -68,10 +73,13 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
     error: rateError,
   } = useTokenRate(currencyType);
   const { mutate: initiateDeposit } = useInitiateDeposit();
-
+  const [bankName, setBankName] = useState("");
+  const [AccountNumber, setAccountNumber] = useState("");
+  const [transferData, setTransferData] = useState<any | string>({});
   // Use currencyMode directly instead of deriving from transferType
   const [activeTab, setActiveTab] = useState<"fiat" | "crypto">(currencyMode);
   // Sync activeTab with currencyMode changes
+  const { mutateAsync: confirmDeposit } = useConfirmDeposit();
   useEffect(() => {
     setActiveTab(currencyMode);
   }, [currencyMode]);
@@ -183,12 +191,26 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
               alert("Please enter both amount values");
               return;
             }
-            initiateDeposit({
-              amountFiat: parseFloat(fiatAmountNGN),
-              tokenSymbol: currencyType.toUpperCase(),
-            });
 
-            setIsDepositModalOpen(true);
+            initiateDeposit(
+              {
+                amountFiat: parseFloat(fiatAmountNGN),
+                tokenSymbol: currencyType.toUpperCase(),
+              },
+
+              {
+                onSuccess(data) {
+                  setBankName(data?.provider);
+                  setTransferData(data?.paymentInstructions);
+                  setAccountNumber(data?.providerRef);
+                  setIsDepositModalOpen(true);
+                },
+                onError(err) {
+                  toast.error(err?.message ?? "Error Fetching Bank Details");
+                },
+              }
+            );
+
             break;
           }
           case "transfer":
@@ -215,6 +237,18 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
     setIsModalOpen(!isModalOpen);
   };
 
+  const confirmFiatDeposit = async () => {
+    if (!transferData) return;
+    try {
+      await confirmDeposit(transferData);
+      setIsDepositModalOpen(false);
+      onNext();
+    } catch (err: any) {
+      toast.error(
+        err.response?.data?.error || err.message || "Failed to confirm deposit."
+      );
+    }
+  };
   return (
     <div className="flex-1 flex flex-col bg-white h-screen w-full  overflow-hidden relative">
       <Tabs
@@ -368,11 +402,12 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
       {/* Deposit Modal */}
       {flowType === "deposit" && (
         <DepositModal
+          bankName={bankName}
+          accountNumber={AccountNumber}
           isOpen={isDepositModalOpen}
           onClose={() => setIsDepositModalOpen(false)}
           onConfirm={() => {
-            setIsDepositModalOpen(false);
-            onNext();
+            confirmFiatDeposit();
           }}
           amount={getCurrentAmount()}
           amountNGN={getCurrentAmountNGN()}
