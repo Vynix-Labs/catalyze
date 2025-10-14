@@ -588,10 +588,7 @@ export async function handleMonnifyWebhook(
   fastify: FastifyInstance,
   request: FastifyRequest
 ) {
-  const maybeRaw = (request as unknown as { rawBody?: string | Buffer }).rawBody;
-  const rawBodyStr: string =
-    (typeof maybeRaw === "string" ? maybeRaw : (maybeRaw as Buffer | undefined)?.toString("utf8")) ??
-    (typeof request.body === "string" ? (request.body as string) : JSON.stringify(request.body));
+  const rawBodyStr: string = JSON.stringify(request.body);
 
   fastify.log.info({ rawBodyStr }, "Raw body used for signature");
 
@@ -620,6 +617,8 @@ export async function handleMonnifyWebhook(
   }
 
   const { eventType, eventData } = (request.body as { eventType?: string; eventData?: unknown }) ?? {};
+
+  fastify.log.info(`Valid Webhook: ${eventType}`)
 
   if (eventType !== "SUCCESSFUL_TRANSACTION" || !eventData) {
     return { success: true, ignored: true };
