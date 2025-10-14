@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowDownRight,
@@ -15,6 +15,8 @@ const currencyIcons = {
   USDT: "/images/usdt.png",
   USDC: "/images/usdc.png",
   STRK: "/images/strk.png",
+  WBTC: "/images/btc.png",
+  WETH: "/images/eth.png",
 };
 
 type TransferProps = {
@@ -37,7 +39,7 @@ const CurrencyIcon = ({
   currencyType: string;
   size?: "small" | "large";
 }) => {
-  const iconPath = currencyIcons[currencyType as keyof typeof currencyIcons];
+  const iconPath = currencyIcons[currencyType.toUpperCase() as keyof typeof currencyIcons];
   const sizeClass = size === "large" ? "w-8 h-8" : "w-6 h-6";
   const imgSizeClass = size === "large" ? "w-6 h-6" : "w-4 h-4";
 
@@ -120,7 +122,7 @@ const AssetDetail = () => {
             {/* Currency Icon and Balance */}
             {!isLoading && (
               <div className="flex items-center space-x-2 mb-2">
-                <CurrencyIcon currencyType={tokenId ?? ""} size="small" />
+                <CurrencyIcon currencyType={tokenId} size="small" />
                 <div>
                   <h2 className="text-sm font-medium text-gray-100 ">
                     <span className="uppercase">{tokenId}</span> Balance
