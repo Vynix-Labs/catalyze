@@ -1,6 +1,7 @@
 import { useState } from "react";
 import GlobalModal from "./GlobalModal";
 import { CopyIcon } from "../../../assets/svg";
+import type { fiatResponse } from "../../../utils/types";
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -9,6 +10,8 @@ interface DepositModalProps {
   amountNGN: string;
   amount: string;
   currencyType: string;
+  depositData?: fiatResponse | null;
+  isLoading?: boolean;
 }
 
 const DepositModal: React.FC<DepositModalProps> = ({
@@ -16,11 +19,16 @@ const DepositModal: React.FC<DepositModalProps> = ({
   onClose,
   onConfirm,
   amountNGN,
+  depositData,
+  isLoading,
 }) => {
   const bankDetails = {
-    bankName: "WEMABOD Bank",
-    accountNumber: "1234567890",
-    amount: `₦${amountNGN}`,
+    bankName: depositData?.paymentInstructions.bankName || "",
+    accountNumber: depositData?.paymentInstructions.accountNumber || "",
+    amount:
+      depositData?.paymentInstructions.totalPayable !== undefined
+        ? `₦${depositData.paymentInstructions.totalPayable}`
+        : `₦${amountNGN}`,
   };
 
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -62,14 +70,18 @@ const DepositModal: React.FC<DepositModalProps> = ({
 
         {/* Loop Bank Details */}
         <div className="space-y-2">
-          {detailItems.map((item, index) => (
+          {(isLoading && !depositData ? [
+            { label: "Bank Name", value: "Loading...", copyable: false },
+            { label: "Account Number", value: "Loading...", copyable: false },
+            { label: "Amount", value: `₦${amountNGN}`, copyable: false },
+          ] : detailItems).map((item, index) => (
             <div key={index} className="bg-neutral-100 p-2 rounded-lg">
               <div className="text-sm text-gray-600 mb-1 ">{item.label}</div>
               <div className="flex justify-between items-center">
                 <strong className="text-base">{item.value}</strong>
                 {item.copyable && (
                   <button
-                    onClick={() => handleCopy("1234567890", "account")}
+                    onClick={() => handleCopy(bankDetails.accountNumber, "account")}
                     className="text-blue-600 text-sm hover:text-blue-800"
                   >
                     {copiedField === "account" ? <CopyIcon className="text-gray-600" /> : <CopyIcon />}
