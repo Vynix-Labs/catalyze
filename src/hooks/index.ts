@@ -6,3 +6,4 @@ export * from "./useRates";
 export * from "./useTransactions";
 export * from "./assets";
 export * from "./useStake";
+export * from "./useCrypto";

@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import type { CryptoComponentProps } from "../../types/types";
 import { CopyIcon } from "../../assets/svg";
-import { axiosInstance } from "../../api/axios";
-import { endpoints } from "../../api/endpoints";
+import { useCryptoAddress } from "../../hooks";
 
 // Currency Icon Component (you need to implement this)
 const CurrencyIcon = ({ currencyType }: { currencyType: string }) => {
@@ -40,9 +39,7 @@ export const CryptoDeposit: React.FC<CryptoComponentProps> = ({
   // onNetworkChange,
 }) => {
   const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [address, setAddress] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
+  const { data, isLoading, error } = useCryptoAddress();
   const handleCopy = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
     setCopiedField(field);
@@ -51,36 +48,7 @@ export const CryptoDeposit: React.FC<CryptoComponentProps> = ({
     setTimeout(() => setCopiedField(null), 3000);
   };
 
-  useEffect(() => {
-    let isMounted = true;
-    const fetchAddress = async () => {
-      try {
-        setLoading(true);
-        setError("");
-        const res = await axiosInstance.get(endpoints.default.cryptoAddress);
-        const data = res.data as { address: string; network: string };
-        if (!isMounted) return;
-        setAddress(data.address || "");
-      } catch (e: unknown) {
-        if (!isMounted) return;
-        let message = "Failed to load address";
-        if (typeof e === "object" && e !== null) {
-          const anyErr = e as { response?: { data?: { message?: string } }; message?: string };
-          message = anyErr.response?.data?.message || anyErr.message || message;
-        }
-        setError(message);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-    fetchAddress();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Encode address + currency + network
-  const qrValue = address;
+  const qrValue = data?.address || "";
 
   return (
     <div className="flex w-md flex-col items-center space-y-6 p-4">
@@ -131,12 +99,12 @@ export const CryptoDeposit: React.FC<CryptoComponentProps> = ({
         </div>
         <div className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg">
           <span className="text-sm font-mono text-gray-800 truncate flex-1 mr-2">
-            {loading ? "Loading..." : error ? "Failed to load" : address}
+            {isLoading ? "Loading..." : error ? "Failed to load" : qrValue}
           </span>
           <button
             className="text-blue-500 hover:text-blue-700 flex-shrink-0 cursor-pointer"
-            onClick={() => handleCopy(address, "account")}
-            disabled={!address}
+            onClick={() => handleCopy(qrValue, "account")}
+            disabled={!qrValue}
           >
             {copiedField === "account" ? (
               <CopyIcon /> // show "copied" state
