@@ -250,7 +250,7 @@ const StakingPage = () => {
                         </div>
 
                         <span className="text-green-500 font-bold">
-                          {pool.apy.toFixed(2)}%
+                          {Number(pool.apy * 100).toFixed(2)}%
                         </span>
                       </div>
 

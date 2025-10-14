@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import Button from "../../common/ui/button";
 import DepositModal from "../../common/ui/modal/DepositModal";
 import GlobalModal from "../../common/ui/modal/GlobalModal";
-import { useInitiateDeposit, useTokenRate } from "../../hooks";
+import { useInitiateDeposit, useTokenRate, useTradingFees } from "../../hooks";
 import type { AmountEntryStepProps } from "../../types/types";
 import type { fiatResponse } from "../../utils/types";
 import { currencyIcons, getNetworkName } from "../../utils";
@@ -70,6 +70,11 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
     isLoading: isRateLoading,
     error: rateError,
   } = useTokenRate(currencyType);
+  const {
+    data: fees,
+    isLoading: isFeeLoading,
+    error: feeError,
+  } = useTradingFees();
   const { mutate: initiateDeposit, isPending: isInitiateDepositPending } =
     useInitiateDeposit();
 
@@ -122,27 +127,41 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
     }
   }, [rates, quoteType]);
 
+  const adjustedRate = useMemo(() => {
+    const buyFee = fees?.buy ?? 0; // decimal fraction e.g., 0.01
+    const sellFee = fees?.sell ?? 0;
+    if (!currentRate) return 0;
+    switch (quoteType) {
+      case "buy":
+        return currentRate * (1 + buyFee);
+      case "sell":
+        return currentRate * (1 - sellFee);
+      default:
+        return currentRate;
+    }
+  }, [currentRate, fees, quoteType]);
+
   const baseRate = useMemo(() => rates?.base ?? 0, [rates]);
 
   const handleFiatUSDCChange = (value: string) => {
     setFiatAmount(value);
     const usdcAmount = parseFloat(value) || 0;
-    if (!currentRate) {
+    if (!adjustedRate) {
       setFiatAmountNGN("");
       return;
     }
-    const ngnEquivalent = (usdcAmount * currentRate).toFixed(2);
+    const ngnEquivalent = (usdcAmount * adjustedRate).toFixed(2);
     setFiatAmountNGN(ngnEquivalent);
   };
 
   const handleFiatNGNChange = (value: string) => {
     setFiatAmountNGN(value);
     const ngnAmount = parseFloat(value) || 0;
-    if (!currentRate) {
+    if (!adjustedRate) {
       setFiatAmount("");
       return;
     }
-    const usdcEquivalent = (ngnAmount / currentRate).toFixed(6);
+    const usdcEquivalent = (ngnAmount / adjustedRate).toFixed(6);
     setFiatAmount(usdcEquivalent);
   };
 
@@ -270,9 +289,9 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
             onAmountNGNChange={handleFiatNGNChange}
             onSwap={handleSwap}
             isSwapped={isSwapped}
-            rate={currentRate}
-            isRateLoading={isRateLoading}
-            rateError={rateError?.message}
+            rate={adjustedRate}
+            isRateLoading={isRateLoading || isFeeLoading}
+            rateError={rateError?.message || feeError?.message}
           />
         ) : (
           <FiatTransfer
@@ -283,9 +302,9 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
             onAmountNGNChange={handleFiatNGNChange}
             onSwap={handleSwap}
             isSwapped={isSwapped}
-            rate={currentRate}
-            isRateLoading={isRateLoading}
-            rateError={rateError?.message}
+            rate={adjustedRate}
+            isRateLoading={isRateLoading || isFeeLoading}
+            rateError={rateError?.message || feeError?.message}
           />
         )
       ) : flowType === "deposit" ? (
@@ -320,6 +339,11 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
           <div className="">
             Estimated amount of naira with our current rate will be transferred
             to beneficiary
+          </div>
+          <div className="">
+            {flowType === "deposit"
+              ? `Fee applied: ${((fees?.buy ?? 0) * 100).toFixed(2)}% (included in rate)`
+              : `Fee applied: ${((fees?.sell ?? 0) * 100).toFixed(2)}% (included in rate)`}
           </div>
         </div>
       )}
