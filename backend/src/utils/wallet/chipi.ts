@@ -80,7 +80,6 @@ export async function transferWithChipi(
   to: string,
   amount: number,
   currency: ChainToken,
-  userId: string
 ) {
   // const decimals = await getTokenDecimals(currency);
 
@@ -104,7 +103,6 @@ export async function approveWithChipi(
   spender: string,
   amount: number,
   currency: CryptoCurrency,
-  userId: string
 ) {
   const decimals = await getTokenDecimals(currency);
   return await chipiSDK.approve({
@@ -124,8 +122,7 @@ export async function approveWithChipi(
 export async function callContractWithChipi(
   wallet: WalletData,
   contractAddress: string,
-  calls: Call[],
-  userId: string
+  calls: Call[]
 ) {
   return await chipiSDK.callAnyContract({
     params: {
@@ -139,7 +136,7 @@ export async function callContractWithChipi(
   });
 }
 
-export async function stakeVesuUsdc(wallet: WalletData, amount: number, userId: string) {
+export async function stakeVesuUsdc(wallet: WalletData, amount: number) {
   return await chipiSDK.stakeVesuUsdc({
     params: {
       /* externalUserId: userId, */
@@ -152,7 +149,7 @@ export async function stakeVesuUsdc(wallet: WalletData, amount: number, userId: 
   });
 }
 
-export async function withdrawVesuUsdc(wallet: WalletData, amount: number, userId: string) {
+export async function withdrawVesuUsdc(wallet: WalletData, amount: number) {
   return await chipiSDK.withdrawVesuUsdc({
     params: {
       /* externalUserId: userId, */
@@ -168,17 +165,15 @@ export async function withdrawVesuUsdc(wallet: WalletData, amount: number, userI
 export async function stakeWithChipi(
   wallet: WalletData,
   amount: number,
-  bearerToken: string,
   tokenSymbol: string,
   contractAddress: string,
-  userId: string
 ) {
   const symbol = tokenSymbol.toLowerCase();
   const currency = symbol as CryptoCurrency;
   const decimals = await getTokenDecimals(currency);
 
   if (symbol === "usdc") {
-    return await stakeVesuUsdc(wallet, amount, userId);
+    return await stakeVesuUsdc(wallet, amount);
   }
 
   const entrypoint = "deposit";
@@ -192,5 +187,5 @@ export async function stakeWithChipi(
   ];
 
   // Execute contract call via Chipi
-  return await callContractWithChipi(wallet, contractAddress, calls, userId);
+  return await callContractWithChipi(wallet, contractAddress, calls);
 }

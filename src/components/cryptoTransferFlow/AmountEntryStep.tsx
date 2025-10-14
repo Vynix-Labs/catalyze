@@ -4,12 +4,9 @@ import { toast } from "sonner";
 import Button from "../../common/ui/button";
 import DepositModal from "../../common/ui/modal/DepositModal";
 import GlobalModal from "../../common/ui/modal/GlobalModal";
-import {
-  useConfirmDeposit,
-  useInitiateDeposit,
-  useTokenRate,
-} from "../../hooks";
+import { useInitiateDeposit, useTokenRate, useTradingFees } from "../../hooks";
 import type { AmountEntryStepProps } from "../../types/types";
+import type { fiatResponse } from "../../utils/types";
 import { currencyIcons, getNetworkName } from "../../utils";
 import Tabs from "../Tabs";
 import { CryptoDeposit } from "./CryptoDeposit";
@@ -55,15 +52,17 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   currencyMode = "fiat",
   onCurrencyModeChange,
   currencyType = "USDC",
+  // selectedAsset,
 }) => {
   const [cryptoAmount, setCryptoAmount] = useState("");
   const [fiatAmount, setFiatAmount] = useState(amount || "");
   const [fiatAmountNGN, setFiatAmountNGN] = useState(amountNGN || "");
   const [address, setAddress] = useState("");
-  const [selectedNetwork, setSelectedNetwork] = useState("");
+  const [selectedNetwork, setSelectedNetwork] = useState("starknet");
   const [isSwapped, setIsSwapped] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+  const [depositDetails, setDepositDetails] = useState<fiatResponse | null>(null);
   // const [rates, setRates] = useState<RatePrices | null>(null);
   // const [isRateLoading, setIsRateLoading] = useState(false);
   // const [rateError, setRateError] = useState<string | null>(null);
@@ -72,10 +71,14 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
     isLoading: isRateLoading,
     error: rateError,
   } = useTokenRate(currencyType);
-  const { mutate: initiateDeposit } = useInitiateDeposit();
-  const [bankName, setBankName] = useState("");
-  const [AccountNumber, setAccountNumber] = useState("");
-  const [transferData, setTransferData] = useState<any | string>({});
+  const {
+    data: fees,
+    isLoading: isFeeLoading,
+    error: feeError,
+  } = useTradingFees();
+  const { mutate: initiateDeposit, isPending: isInitiateDepositPending } =
+    useInitiateDeposit();
+
   // Use currencyMode directly instead of deriving from transferType
   const [activeTab, setActiveTab] = useState<"fiat" | "crypto">(currencyMode);
   // Sync activeTab with currencyMode changes
@@ -100,6 +103,13 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
     setAmountNGN,
   ]);
 
+  // Enforce Starknet for crypto deposit (no network selector)
+  useEffect(() => {
+    if (flowType === "deposit" && activeTab === "crypto" && selectedNetwork !== "starknet") {
+      setSelectedNetwork("starknet");
+    }
+  }, [flowType, activeTab, selectedNetwork]);
+
   const quoteType = useMemo<"base" | "buy" | "sell">(() => {
     if (activeTab !== "fiat") return "base";
     if (flowType === "deposit") return "buy";
@@ -119,27 +129,41 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
     }
   }, [rates, quoteType]);
 
+  const adjustedRate = useMemo(() => {
+    const buyFee = fees?.buy ?? 0; // decimal fraction e.g., 0.01
+    const sellFee = fees?.sell ?? 0;
+    if (!currentRate) return 0;
+    switch (quoteType) {
+      case "buy":
+        return currentRate * (1 + buyFee);
+      case "sell":
+        return currentRate * (1 - sellFee);
+      default:
+        return currentRate;
+    }
+  }, [currentRate, fees, quoteType]);
+
   const baseRate = useMemo(() => rates?.base ?? 0, [rates]);
 
   const handleFiatUSDCChange = (value: string) => {
     setFiatAmount(value);
     const usdcAmount = parseFloat(value) || 0;
-    if (!currentRate) {
+    if (!adjustedRate) {
       setFiatAmountNGN("");
       return;
     }
-    const ngnEquivalent = (usdcAmount * currentRate).toFixed(2);
+    const ngnEquivalent = (usdcAmount * adjustedRate).toFixed(2);
     setFiatAmountNGN(ngnEquivalent);
   };
 
   const handleFiatNGNChange = (value: string) => {
     setFiatAmountNGN(value);
     const ngnAmount = parseFloat(value) || 0;
-    if (!currentRate) {
+    if (!adjustedRate) {
       setFiatAmount("");
       return;
     }
-    const usdcEquivalent = (ngnAmount / currentRate).toFixed(6);
+    const usdcEquivalent = (ngnAmount / adjustedRate).toFixed(6);
     setFiatAmount(usdcEquivalent);
   };
 
@@ -191,26 +215,23 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
               alert("Please enter both amount values");
               return;
             }
-
+            setDepositDetails(null);
+            setIsDepositModalOpen(true);
             initiateDeposit(
               {
                 amountFiat: parseFloat(fiatAmountNGN),
                 tokenSymbol: currencyType.toUpperCase(),
               },
-
               {
-                onSuccess(data) {
-                  setBankName(data?.provider);
-                  setTransferData(data?.paymentInstructions);
-                  setAccountNumber(data?.providerRef);
-                  setIsDepositModalOpen(true);
+                onSuccess: (response) => {
+                  setDepositDetails(response);
                 },
-                onError(err) {
-                  toast.error(err?.message ?? "Error Fetching Bank Details");
+                onError: (error) => {
+                  setIsDepositModalOpen(false);
+                  alert(error.message || "Unable to initiate deposit");
                 },
               }
             );
-
             break;
           }
           case "transfer":
@@ -237,18 +258,16 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
     setIsModalOpen(!isModalOpen);
   };
 
-  const confirmFiatDeposit = async () => {
-    if (!transferData) return;
-    try {
-      await confirmDeposit(transferData);
-      setIsDepositModalOpen(false);
-      onNext();
-    } catch (err: any) {
-      toast.error(
-        err.response?.data?.error || err.message || "Failed to confirm deposit."
-      );
-    }
+  const closeDepositModal = () => {
+    setIsDepositModalOpen(false);
+    setDepositDetails(null);
   };
+
+  const handleDepositConfirm = () => {
+    closeDepositModal();
+    onNext();
+  };
+
   return (
     <div className="flex-1 flex flex-col bg-white h-screen w-full  overflow-hidden relative">
       <Tabs
@@ -264,7 +283,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
       {activeTab === "fiat" ? (
         flowType === "deposit" ? (
           <FiatDeposit
-            availableAmount={"10000"}
+            availableAmount={fiatAmountNGN}
             amount={fiatAmount}
             amountNGN={fiatAmountNGN}
             currencyType={currencyType}
@@ -272,9 +291,9 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
             onAmountNGNChange={handleFiatNGNChange}
             onSwap={handleSwap}
             isSwapped={isSwapped}
-            rate={currentRate}
-            isRateLoading={isRateLoading}
-            rateError={rateError?.message}
+            rate={adjustedRate}
+            isRateLoading={isRateLoading || isFeeLoading}
+            rateError={rateError?.message || feeError?.message}
           />
         ) : (
           <FiatTransfer
@@ -285,9 +304,9 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
             onAmountNGNChange={handleFiatNGNChange}
             onSwap={handleSwap}
             isSwapped={isSwapped}
-            rate={currentRate}
-            isRateLoading={isRateLoading}
-            rateError={rateError?.message}
+            rate={adjustedRate}
+            isRateLoading={isRateLoading || isFeeLoading}
+            rateError={rateError?.message || feeError?.message}
           />
         )
       ) : flowType === "deposit" ? (
@@ -309,6 +328,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
           onCryptoAmountChange={handleCryptoAmountChange}
           onAddressChange={setAddress}
           onNetworkChange={setSelectedNetwork}
+          balance={fiatAmountNGN}
         />
       )}
 
@@ -321,6 +341,11 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
           <div className="">
             Estimated amount of naira with our current rate will be transferred
             to beneficiary
+          </div>
+          <div className="">
+            {flowType === "deposit"
+              ? `Fee applied: ${((fees?.buy ?? 0) * 100).toFixed(2)}% (included in rate)`
+              : `Fee applied: ${((fees?.sell ?? 0) * 100).toFixed(2)}% (included in rate)`}
           </div>
         </div>
       )}
@@ -338,7 +363,8 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
             flowType === "deposit" && activeTab === "crypto"
               ? !selectedNetwork
               : activeTab === "fiat"
-              ? !fiatAmount || !fiatAmountNGN
+              ? !fiatAmount || !fiatAmountNGN ||
+                (flowType === "deposit" && isInitiateDepositPending)
               : !cryptoAmount || !address || !selectedNetwork
           }
         />
@@ -402,16 +428,15 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
       {/* Deposit Modal */}
       {flowType === "deposit" && (
         <DepositModal
-          bankName={bankName}
-          accountNumber={AccountNumber}
+          
           isOpen={isDepositModalOpen}
-          onClose={() => setIsDepositModalOpen(false)}
-          onConfirm={() => {
-            confirmFiatDeposit();
-          }}
+          onClose={closeDepositModal}
+          onConfirm={handleDepositConfirm}
           amount={getCurrentAmount()}
           amountNGN={getCurrentAmountNGN()}
           currencyType={currencyType}
+          depositData={depositDetails}
+          isLoading={isInitiateDepositPending}
         />
       )}
     </div>

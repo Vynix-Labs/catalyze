@@ -12,6 +12,7 @@ const envSchema = z.object({
   MONNIFY_BASE_URL: z.string().min(1),
   MONNIFY_API_KEY: z.string().min(1),
   MONNIFY_SECRET_KEY: z.string().min(1),
+  MONNIFY_WEBHOOK_SECRET: z.string().optional(),
   MONNIFY_CONTRACT_CODE: z.string().min(1),
   MONNIFY_WALLET_ACCOUNT_NUMBER: z.string().min(1),
 

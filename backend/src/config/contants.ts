@@ -30,3 +30,8 @@ export const SPREAD = {
   sell: -5
 };
 
+export const TRADING_FEES = {
+  buyPercent: 1,
+  sellPercent: 1,
+};
+

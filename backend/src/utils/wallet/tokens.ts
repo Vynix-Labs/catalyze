@@ -20,24 +20,9 @@ export const TOKEN_DECIMALS: Record<CryptoCurrency, number> = {
  * Get token decimals for a specific currency
  */
 export async function getTokenDecimals(currency: CryptoCurrency): Promise<number> {
-  try {
-    const contract = new Contract(erc20Abi, TOKEN_MAP[currency], provider);
-    const decimalsResult = await contract.functions.decimals?.();
-  
-    if (decimalsResult === undefined) {
-      return TOKEN_DECIMALS[currency] ?? 18;
-    }
-    
-    if ("result" in decimalsResult && Array.isArray(decimalsResult.result)) {
-      return Number(decimalsResult.result[0]);
-    }
-
-    return Number(decimalsResult);
-  } catch (error) {
-    console.error(`Error getting decimals for ${currency}:`, error);
-    return TOKEN_DECIMALS[currency] ?? 18;
-  }
+  return TOKEN_DECIMALS[currency]
 }
+
 
 
 /**

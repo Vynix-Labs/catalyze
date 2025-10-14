@@ -8,13 +8,14 @@ export const CryptoTransfer: React.FC<CryptoComponentProps> = ({
   onCryptoAmountChange,
   onAddressChange,
   onNetworkChange,
+  balance,
 }) => {
   return (
     <div className="flex-1  w-md p-4 space-y-4">
       <div className="mb-4 w-full">
         <div className="flex items-center justify-between text-sm mb-2">
           <div className="font-medium text-gray-900">Amount</div>
-          <span className="text-gray-500">Available Amount: 10,000</span>
+          <span className="text-gray-500">Available Amount:{balance}</span>
         </div>
         <div className="relative w-full">
           <input

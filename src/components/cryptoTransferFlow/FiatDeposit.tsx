@@ -14,7 +14,7 @@ export const FiatDeposit: React.FC<FiatDepositProps> = ({
   onAmountChange,
   onAmountNGNChange,
   onSwap,
-  availableAmount = "10,000",
+  availableAmount,
   isSwapped,
   rate = 0,
   isRateLoading = false,

@@ -8,8 +8,6 @@ import {
 } from "../../assets/svg";
 import Assets, { type Asset } from "../../components/Assets";
 import Transactions, { type Transaction } from "../../components/Transactions";
-import CurrencyDetailPage from "./CurrencyDetailPage";
-import TransactionDetailsPage from "./transactionDetails";
 
 import { useAtom } from "jotai";
 import { useNavigate } from "react-router-dom";
@@ -24,10 +22,9 @@ import {
 
 import { NoTransactions } from "../../components/EmptyStates";
 import { authAtom } from "../../store/jotai";
+import { RoutePath } from "../../routes/routePath";
 
 const Home: React.FC = () => {
-  const [showTransactionDetails, setShowTransactionDetails] = useState(false);
-  const [showCurrencyDetail, setShowCurrencyDetail] = useState(false);
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAssetForModal, setSelectedAssetForModal] =
@@ -58,28 +55,13 @@ const Home: React.FC = () => {
     setIsBalanceVisible(!isBalanceVisible);
   };
 
-  const [selectedCurrency, setSelectedCurrency] = useState<{
-    type: string;
-    balance: string;
-    nairaValue: string;
-  } | null>(null);
-
   const handleViewAllTransactions = () => {
-    setShowTransactionDetails(true);
-  };
-
-  const handleBackFromTransactions = () => {
-    setShowTransactionDetails(false);
+    navigate(RoutePath.TRANSACTIONS);
   };
 
   // In your Home component
   const handleAssetClick = (asset: Asset) => {
-    setSelectedCurrency({
-      type: asset.symbol,
-      balance: asset.balance,
-      nairaValue: asset.value,
-    });
-    setShowCurrencyDetail(true);
+    navigate(`/dashboard/asset/${asset.symbol}`);
   };
 
   // Handle Transfer button click from dashboard
@@ -120,21 +102,9 @@ const Home: React.FC = () => {
   const handleTransactionClick = (transaction: Transaction) => {
     const currencyType =
       transaction.currencyType || detectCurrencyType(transaction.title);
+    console.log(currencyType);
 
     // Find the asset data for this currency
-    const asset = assetsData.find((a) => a.symbol === currencyType);
-
-    setSelectedCurrency({
-      type: currencyType,
-      balance: asset?.balance || "0.00",
-      nairaValue: asset?.value || "0.00",
-    });
-    setShowCurrencyDetail(true);
-  };
-
-  const handleBackFromCurrencyDetail = () => {
-    setShowCurrencyDetail(false);
-    setSelectedCurrency(null);
   };
 
   // Helper function to detect currency type from title
@@ -199,29 +169,6 @@ const Home: React.FC = () => {
           };
         })
       : [];
-
-  // Render currency detail page
-  if (showCurrencyDetail && selectedCurrency) {
-    return (
-      <CurrencyDetailPage
-        currencyType={selectedCurrency.type}
-        balance={selectedCurrency.balance}
-        nairaValue={selectedCurrency.nairaValue}
-        transactions={transactionsData}
-        onBack={handleBackFromCurrencyDetail}
-      />
-    );
-  }
-
-  // Render transaction details page
-  if (showTransactionDetails) {
-    return (
-      <TransactionDetailsPage
-        transactions={transactionsData}
-        onBack={handleBackFromTransactions}
-      />
-    );
-  }
 
   return (
     <div className="bg-neutral-50 w-full h-screen flex flex-col">

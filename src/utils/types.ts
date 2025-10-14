@@ -64,9 +64,21 @@ export type fiatResponse = {
   provider: string;
   providerRef: string;
   paymentInstructions: {
-    additionalProp1: string;
-    additionalProp2: string;
-    additionalProp3: string;
+    accountNumber: string;
+    accountName: string;
+    bankName: string;
+    bankCode: string;
+    accountDurationSeconds: number;
+    ussdPayment: unknown;
+    requestTime: string;
+    expiresOn: string;
+    transactionReference: string;
+    paymentReference: string;
+    amount: number;
+    fee: number;
+    totalPayable: number;
+    collectionChannel: string;
+    productInformation: unknown;
   };
 };
 

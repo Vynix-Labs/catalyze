@@ -42,7 +42,7 @@ export default function GlobalModal({
       onClick={handleBackdropClick}
     >
       <motion.div
-        className="bg-white rounded-t-lg shadow-xl max-w-md flex items-baseline justify-baseline absolute bottom-0 py-6 px-4 w-full max-h-[90vh] overflow-auto flex-col gap-8.5"
+        className="bg-white rounded-t-lg shadow-xl max-w-md flex items-baseline justify-baseline absolute bottom-0 py-6 px-4 w-full max-h-[90vh] overflow-auto flex-col gap-8.5 "
         onClick={(e) => e.stopPropagation()}
         initial={{
           y: "10vh",

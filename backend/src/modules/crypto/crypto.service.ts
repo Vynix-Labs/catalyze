@@ -106,7 +106,7 @@ export class CryptoService {
       metadata: { toAddress },
     });
 
-    const tx = await transferWithChipi(wallet as unknown as WalletData, toAddress, amount, toChainToken(symbol), bearerToken);
+    const tx = await transferWithChipi(wallet as unknown as WalletData, toAddress, amount, toChainToken(symbol));
     const txHash = typeof tx === "string"
       ? tx
       : (tx as { transaction_hash?: string; hash?: string }).transaction_hash ?? (tx as { hash?: string }).hash ?? "";
