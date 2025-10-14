@@ -56,8 +56,7 @@ const stakingRoutes: FastifyPluginAsync = async (fastify) => {
       }
       const headers = new Headers();
       Object.entries(request.headers).forEach(([k, v]) => { if (v) headers.append(k, v.toString()); });
-      const bearToken = await request.server.auth.api.getToken({ headers });
-      const result = await svc.stake(userId, strategyId, amount, bearToken.token);
+      const result = await svc.stake(userId, strategyId, amount);
       return reply.code(200).send(result);
     }
   );
@@ -79,8 +78,7 @@ const stakingRoutes: FastifyPluginAsync = async (fastify) => {
       }
       const headers = new Headers();
       Object.entries(request.headers).forEach(([k, v]) => { if (v) headers.append(k, v.toString()); });
-      const bearToken = await request.server.auth.api.getToken({ headers });
-      const result = await svc.unstake(userId, strategyId, amount, bearToken.token);
+      const result = await svc.unstake(userId, strategyId, amount);
       return reply.code(200).send(result);
     }
   );

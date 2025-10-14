@@ -2,6 +2,7 @@ import { useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import type { CryptoComponentProps } from "../../types/types";
 import { CopyIcon } from "../../assets/svg";
+import { useCryptoAddress } from "../../hooks";
 
 // Currency Icon Component (you need to implement this)
 const CurrencyIcon = ({ currencyType }: { currencyType: string }) => {
@@ -33,11 +34,12 @@ const CurrencyIcon = ({ currencyType }: { currencyType: string }) => {
 };
 
 export const CryptoDeposit: React.FC<CryptoComponentProps> = ({
-  selectedNetwork,
+  // selectedNetwork,
   currencyType,
-  onNetworkChange,
+  // onNetworkChange,
 }) => {
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const { data, isLoading, error } = useCryptoAddress();
   const handleCopy = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
     setCopiedField(field);
@@ -46,14 +48,7 @@ export const CryptoDeposit: React.FC<CryptoComponentProps> = ({
     setTimeout(() => setCopiedField(null), 3000);
   };
 
-  const depositAddress = "Awsd4543685jdnnu556547addsa12454wr355";
-
-  // Encode address + currency + network
-  const qrValue = JSON.stringify({
-    currency: currencyType,
-    network: selectedNetwork,
-    address: depositAddress,
-  });
+  const qrValue = data?.address || "";
 
   return (
     <div className="flex w-md flex-col items-center space-y-6 p-4">
@@ -76,12 +71,12 @@ export const CryptoDeposit: React.FC<CryptoComponentProps> = ({
         </div>
       </div>
 
-      {/* Network Selection */}
+      {/* Network (disabled - only Starknet supported) */}
       <div className="w-full">
         <div className="block text-sm font-medium text-gray-700 mb-2">
           Network
         </div>
-        <select
+        {/* <select
           value={selectedNetwork}
           onChange={(e) => onNetworkChange(e.target.value)}
           className="w-full p-3 border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
@@ -91,7 +86,10 @@ export const CryptoDeposit: React.FC<CryptoComponentProps> = ({
           <option value="erc20">ERC-20 (Ethereum)</option>
           <option value="spl">SPL (Solana)</option>
           <option value="polygon">Polygon</option>
-        </select>
+        </select> */}
+        <div className="w-full p-3 border border-gray-200 rounded-lg text-gray-700 bg-gray-50">
+          Starknet
+        </div>
       </div>
 
       {/* Address Display */}
@@ -101,11 +99,12 @@ export const CryptoDeposit: React.FC<CryptoComponentProps> = ({
         </div>
         <div className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg">
           <span className="text-sm font-mono text-gray-800 truncate flex-1 mr-2">
-            {depositAddress}
+            {isLoading ? "Loading..." : error ? "Failed to load" : qrValue}
           </span>
           <button
             className="text-blue-500 hover:text-blue-700 flex-shrink-0 cursor-pointer"
-            onClick={() => handleCopy(depositAddress, "account")}
+            onClick={() => handleCopy(qrValue, "account")}
+            disabled={!qrValue}
           >
             {copiedField === "account" ? (
               <CopyIcon /> // show "copied" state

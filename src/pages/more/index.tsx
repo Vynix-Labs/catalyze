@@ -85,7 +85,7 @@ const MorePage = () => {
   ];
 
   return (
-    <div className=" bg-gray-50 p-4">
+    <div className=" bg-gray-50 p-4 w-full">
       <div className="mx-auto   max-w-md w-full space-y-4">
         {/* Header */}
         <div className="space-y-1">

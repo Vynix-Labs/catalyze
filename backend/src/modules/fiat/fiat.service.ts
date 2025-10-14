@@ -1,11 +1,11 @@
-import { randomUUID, createHash } from "crypto";
+import { randomUUID, createHmac, timingSafeEqual } from "crypto";
 import { eq, and, desc, gt } from "drizzle-orm";
 import { depositIntents, balances, transactions, withdrawRequests, priceFeeds, reserves, userWallets } from "../../db/schema";
 import env from "../../config/env";
 import { Buffer } from "buffer";
 import type { InitiateFiatDepositInput, InitiateFiatTransferInput } from "./fiat.schema";
 import { mapMonnifyStatus } from "../../utils/monnify";
-import { toChainToken, type CryptoCurrency } from "../../config";
+import { toChainToken, type CryptoCurrency, TRADING_FEES } from "../../config";
 import { getSystemTokenBalance, transferFromSystem } from "../../utils/wallet/system";
 import { validateSufficientBalance } from "../../utils/wallet/tokens";
 import { transferWithChipi } from "../../utils/wallet/chipi";
@@ -120,6 +120,8 @@ export class MonnifyClient {
     const symbol = tokenSymbol.toLowerCase() as CryptoCurrency;
 
     // compute token amount using BUY price; priceFeeds stored in lowercase
+    const buyFeeMultiplier = 1 + (TRADING_FEES.buyPercent ?? 0) / 100;
+
     const amountToken = await fastify.db
       .select()
       .from(priceFeeds)
@@ -131,7 +133,9 @@ export class MonnifyClient {
         const row = rows[0]!;
         const priceInNGN = Number(row.priceNgnBuy);
         if (!priceInNGN || priceInNGN <= 0) throw new Error(`Invalid price feed for ${symbol}`);
-        return (amountFiat / priceInNGN).toFixed(8);
+        const adjustedPrice = priceInNGN * buyFeeMultiplier;
+        if (!adjustedPrice || adjustedPrice <= 0) throw new Error(`Invalid adjusted price for ${symbol}`);
+        return (amountFiat / adjustedPrice).toFixed(8);
       });
 
     // Liquidity check: system balance - sum(active reserves) >= requested
@@ -279,7 +283,7 @@ export class MonnifyClient {
   /**
    * Create a fiat transfer intent (withdraw)
    */
-  async createTransferIntent(fastify: FastifyInstance, userId: string, input: InitiateFiatTransferInput, bearerToken: string) {
+  async createTransferIntent(fastify: FastifyInstance, userId: string, input: InitiateFiatTransferInput) {
     const { amountFiat, tokenSymbol, bankName, accountNumber, bankCode, narration, pinToken } = input;
 
     const pinValid = await validatePinToken(fastify, userId, pinToken, "fiat_transfer");
@@ -287,6 +291,11 @@ export class MonnifyClient {
 
     const reference = `MNFY-WDR-${Date.now()}-${randomUUID()}`;
     const symbol = tokenSymbol.toLowerCase() as CryptoCurrency;
+
+    const sellFeeMultiplier = 1 - (TRADING_FEES.sellPercent ?? 0) / 100;
+    if (sellFeeMultiplier <= 0) {
+      throw new Error("Invalid sell fee configuration");
+    }
 
     const amountToken = await fastify.db
     .select()
@@ -303,7 +312,11 @@ export class MonnifyClient {
       if (priceInNGN <= 0) {
         throw new Error(`Invalid price feed for ${symbol}`);
       }
-      return (amountFiat / priceInNGN).toFixed(8);
+      const adjustedPrice = priceInNGN * sellFeeMultiplier;
+      if (adjustedPrice <= 0) {
+        throw new Error(`Invalid adjusted price for ${symbol}`);
+      }
+      return (amountFiat / adjustedPrice).toFixed(8);
     });
 
     // Lookup user DB balance and on-chain balance
@@ -372,8 +385,7 @@ export class MonnifyClient {
         wallet as unknown as WalletData,
         env.SYSTEM_WALLET_ADDRESS,
         Number(amountToken),
-        toChainToken(symbol),
-        userId
+        toChainToken(symbol)
       );
       const txHash = typeof tx === "string"
         ? tx
@@ -576,10 +588,7 @@ export async function handleMonnifyWebhook(
   fastify: FastifyInstance,
   request: FastifyRequest
 ) {
-  const maybeRaw = (request as unknown as { rawBody?: string | Buffer }).rawBody;
-  const rawBodyStr: string =
-    (typeof maybeRaw === "string" ? maybeRaw : (maybeRaw as Buffer | undefined)?.toString("utf8")) ??
-    (typeof request.body === "string" ? (request.body as string) : JSON.stringify(request.body));
+  const rawBodyStr: string = JSON.stringify(request.body);
 
   fastify.log.info({ rawBodyStr }, "Raw body used for signature");
 
@@ -591,16 +600,25 @@ export async function handleMonnifyWebhook(
     throw new Error("Missing signature header");
   }
 
-  const computed = createHash("sha512")
-    .update(rawBodyStr + (MONNIFY_SECRET_KEY ?? ""))
+  const secret = MONNIFY_SECRET_KEY;
+  const computed = createHmac("sha512", secret)
+    .update(rawBodyStr)
     .digest("hex");
 
-  if (computed !== signatureHeader) {
+  const sigHeader = signatureHeader.trim().toLowerCase();
+  const comp = computed.toLowerCase();
+  const valid =
+    sigHeader.length === comp.length &&
+    timingSafeEqual(Buffer.from(sigHeader, "utf8"), Buffer.from(comp, "utf8"));
+  
+  if (!valid) {
     fastify.log.warn({ computed, signatureHeader }, "Invalid Monnify webhook signature");
     throw new Error("Invalid signature");
   }
 
   const { eventType, eventData } = (request.body as { eventType?: string; eventData?: unknown }) ?? {};
+
+  fastify.log.info(`Valid Webhook: ${eventType}`)
 
   if (eventType !== "SUCCESSFUL_TRANSACTION" || !eventData) {
     return { success: true, ignored: true };

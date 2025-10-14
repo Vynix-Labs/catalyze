@@ -41,6 +41,10 @@ export const endpoints = {
     single: (token: string) => `/rates/${token}`,
   },
 
+  fees: {
+    trading: "/fees/trading",
+  },
+
   default: {
     default: "/",
 
@@ -57,5 +61,6 @@ export const endpoints = {
     strategies: "/staking/strategies",
     stake: "/staking/staking/stake",
     unstake: "/staking/staking/unstake",
+    user_stakes: "/staking/user-stakes",
   },
 };

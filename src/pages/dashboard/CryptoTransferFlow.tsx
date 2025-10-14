@@ -31,14 +31,15 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
   const { selectedAsset, transferType: stateTransferType } =
     location.state || {};
 
+  console.log(selectedAsset);
+
   // Separate flow type from currency mode
   const [flowType, setFlowType] = useState<FlowType>(
     stateTransferType === "deposit" ? "deposit" : "transfer"
   );
 
-  const [currencyMode, setCurrencyMode] = useState<CurrencyMode>(
-    stateTransferType === "crypto" ? "crypto" : "fiat"
-  );
+  // Fix currency mode detection - it should default to crypto for crypto assets
+  const [currencyMode, setCurrencyMode] = useState<CurrencyMode>("crypto");
 
   const [currencyType, setCurrencyType] = useState(
     propCurrencyType || selectedAsset?.symbol || "Crypto"
@@ -46,12 +47,16 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
 
   // Update currency type when component mounts or when selectedAsset changes
   useEffect(() => {
+    console.log("CryptoTransferFlow - selectedAsset:", selectedAsset);
+    console.log("CryptoTransferFlow - propCurrencyType:", propCurrencyType);
+    console.log("CryptoTransferFlow - transferType from state:", stateTransferType);
+    
     if (selectedAsset?.symbol) {
       setCurrencyType(selectedAsset.symbol);
     } else if (propCurrencyType) {
       setCurrencyType(propCurrencyType);
     }
-  }, [selectedAsset, propCurrencyType]);
+  }, [selectedAsset, propCurrencyType, stateTransferType]);
 
   const resetForm = () => {
     setCurrentStep(1);
@@ -61,7 +66,7 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
     setAccountNumber("");
     setPin("");
     setFlowType(stateTransferType === "deposit" ? "deposit" : "transfer");
-    setCurrencyMode(stateTransferType === "crypto" ? "crypto" : "fiat");
+    setCurrencyMode("crypto"); // Default to crypto mode
   };
 
   const goToNextStep = () => {
@@ -216,7 +221,7 @@ const CryptoTransferFlow: React.FC<CurrencyDetailPageProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white shrink-0">
         <button
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate(-1)}
           className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
         >
           <ChevronLeftIcon />

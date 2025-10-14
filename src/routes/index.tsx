@@ -18,11 +18,13 @@ import StakingPage from "../pages/more/staking";
 import NotFound from "../pages/notFound";
 import RewardPage from "../pages/reward";
 import PersonalInfo from "../pages/settings/personalInfo";
-import SetPin from "../pages/settings/setPin";
+import SetPin from "../pages/settings/SetPin";
 import Settings from "../pages/settings/settings";
 import UpdatePassword from "../pages/settings/updatePassword";
 import { RoutePath } from "./routePath";
 import ClaimRewardsPageWrapper from "../components/ClaimRewardPageWrapper";
+import TransactionDetailsPage from "../pages/dashboard/transactionDetails";
+import AssetDetail from "../pages/dashboard/AssetDetails";
 
 export const routes = createBrowserRouter([
   {
@@ -43,17 +45,19 @@ export const routes = createBrowserRouter([
     errorElement: <NotFound />,
     children: [
       { index: true, element: <Home /> }, // index route
-      { path: RoutePath.MORE, element: <MorePage /> },
-      { path: RoutePath.INVESTMENT, element: <InvestmentPage /> },
-      { path: RoutePath.REWARD, element: <RewardPage /> },
-      { path: RoutePath.STAKING, element: <StakingPage /> },
-      { path: RoutePath.CLAIMREWARDPAGE, element: <ClaimRewardsPageWrapper /> },
+      { path: "more", element: <MorePage /> },
+      { path: "investment", element: <InvestmentPage /> },
+      { path: "reward", element: <RewardPage /> },
+      { path: "more/staking", element: <StakingPage /> },
+      { path: "transactions", element: <TransactionDetailsPage /> },
+      { path: "asset/:token", element: <AssetDetail /> },
+      { path: "more/staking/claim-reward", element: <ClaimRewardsPageWrapper /> },
       {
-        path: RoutePath.ENTERAMOUNTPAGE,
+        path: "more/staking/:crypto",
         element: <EnterAmountPageWrapper />, // Use the wrapper instead of direct component
       },
-      { path: RoutePath.TRANSFER, element: <CryptoTransferFlow /> },
-      { path: RoutePath.SETTINGS, element: <Settings /> },
+      { path: "transfer", element: <CryptoTransferFlow /> },
+      { path: "more/settings", element: <Settings /> },
     ],
   },
   // Nested route under settings (protected)

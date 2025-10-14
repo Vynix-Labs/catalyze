@@ -76,19 +76,21 @@ export class BalancesService<T extends Database> {
       .from(balances)
       .where(and(eq(balances.userId, userId), eq(balances.tokenSymbol, token)));
 
-    if (!row) return null;
+    const balance = Number(row?.balance ?? 0);
 
-    const [price] = await this.db
+    const [priceRow] = await this.db
       .select()
       .from(priceFeeds)
       .where(eq(priceFeeds.tokenSymbol, token.toLowerCase()));
 
-    const fiatEquivalent = coalescePrice(price, quote) * Number(row.balance ?? 0);
+    const price = coalescePrice(priceRow, quote);
+    const fiatEquivalent = price * balance;
 
     return {
-      tokenSymbol: row.tokenSymbol,
-      balance: row.balance?.toString() ?? "0",
+      tokenSymbol: token.toUpperCase(),
+      balance: balance.toString(),
       fiatEquivalent: fiatEquivalent.toFixed(2),
     };
   }
+
 }

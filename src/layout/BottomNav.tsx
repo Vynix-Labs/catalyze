@@ -16,23 +16,24 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab = "home" }) => {
       icon: <HomeIcon color={activeTab === "home" ? "#4F46E5" : "#6A7282"} />,
     },
     {
-      id: "investment",
-      label: "Investment",
-      path: RoutePath.INVESTMENT,
+      id: "staking",
+      label: "Staking",
+      path: RoutePath.STAKING,
       icon: (
-        <InvestmentIcon
-          color={activeTab === "investment" ? "#4F46E5" : "#6A7282"}
-        />
+        <RewardsIcon color={activeTab === "staking" ? "#4F46E5" : "#6A7282"} />
       ),
     },
     {
-      id: "rewards",
-      label: "Rewards",
-      path: RoutePath.REWARD,
+      id: "transactions",
+      label: "Transactions",
+      path: RoutePath.TRANSACTIONS,
       icon: (
-        <RewardsIcon color={activeTab === "rewards" ? "#4F46E5" : "#6A7282"} />
+        <InvestmentIcon
+          color={activeTab === "transactions" ? "#4F46E5" : "#6A7282"}
+        />
       ),
     },
+
     {
       id: "more",
       label: "More",
