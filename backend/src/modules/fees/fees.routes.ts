@@ -1,12 +1,9 @@
 import type { FastifyPluginAsync } from 'fastify'
+import { TRADING_FEES } from '../../config'
 
 const feesRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/trading', async () => {
-    // Hardcoded 1% buy and 1% sell for now
-    return {
-      buyPercent: 1,
-      sellPercent: 1,
-    }
+    return TRADING_FEES
   })
 }
 

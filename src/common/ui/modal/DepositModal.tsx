@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import GlobalModal from "./GlobalModal";
 import { CopyIcon } from "../../../assets/svg";
 import type { fiatResponse } from "../../../utils/types";
@@ -22,6 +22,69 @@ const DepositModal: React.FC<DepositModalProps> = ({
   depositData,
   isLoading,
 }) => {
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [isExpired, setIsExpired] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setTimeLeft(0);
+      setIsExpired(false);
+      return;
+    }
+
+    const defaultDurationMs = 30 * 60 * 1000;
+    const expiresAtMs = (() => {
+      const expiresOn = depositData?.paymentInstructions.expiresOn;
+      if (expiresOn) {
+        const parsed = new Date(expiresOn).getTime();
+        if (!Number.isNaN(parsed)) {
+          return parsed;
+        }
+      }
+      const requestTime = depositData?.paymentInstructions.requestTime;
+      if (requestTime) {
+        const parsedRequest = new Date(requestTime).getTime();
+        if (!Number.isNaN(parsedRequest)) {
+          const durationSeconds = depositData?.paymentInstructions.accountDurationSeconds ?? 30 * 60;
+          return parsedRequest + durationSeconds * 1000;
+        }
+      }
+      return Date.now() + defaultDurationMs;
+    })();
+
+    const updateTimeLeft = () => {
+      const remaining = Math.max(Math.floor((expiresAtMs - Date.now()) / 1000), 0);
+      setTimeLeft(remaining);
+      setIsExpired(remaining <= 0);
+      return remaining;
+    };
+
+    if (updateTimeLeft() <= 0) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      const remaining = updateTimeLeft();
+      if (remaining <= 0) {
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [depositData, isOpen]);
+
+  const formattedTimeLeft = useMemo(() => {
+    const minutes = Math.floor(timeLeft / 60)
+      .toString()
+      .padStart(2, "0");
+    const seconds = (timeLeft % 60)
+      .toString()
+      .padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  }, [timeLeft]);
+
   const bankDetails = {
     bankName: depositData?.paymentInstructions.bankName || "",
     accountNumber: depositData?.paymentInstructions.accountNumber || "",
@@ -59,7 +122,7 @@ const DepositModal: React.FC<DepositModalProps> = ({
       headingText="Deposit"
       btnText="I've made the transfer"
       onProceed={onConfirm}
-      isProceedDisabled={false}
+      isProceedDisabled={Boolean(isExpired || isLoading)}
     >
       <div className=" space-y-4">
         <p className="text-base text-gray-600 py-2 max-w-[22rem]">
@@ -67,6 +130,12 @@ const DepositModal: React.FC<DepositModalProps> = ({
           <strong className="text-primary-100">{bankDetails.amount}</strong> to
           the checkout details below
         </p>
+
+        <div className="bg-red-50 border border-red-100 text-red-600 rounded-lg px-3 py-2 text-sm">
+          {isExpired
+            ? "Payment window has expired. Please initiate a new deposit request."
+            : `Complete payment within ${formattedTimeLeft}.`}
+        </div>
 
         {/* Loop Bank Details */}
         <div className="space-y-2">
