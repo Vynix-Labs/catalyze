@@ -51,18 +51,20 @@ function VerifyEmail() {
   const handleResetPasswordVerification = () => {
     authClient.emailOtp.checkVerificationOtp(
       {
-        email: decodeURIComponent(email || ""),
+        email: decodeURIComponent(email!),
         otp,
         type: "forget-password",
       },
       {
         onSuccess: () => {
           toast.success("OTP verified successfully");
-          // Navigate to reset password page instead of create password
+          // Persist OTP for the next step and navigate with email as path param
+          setOtpAtom(otp);
           navigate(
-            `${RoutePath.CREATE_PASSWORD}?email=${encodeURIComponent(
-              email || ""
-            )}`
+            RoutePath.CREATE_PASSWORD.replace(
+              ":email",
+              encodeURIComponent(email!)
+            )
           );
         },
         onError: (error) => {
