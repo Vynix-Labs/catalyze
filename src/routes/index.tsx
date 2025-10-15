@@ -18,7 +18,7 @@ import StakingPage from "../pages/more/staking";
 import NotFound from "../pages/notFound";
 import RewardPage from "../pages/reward";
 import PersonalInfo from "../pages/settings/personalInfo";
-import SetPin from "../pages/settings/SetPin";
+import SetPin from "../pages/settings/setPin";
 import Settings from "../pages/settings/settings";
 import UpdatePassword from "../pages/settings/updatePassword";
 import { RoutePath } from "./routePath";
