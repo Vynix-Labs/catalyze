@@ -6,13 +6,7 @@ import {
   useValidateMonnifyAccount,
 } from "../../hooks/useFiat";
 import type { BankResponse, BankSelectionStepProps } from "../../types/types";
-
-// Currency icon mapping
-const currencyIcons = {
-  USDT: "/images/usdt.png",
-  USDC: "/images/usdc.png",
-  STRK: "/images/strk.png",
-};
+import { currencyIcons } from "../../utils";
 
 const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
   selectedBank,

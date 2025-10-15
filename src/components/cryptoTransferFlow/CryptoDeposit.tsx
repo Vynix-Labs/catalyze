@@ -3,15 +3,10 @@ import { QRCodeCanvas } from "qrcode.react";
 import type { CryptoComponentProps } from "../../types/types";
 import { CopyIcon } from "../../assets/svg";
 import { useCryptoAddress } from "../../hooks";
+import { currencyIcons } from "../../utils";
 
 // Currency Icon Component (you need to implement this)
 const CurrencyIcon = ({ currencyType }: { currencyType: string }) => {
-  const currencyIcons = {
-    USDT: "/images/usdt.png",
-    USDC: "/images/usdc.png",
-    STRK: "/images/strk.png",
-  };
-
   const iconPath = currencyIcons[currencyType.toUpperCase() as keyof typeof currencyIcons];
 
   if (iconPath) {

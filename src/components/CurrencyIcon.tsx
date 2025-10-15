@@ -1,14 +1,6 @@
 // Currency icon component
 import { currencyIcons } from "../utils";
 
-// Currency icon mapping
-// const currencyIcons = {
-//   USDT: "/images/usdt.png",
-//   USDC: "/images/usdc.png",
-//   STRK: "/images/strk.png",
-//   UNKNOWN: "/images/default-currency.png",
-// };
-
 const CurrencyIcon = ({
   currencyType,
   size = "small",

@@ -9,15 +9,7 @@ import {
 } from "../../assets/svg";
 import { type Asset } from "../../components/Assets";
 import { useTokenBalance, useTransactions } from "../../hooks";
-
-// Currency icon mapping
-const currencyIcons = {
-  USDT: "/images/usdt.png",
-  USDC: "/images/usdc.png",
-  STRK: "/images/strk.png",
-  WBTC: "/images/btc.png",
-  WETH: "/images/eth.png",
-};
+import { currencyIcons } from "../../utils";
 
 type TransferProps = {
   transferType: "transfer" | "deposit";

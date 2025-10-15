@@ -10,13 +10,7 @@ import {
 import type { CurrencyDetailPageProps } from "../../types/types";
 import GlobalModal from "../../common/ui/modal/GlobalModal";
 import Assets, { type Asset } from "../../components/Assets";
-
-// Currency icon mapping
-const currencyIcons = {
-  USDT: "/images/usdt.png",
-  USDC: "/images/usdc.png",
-  STRK: "/images/strk.png",
-};
+import { currencyIcons } from "../../utils";
 
 // Fallback component for unknown currencies
 const FallbackIcon = ({ currencyType }: { currencyType: string }) => (
