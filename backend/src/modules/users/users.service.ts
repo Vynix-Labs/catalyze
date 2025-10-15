@@ -66,6 +66,32 @@ export class BalancesService<T extends Database> {
     };
   }
 
+  async computeFiatForBalances(
+    inputs: { tokenSymbol: string; balance: number }[],
+    quote: PriceQuoteType = "base"
+  ) {
+    const prices = await this.db.select().from(priceFeeds);
+
+    let totalFiat = 0;
+    const items = inputs.map(({ tokenSymbol, balance }) => {
+      const priceRow = selectPriceRow(prices, tokenSymbol);
+      const price = coalescePrice(priceRow, quote);
+      const fiatEquivalent = Number(balance ?? 0) * price;
+      totalFiat += fiatEquivalent;
+
+      return {
+        tokenSymbol: tokenSymbol.toUpperCase(),
+        balance: balance.toString(),
+        fiatEquivalent: fiatEquivalent.toFixed(2),
+      };
+    });
+
+    return {
+      items,
+      totalFiat: totalFiat.toFixed(2),
+    };
+  }
+
 
   /**
    * Get a specific token balance for a user with fiat equivalent

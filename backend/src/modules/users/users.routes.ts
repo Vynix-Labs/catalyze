@@ -26,7 +26,20 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       const userId = request.currentUserId as string;
       const { quote } = BalanceQuery.parse(request.query ?? {});
-      const result = await svc.listUserBalances(userId, quote);
+      const headers = new Headers();
+      Object.entries(request.headers).forEach(([key, value]) => {
+        if (value) headers.append(key, value.toString());
+      });
+      const bearToken = await fastify.auth.api.getToken({ headers });
+      const wallet = await ensureUserWallet(fastify, userId, "starknet", bearToken.token);
+      const tokens: CryptoCurrency[] = ["usdt", "usdc", "strk", "weth", "wbtc"];
+      const onchain = await Promise.all(
+        tokens.map(async (t) => {
+          const b = await getNormalizedBalance(wallet.publicKey, t);
+          return { tokenSymbol: t, balance: b?.balance ?? 0 };
+        })
+      );
+      const result = await svc.computeFiatForBalances(onchain, quote);
       return reply.code(200).send(BalancesResponse.parse(result));
     }
   );
@@ -111,12 +124,21 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
       const userId = request.currentUserId as string;
       const { token } = BalanceParam.parse(request.params);
       const normalizedToken = token.toLowerCase();
-
       const { quote } = BalanceQuery.parse(request.query ?? {});
-      const result = await svc.getUserBalance(userId, normalizedToken, quote);
-      if (!result) return reply.code(404).send({ error: "Balance not found" });
-
-      return reply.code(200).send(BalanceResponse.parse(result));
+      const headers = new Headers();
+      Object.entries(request.headers).forEach(([key, value]) => {
+        if (value) headers.append(key, value.toString());
+      });
+      const bearToken = await fastify.auth.api.getToken({ headers });
+      const wallet = await ensureUserWallet(fastify, userId, "starknet", bearToken.token);
+      const b = await getNormalizedBalance(wallet.publicKey, normalizedToken as CryptoCurrency);
+      if (!b) return reply.code(404).send({ error: "Balance not found" });
+      const computed = await svc.computeFiatForBalances(
+        [{ tokenSymbol: normalizedToken, balance: b.balance }],
+        quote
+      );
+      const item = computed.items[0];
+      return reply.code(200).send(BalanceResponse.parse(item));
     }
   );
 };
