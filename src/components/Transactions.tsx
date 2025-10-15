@@ -19,6 +19,7 @@ export interface Transaction {
   currency?: string;
   type: string; // Make more flexible instead of strict union
   currencyType?: string; // Remove strict union
+  subtype?: string;
 }
 
 interface TransactionsProps {
@@ -119,8 +120,8 @@ const Transactions: React.FC<TransactionsProps> = ({
                   }`}
                 >
                   {transaction.type === "deposit" ? "+" : "-"}
-                  {transaction.currency || "₦"}
-                  {transaction.amount}
+                  {transaction.subtype === "fiat" ? transaction.currency || "₦" : ""}
+                  {Number(transaction.amount).toFixed(2)}
                 </span>
               </div>
             </div>

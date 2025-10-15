@@ -11,8 +11,8 @@ const StakeDetails = ({ amount, pool }: StakeDetailsProps) => (
     <div className="space-y-4 mt-4">
       {[
         { label: "Staked", value: `${amount} ${pool.name}` },
-        { label: "APY", value: `${pool.apy}%`, className: "text-green-500" },
-        { label: "Next Reward", value: "24 hrs" },
+        { label: "APY", value: `${Number(pool.apy * 100).toFixed(2)}%`, className: "text-green-500" },
+        // { label: "Next Reward", value: "24 hrs" },
       ].map((item, index) => (
         <div key={index} className="flex justify-between items-center py-2">
           <span className="text-gray-600 text-xs">{item.label}</span>

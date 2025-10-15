@@ -130,6 +130,7 @@ const Home: React.FC = () => {
       currency: "₦",
       type: tx.type as "transfer" | "deposit" | "withdrawal",
       currencyType: tx.tokenSymbol,
+      subtype: tx.subtype as string,
     })) || [];
 
   // Helper function to get token name from symbol

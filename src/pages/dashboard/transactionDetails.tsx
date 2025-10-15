@@ -84,7 +84,7 @@ const TransactionDetailsPage = () => {
                           : ""}
                         {transaction.subtype === "fiat"
                           ? `N${transaction.amountFiat}`
-                          : `${transaction.tokenSymbol} ${transaction.amountToken}`}
+                          : `${Number(transaction.amountToken).toFixed(2)}`}
                       </span>
                     </div>
                   </div>
