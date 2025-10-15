@@ -234,7 +234,6 @@ const StakingPage = () => {
           ) : (
             <div className="grid grid-cols-1 gap-4 mb-12">
               {pools?.strategies.map((pool) => {
-                const currencyType = detectCurrencyType(pool.name);
                 const isHighlighted =
                   highlightedPool?.toString() === pool.id.toString();
 
@@ -253,7 +252,7 @@ const StakingPage = () => {
                         <div className="flex gap-2 w-full items-center">
                           <div className="rounded-full w-10 h-10 flex items-center justify-center overflow-hidden">
                             <CurrencyIcon
-                              currencyType={currencyType ?? ""}
+                              currencyType={pool.tokenSymbol}
                               size="large"
                             />
                           </div>
