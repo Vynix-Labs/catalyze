@@ -12,6 +12,9 @@ concurrency:
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
+    env:
+      VITE_AUTH_BASE_URL: https://catalyze-api.apps.ikem.dev/api/auth
+      VITE_BASE_URL: https://catalyze-api.apps.ikem.dev/api
     steps:
       - uses: actions/checkout@v4
 
