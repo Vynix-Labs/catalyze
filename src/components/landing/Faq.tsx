@@ -5,6 +5,14 @@ import Accordion from "./FaqDropDown";
 
 function Faq() {
   const [activeAccordion, setActiveAccordion] = useState<number | null>(1);
+
+  const scrollToWaitlist = () => {
+    const element = document.getElementById("waitlist-cta");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
+
   return (
     <section className="md:pt-30 md:pb-25 py-8  px-4">
       <div className="md:max-w-6xl mx-auto flex flex-col md:flex-row gap-6 md:gap-14.5">
@@ -22,6 +30,7 @@ function Faq() {
           <Button
             variants="primary" fullWidth
             classes="text-sm md:text-base md:!w-fit text-nowrap px-6 py-3 font-bold shadow-[inset_4px_4px_16px_#0647DF]"
+            handleClick={scrollToWaitlist}
           >
             Join waitlist
           </Button>

@@ -1,8 +1,12 @@
 import Button from "../../common/ui/button";
 import bg from "../../assets/images/cta_bg.png";
+import { useWaitlist } from "../../hooks/useWaitlist";
+
 function CtaSection() {
+  const { email, setEmail, isLoading, handleJoinWaitlist } = useWaitlist();
+
   return (
-    <section className="px-4">
+    <section id="waitlist-cta" className="px-4">
       <div
         style={{
           backgroundImage: `url(${bg})`,
@@ -23,15 +27,20 @@ function CtaSection() {
         <div className="relative max-w-[35rem] w-full bg-white/40 rounded-full h-14  md:h-16 overflow-hidden ">
           <input
             type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="email address"
             className="w-full h-full md:px-11 md:py-5.5 pl-4 outline-none border-0 text-xs md:text-base font-semibold text-white placeholder:capitalize placeholder:text-white"
+            onKeyPress={(e) => e.key === "Enter" && handleJoinWaitlist()}
           />
           <div className="absolute top-1/2 right-1.5 -translate-y-1/2">
             <Button
               variants="primary" fullWidth
               classes="text-xs md:text-base !w-fit text-nowrap md:px-6 md:py-3 capitalize font-bold shadow-[inset_4px_4px_16px_#0647DF]"
+              handleClick={handleJoinWaitlist}
+              disabled={isLoading}
             >
-              join waitlist today!
+              {isLoading ? "Joining..." : "join waitlist today!"}
             </Button>
           </div>
         </div>

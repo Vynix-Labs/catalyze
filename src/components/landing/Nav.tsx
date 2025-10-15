@@ -13,6 +13,13 @@ function Nav() {
   const lastScrollY = useRef(window.scrollY);
   const dropDownRef = useRef<HTMLLIElement | null>(null);
 
+  const scrollToWaitlist = () => {
+    const element = document.getElementById("waitlist-cta");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
+
   // Add inside your Nav component
   useEffect(() => {
     if (mobileMenuOpen) {
@@ -145,6 +152,7 @@ function Nav() {
               <Button
                 variants="primary"
                 classes="text-base text-nowrap px-6 py-3 font-bold shadow-[inset_4px_4px_16px_#0647DF]"
+                handleClick={scrollToWaitlist}
               >
                 Join waitlist
               </Button>
@@ -258,7 +266,10 @@ function Nav() {
                   fullWidth
                   variants="primary"
                   classes="w-full text-sm py-3 font-bold shadow-[inset_4px_4px_16px_#0647DF]"
-                  handleClick={() => setMobileMenuOpen(false)}
+                  handleClick={() => {
+                    setMobileMenuOpen(false);
+                    scrollToWaitlist();
+                  }}
                 >
                   Join waitlist
                 </Button>

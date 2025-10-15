@@ -63,4 +63,8 @@ export const endpoints = {
     unstake: "/staking/unstake",
     user_stakes: "/staking/user-stakes",
   },
+
+  waitlist: {
+    join: "/waitlist/join",
+  },
 };

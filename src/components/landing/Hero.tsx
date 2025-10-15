@@ -6,7 +6,11 @@ import bitcoin from "../../assets/images/bitcoin.png";
 import ethereum from "../../assets/images/ethereum.png";
 import Button from "../../common/ui/button";
 import { motion } from "framer-motion";
+import { useWaitlist } from "../../hooks/useWaitlist";
+
 function Hero() {
+  const { email, setEmail, isLoading, showInput, setShowInput, handleJoinWaitlist } = useWaitlist();
+
   return (
     <section
       className="bg-cover bg-center bg-no-repeat pt-32 px-4 md:px-0 md:pt-46 space-y-14 min-h-svh sm:min-h-screen "
@@ -26,12 +30,34 @@ function Hero() {
             Empowering you Through Micro-Investments in Digital Assets
           </p>
         </div>
-        <Button
-          variants="primary"
-          classes="text-base text-nowrap px-6 !w-fit py-3 font-bold shadow-[inset_4px_4px_16px_#0647DF]"
-        >
-          Join waitlist Today!
-        </Button>
+        {!showInput ? (
+          <Button
+            variants="primary"
+            classes="text-base text-nowrap px-6 !w-fit py-3 font-bold shadow-[inset_4px_4px_16px_#0647DF]"
+            handleClick={() => setShowInput(true)}
+          >
+            Join waitlist Today!
+          </Button>
+        ) : (
+          <div className="flex gap-2 items-center w-full max-w-md">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              className="flex-1 px-4 py-3 rounded-full border border-gray-300 outline-none focus:border-primary-100"
+              onKeyPress={(e) => e.key === "Enter" && handleJoinWaitlist()}
+            />
+            <Button
+              variants="primary"
+              classes="text-base text-nowrap px-6 !w-fit py-3 font-bold shadow-[inset_4px_4px_16px_#0647DF]"
+              handleClick={handleJoinWaitlist}
+              disabled={isLoading}
+            >
+              {isLoading ? "Joining..." : "Join"}
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="relative">

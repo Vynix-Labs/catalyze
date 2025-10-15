@@ -2,7 +2,16 @@ import { Check } from "lucide-react";
 import iphone_top from "../../assets/images/iphone 15.png";
 import iphone_bottom from "../../assets/images/iphone_bottom.png";
 import Button from "../../common/ui/button";
+
 function FeaturesSection() {
+
+  const scrollToWaitlist = () => {
+    const element = document.getElementById("waitlist-cta");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
+
   return (
     <section className="lg:py-30 pb-14 space-y-20 px-4 lg:px-6 bg-[#FEFEFE]">
       <div className="lg:max-w-6xl flex flex-col lg:flex-row gap-6 md:gap-16 justify-between mx-auto items-center">
@@ -56,6 +65,7 @@ function FeaturesSection() {
               variants="primary"
               fullWidth
               classes="text-sm lg:text-base md:!w-fit text-nowrap px-6 py-3 font-bold shadow-[inset_4px_4px_16px_#0647DF]"
+              handleClick={scrollToWaitlist}
             >
               Join waitlist
             </Button>
@@ -115,6 +125,7 @@ function FeaturesSection() {
               variants="primary"
               fullWidth
               classes="text-sm lg:text-base md:!w-fit text-nowrap px-6 py-3 font-bold shadow-[inset_4px_4px_16px_#0647DF]"
+              handleClick={scrollToWaitlist}
             >
               Join waitlist
             </Button>

@@ -29,14 +29,17 @@ import AssetDetail from "../pages/dashboard/AssetDetails";
 export const routes = createBrowserRouter([
   {
     path: RoutePath.ROOT,
-    element: <Onboarding />,
+    element: <LandingPage />,
     errorElement: <NotFound />,
     index: true,
   },
-  { path: RoutePath.LANDING, element: <LandingPage /> },
+  {
+    path: RoutePath.ONBOARDING,
+    element: <Onboarding />,
+  },
 
   {
-    path: "/dashboard",
+    path: "/app/dashboard",
     element: (
       <ProtectedRoute>
         <Layout />
@@ -87,7 +90,7 @@ export const routes = createBrowserRouter([
   },
 
   {
-    path: "/auth",
+    path: "/app/auth",
     children: [
       { path: RoutePath.CREATE_ACCOUNT, element: <SignUp /> },
       { path: RoutePath.RESET_OTP, element: <VerifyEmail /> },
