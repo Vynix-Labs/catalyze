@@ -51,6 +51,23 @@ const StakingPage = () => {
   // Derive hasStakes from actual data
   const hasStakes = userStakes?.stakes && userStakes.stakes.length > 0;
 
+  const totalStaked = hasStakes
+    ? userStakes!.stakes.reduce(
+        (acc, s) => acc + Number(s.amountStaked || 0),
+        0
+      )
+    : 0;
+  const symbolSet = new Set(
+    (userStakes?.stakes || []).map((s) => (s.tokenSymbol || "").toUpperCase())
+  );
+  const singleSymbol = symbolSet.size === 1 ? Array.from(symbolSet)[0] : "";
+  const avgApy = hasStakes && totalStaked > 0
+    ? userStakes!.stakes.reduce(
+        (acc, s) => acc + Number(s.apy || 0) * Number(s.amountStaked || 0),
+        0
+      ) / totalStaked
+    : 0;
+
   // Handle pool selection with highlight effect
   const handlePoolClick = (pool: Pool) => {
     setHighlightedPool(pool.id);
@@ -165,9 +182,9 @@ const StakingPage = () => {
               <p className="text-gray-600 flex gap-2 items-center text-sm font-bold">
                 <LockIcon className="text-primary-100" /> Total Staked
               </p>
-              <h2 className="text-base font-bold text-gray-800">₦127,450</h2>
+              <h2 className="text-base font-bold text-gray-800">{singleSymbol ? `${totalStaked} ${singleSymbol}` : totalStaked}</h2>
               <span className="text-green-500 text-sm font-medium">
-                +12.5% earned
+                +N/A% earned
               </span>
             </div>
 
@@ -176,7 +193,7 @@ const StakingPage = () => {
                 <ArrowSquareOutIcon className="text-green-500" />
                 Avg. APY
               </p>
-              <h2 className="text-base font-bold text-gray-800">5.0%</h2>
+              <h2 className="text-base font-bold text-gray-800">{Number(avgApy * 100).toFixed(2)}%</h2>
               <span className="text-gray-500 text-sm">Account in post</span>
             </div>
           </div>
@@ -292,7 +309,7 @@ const StakingPage = () => {
                         <div className="flex items-center gap-2 text-xs text-neutral-500 mt-1">
                           <span>{stake.amountStaked}</span>
                           <div className="w-1 h-1 bg-gray-400 rounded-full" />
-                          <span>{stake.apy}% APY</span>
+                          <span>{Number(stake.apy * 100).toFixed(2)}% APY</span>
                         </div>
                         <p className="text-neutral-400 text-xs mt-1">
                           Lock Period:{" "}
@@ -301,7 +318,7 @@ const StakingPage = () => {
                       </div>
                     </div>
                     <span className="text-green-500 font-medium">
-                      {stake.apy}%
+                      {Number(stake.apy * 100).toFixed(2)}%
                     </span>
                   </div>
 
