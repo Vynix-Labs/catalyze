@@ -93,7 +93,7 @@ const BankSelectionStep: React.FC<BankSelectionStepProps> = ({
 
   // Currency Icon Component
   const CurrencyIcon = ({ currencyType }: { currencyType: string }) => {
-    const iconPath = currencyIcons[currencyType as keyof typeof currencyIcons];
+    const iconPath = currencyIcons[currencyType.toUpperCase() as keyof typeof currencyIcons];
 
     if (iconPath) {
       return (

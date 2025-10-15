@@ -70,7 +70,7 @@ const Transactions: React.FC<TransactionsProps> = ({
           const currencyType =
             transaction.currencyType || detectCurrencyType(transaction.title);
           const iconPath =
-            currencyIcons[currencyType as keyof typeof currencyIcons];
+            currencyIcons[currencyType.toUpperCase() as keyof typeof currencyIcons];
 
           return (
             <div

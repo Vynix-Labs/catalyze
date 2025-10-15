@@ -67,7 +67,7 @@ const EnterAmountPage = ({ pool, onBack }: EnterAmountPageProps) => {
           console.log("✅ Pin verified:", res);
 
           const payload = {
-            strategyId: pool.contractAddress,
+            strategyId: pool.id,
             amount: parseFloat(amount),
             pinToken: res.token,
           };

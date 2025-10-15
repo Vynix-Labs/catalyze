@@ -5,7 +5,7 @@ interface CurrencyIconProps {
 }
 
 const CurrencyIcon = ({ currencyType }: CurrencyIconProps) => {
-  const iconPath = currencyIcons[currencyType as keyof typeof currencyIcons];
+  const iconPath = currencyIcons[currencyType.toUpperCase() as keyof typeof currencyIcons];
   
   return (
     <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">

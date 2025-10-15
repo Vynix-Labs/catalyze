@@ -28,7 +28,7 @@ const PoolSelectionModal = ({
   const currencyType = detectCurrencyType(pool.name);
 
   const CurrencyIcon = ({ currencyType }: { currencyType: string }) => {
-    const iconPath = currencyIcons[currencyType as keyof typeof currencyIcons];
+    const iconPath = currencyIcons[currencyType.toUpperCase() as keyof typeof currencyIcons];
 
     if (iconPath) {
       return (
@@ -74,7 +74,7 @@ const PoolSelectionModal = ({
           <div className="flex justify-between pb-2">
             <span className="text-gray-600">APY</span>
             <span className="font-semibold text-green-500">
-              {pool.apy.toFixed(3)}%
+              {Number(pool.apy * 100).toFixed(3)}%
             </span>
           </div>
           <div className="flex justify-between pb-2">
@@ -83,7 +83,7 @@ const PoolSelectionModal = ({
           </div>
           <div className="flex justify-between pb-2">
             <span className="text-gray-600">Minimum Stake</span>
-            <span className="font-semibold">1 {pool.name}</span>
+            <span className="font-semibold">N/A</span>
           </div>
         </div>
       </div>

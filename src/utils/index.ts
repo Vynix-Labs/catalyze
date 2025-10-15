@@ -3,6 +3,7 @@ import wethIcon from "../assets/images/eth.png";
 import strkIcon from "../assets/images/strk.png";
 import usdcIcon from "../assets/images/usdc.png";
 import usdtIcon from "../assets/images/usdt.png";
+
 export const currencyIcons = {
   USDT: usdtIcon,
   USDC: usdcIcon,

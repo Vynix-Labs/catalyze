@@ -53,14 +53,14 @@ export const endpoints = {
     cryptoWithdraw: "/crypto/withdraw",
     cryptoDepositWebhook: "/crypto/deposit/webhook",
     stakingStrategies: "/staking/strategies",
-    stakingStake: "/staking/staking/stake",
-    stakingUnstake: "/staking/staking/unstake",
+    stakingStake: "/staking/stake",
+    stakingUnstake: "/staking/unstake",
   },
 
   staking: {
     strategies: "/staking/strategies",
-    stake: "/staking/staking/stake",
-    unstake: "/staking/staking/unstake",
+    stake: "/staking/stake",
+    unstake: "/staking/unstake",
     user_stakes: "/staking/user-stakes",
   },
 };

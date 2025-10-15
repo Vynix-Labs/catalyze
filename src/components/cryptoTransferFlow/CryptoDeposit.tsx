@@ -12,7 +12,7 @@ const CurrencyIcon = ({ currencyType }: { currencyType: string }) => {
     STRK: "/images/strk.png",
   };
 
-  const iconPath = currencyIcons[currencyType as keyof typeof currencyIcons];
+  const iconPath = currencyIcons[currencyType.toUpperCase() as keyof typeof currencyIcons];
 
   if (iconPath) {
     return (

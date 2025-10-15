@@ -1,6 +1,6 @@
 import { getStrategies } from "../../utils/troves/strategies";
 import { approveWithChipi, callContractWithChipi, stakeVesuUsdc } from "../../utils/wallet/chipi";
-import { validateSufficientBalance } from "../../utils/wallet/tokens";
+import { validateSufficientBalance, waitForAllowance } from "../../utils/wallet/tokens";
 import { TransactionsService } from "../transactions/transactions.service";
 // import { db } from "../../plugins/db";
 import type { WalletData } from "@chipi-pay/chipi-sdk";
@@ -116,7 +116,7 @@ export class StakingService {
       tokenSymbol,
       contractAddress,
       amountStaked: amount.toString(),
-      apy: strategy.apy.toString(),
+      apy: String(strategy.apy ?? 0),
       txHash: hash,
       status: "active" as const,
     });
@@ -160,6 +160,20 @@ export class StakingService {
 
       return { status: true, message: "Stake successful", txHash };
     } catch (err: unknown) {
+      // If the failure is a database insert/type error, do NOT attempt on-chain fallback again.
+      const emsg = err instanceof Error ? err.message : String(err);
+      let ecode: string | undefined = undefined;
+      if (err && typeof err === 'object' && 'code' in err) {
+        const val = (err as { code?: unknown }).code;
+        ecode = typeof val === 'string' ? val : undefined;
+      }
+      if (
+        emsg.includes('invalid input syntax for type uuid') ||
+        emsg.includes('PostgresError') ||
+        ecode === '22P02'
+      ) {
+        throw err;
+      }
       console.warn("Batched approve+deposit failed, falling back to two-step:", err);
       // Fallback path: if batched multi-address call is not supported, do two-step
       try {
@@ -173,6 +187,8 @@ export class StakingService {
 
         // Approve via Chipi helper
         await approveWithChipi(wallet as unknown as WalletData, contractAddress, amount, tokenSymbol);
+        // Wait for allowance to reflect on-chain before attempting deposit
+        await waitForAllowance(wallet.publicKey, contractAddress, amountWei, tokenSymbol);
 
         
         // Then deposit only (construct call directly to avoid array index)

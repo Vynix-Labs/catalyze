@@ -16,7 +16,7 @@ const CurrencyIcon = ({
   currencyType: string;
   size?: "small" | "large";
 }) => {
-  const iconPath = currencyIcons[currencyType as keyof typeof currencyIcons];
+  const iconPath = currencyIcons[currencyType.toUpperCase() as keyof typeof currencyIcons];
   const sizeClass = size === "large" ? "w-12 h-12" : "w-6 h-6";
   const imgSizeClass = size === "large" ? "w-12 h-12" : "w-6 h-6";
 

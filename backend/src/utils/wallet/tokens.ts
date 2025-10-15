@@ -1,4 +1,4 @@
-import { Contract, Provider } from "starknet";
+import { Contract, Provider, uint256 } from "starknet";
 import env from "../../config/env";
 import erc20Abi from "./erc20-abi";
 import { TOKEN_MAP, type CryptoCurrency } from "../../config";
@@ -21,6 +21,51 @@ export const TOKEN_DECIMALS: Record<CryptoCurrency, number> = {
  */
 export async function getTokenDecimals(currency: CryptoCurrency): Promise<number> {
   return TOKEN_DECIMALS[currency]
+}
+
+type U256Like = { low: string | bigint; high: string | bigint } | [string | bigint, string | bigint] | string | bigint | number;
+
+export async function getAllowanceU256(
+  owner: string,
+  spender: string,
+  currency: CryptoCurrency
+): Promise<bigint> {
+  const contract = new Contract(erc20Abi, TOKEN_MAP[currency], provider);
+  const allowanceFn = contract.functions?.allowance;
+  const res: U256Like = await (
+    typeof allowanceFn === "function"
+      ? allowanceFn(owner, spender)
+      : contract.call("allowance", [owner, spender])
+  );
+  if (res && typeof res === "object" && !Array.isArray(res) && "low" in res && "high" in res) {
+    const obj = res as { low: string | bigint; high: string | bigint };
+    return uint256.uint256ToBN({ low: BigInt(obj.low), high: BigInt(obj.high) });
+  }
+  if (Array.isArray(res) && res.length >= 2) {
+    const arr = res as [string | bigint, string | bigint];
+    return uint256.uint256ToBN({ low: BigInt(arr[0]), high: BigInt(arr[1]) });
+  }
+  if (typeof res === "string" || typeof res === "number" || typeof res === "bigint") {
+    return BigInt(res);
+  }
+  throw new Error("Unexpected allowance result shape");
+}
+
+export async function waitForAllowance(
+  owner: string,
+  spender: string,
+  required: bigint,
+  currency: CryptoCurrency,
+  timeoutMs = 60000,
+  intervalMs = 2000
+): Promise<void> {
+  const start = Date.now();
+  for (;;) {
+    const current = await getAllowanceU256(owner, spender, currency);
+    if (current >= required) return;
+    if (Date.now() - start > timeoutMs) throw new Error("Allowance not updated in time");
+    await new Promise((r) => setTimeout(r, intervalMs));
+  }
 }
 
 
