@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { strategies, stake } from "../utils/types";
 import { axiosInstance } from "../api/axios";
 import { endpoints } from "../api/endpoints";
@@ -43,6 +43,7 @@ export const useStrategies = () => {
   });
 };
 export const useStake = () => {
+  const queryClient = useQueryClient();
   return useMutation<
     stake,
     Error,
@@ -62,9 +63,13 @@ export const useStake = () => {
         throw error;
       }
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user-stakes"] });
+    },
   });
 };
 export const useUnstake = () => {
+  const queryClient = useQueryClient();
   return useMutation<
     stake,
     Error,
@@ -84,9 +89,13 @@ export const useUnstake = () => {
         throw error;
       }
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user-stakes"] });
+    },
   });
 };
 export const useGetStakes = () => {
+  const { logout } = useAuthState();
   return useQuery<userStakes, Error>({
     queryKey: ["user-stakes"],
     queryFn: async () => {
@@ -95,6 +104,9 @@ export const useGetStakes = () => {
         return response.data;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
+        if (error?.response?.status === 401) {
+          logout();
+        }
         console.error(
           "❌ Failed to fetch user stakes:",
           error?.message || error
