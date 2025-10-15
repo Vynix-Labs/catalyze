@@ -9,7 +9,9 @@ export const currencyIcons = {
   USDC: usdcIcon,
   STRK: strkIcon,
   UNKNOWN: usdtIcon, // fallback to usdt icon
+  ETH: wethIcon,
   WETH: wethIcon,
+  BTC: wbtcIcon,
   WBTC: wbtcIcon,
 };
 
