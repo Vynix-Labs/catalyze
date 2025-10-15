@@ -114,6 +114,7 @@ function Login() {
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, navigate, from]);
+  
   const handleFormSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     const payload = {
