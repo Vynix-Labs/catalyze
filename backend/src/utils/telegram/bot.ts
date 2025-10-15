@@ -2,18 +2,118 @@ import TelegramBot from "node-telegram-bot-api";
 import env from "../../config/env";
 
 const { TELEGRAM_TOKEN, ADMIN_CHAT_ID, MONNIFY_API_KEY, MONNIFY_SECRET_KEY, MONNIFY_BASE_URL } = env;
+const { APP_URL, ADMIN_API_TOKEN } = env;
 
 const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: true });
+
+// Approve withdrawal (manual)
+bot.onText(/\/approve (\S+)(?:\s+(\S+))?/, async (msg, match) => {
+  const chatId = msg.chat.id.toString();
+  if (chatId !== ADMIN_CHAT_ID) {
+    return bot.sendMessage(chatId, "You are not authorized.");
+  }
+  const reference = match?.[1];
+  const proofUrl = match?.[2];
+  if (!reference) return bot.sendMessage(chatId, "Usage: /approve <reference> [proofUrl]");
+
+  try {
+    const resp = await fetch(`${APP_URL}/fiat/admin/withdraw/${reference}/approve`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-token": ADMIN_API_TOKEN || "",
+      },
+      body: JSON.stringify({ proofUrl }),
+    });
+    if (resp.ok) {
+      bot.sendMessage(chatId, `Approved ${reference}`);
+    } else {
+      const txt = await resp.text();
+      bot.sendMessage(chatId, `Approve failed: ${txt}`);
+    }
+  } catch (err: unknown) {
+    const msgText = err instanceof Error ? err.message : String(err);
+    bot.sendMessage(chatId, `Error: ${msgText}`);
+  }
+});
+
+// Reject withdrawal (manual)
+bot.onText(/\/reject (\S+)(?:\s+([\s\S]+))?/, async (msg, match) => {
+  const chatId = msg.chat.id.toString();
+  if (chatId !== ADMIN_CHAT_ID) {
+    return bot.sendMessage(chatId, "You are not authorized.");
+  }
+  const reference = match?.[1];
+  const reason = match?.[2];
+  if (!reference) return bot.sendMessage(chatId, "Usage: /reject <reference> [reason]");
+
+  try {
+    const resp = await fetch(`${APP_URL}/fiat/admin/withdraw/${reference}/reject`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-token": ADMIN_API_TOKEN || "",
+      },
+      body: JSON.stringify({ reason }),
+    });
+    if (resp.ok) {
+      bot.sendMessage(chatId, `Rejected ${reference}`);
+    } else {
+      const txt = await resp.text();
+      bot.sendMessage(chatId, `Reject failed: ${txt}`);
+    }
+  } catch (err: unknown) {
+    const msgText = err instanceof Error ? err.message : String(err);
+    bot.sendMessage(chatId, `Error: ${msgText}`);
+  }
+});
 let botStopped = false;
 
 // Send message helper
-export function notifyAdminOfWithdrawal(reference: string, amount: number, bank: string) {
-  bot.sendMessage(
-    ADMIN_CHAT_ID,
-    `New withdrawal request:\n\nRef: ${reference}\nAmount: ₦${amount}\nBank: ${bank}\n\nReply with OTP using:\n/otp ${reference} 123456`
-  )
-  .then(() => console.log("Telegram message sent"))
-  .catch((err) => console.error("Telegram sendMessage failed:", err));
+export function notifyAdminOfWithdrawal(details: {
+  reference: string;
+  amountFiat: number;
+  tokenSymbol: string;
+  amountToken: string | number;
+  bankName: string;
+  bankCode?: string;
+  accountNumber: string;
+  narration?: string;
+  userId: string;
+  userName?: string | null;
+  userEmail?: string | null;
+}) {
+  const {
+    reference,
+    amountFiat,
+    tokenSymbol,
+    amountToken,
+    bankName,
+    bankCode,
+    accountNumber,
+    narration,
+    userId,
+    userName,
+    userEmail,
+  } = details;
+
+  const lines = [
+    `New withdrawal request`,
+    `Ref: ${reference}`,
+    `User: ${userName ?? "N/A"} (${userEmail ?? "N/A"})`,
+    `UserId: ${userId}`,
+    `Fiat: ₦${amountFiat}`,
+    `Token: ${amountToken} ${tokenSymbol}`,
+    `Bank: ${bankName} ${bankCode ? `(${bankCode})` : ""}`.trim(),
+    `Account: ${accountNumber}`,
+    narration ? `Narration: ${narration}` : undefined,
+    `\nMonnify flow: /otp ${reference} 123456`,
+  ].filter(Boolean);
+
+  bot
+    .sendMessage(ADMIN_CHAT_ID, lines.join("\n"))
+    .then(() => console.log("Telegram message sent"))
+    .catch((err) => console.error("Telegram sendMessage failed:", err));
 }
 
 export async function shutdownTelegramBot() {

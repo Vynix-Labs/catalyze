@@ -46,6 +46,9 @@ const envSchema = z.object({
 
   TELEGRAM_TOKEN: z.string().min(1),
   ADMIN_CHAT_ID: z.string().min(1),
+  // Manual withdrawals PoC
+  MANUAL_WITHDRAWALS: z.coerce.boolean().optional().default(true),
+  ADMIN_API_TOKEN: z.string().optional(),
 });
 
 export type env = z.infer<typeof envSchema>;

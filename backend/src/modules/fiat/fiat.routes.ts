@@ -1,8 +1,11 @@
-import type { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsync, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { requireAuth } from "../../plugins/requireAuth";
 import { initiateFiatDepositSchema, FiatDepositResponse, SuccessResponse, ErrorResponse, initiateFiatTransferSchema, FiatTransferResponse, TransferStatusResponse, AuthorizeTransferSchema } from "./fiat.schema";
 import { handleMonnifyWebhook, syncTransferStatus } from "./fiat.service";
+import { eq, and } from "drizzle-orm";
+import env from "../../config/env";
+import { withdrawRequests, transactions, balances } from "../../db/schema";
 import { monnify } from "./fiat.service";
 
 const fiatRoutes: FastifyPluginAsync = async (fastify) => {
@@ -34,6 +37,158 @@ const fiatRoutes: FastifyPluginAsync = async (fastify) => {
         fastify.log.error(err);
         return reply.code(400).send(ErrorResponse.parse({ error: (err as Error).message }));
       }
+    }
+  );
+
+  // ------------------- ADMIN: APPROVE/REJECT (MANUAL MODE) -------------------
+  const assertAdmin = (req: FastifyRequest) => {
+    const token = req.headers["x-admin-token"] as string | undefined;
+    if (!env.ADMIN_API_TOKEN || token !== env.ADMIN_API_TOKEN) {
+      const err = new Error("unauthorized") as Error & { statusCode: number };
+      err.statusCode = 401;
+      throw err;
+    }
+  };
+
+  fastify.post(
+    "/admin/withdraw/:reference/approve",
+    {
+      schema: {
+        description: "Admin approve withdrawal (manual)",
+        tags: ["Fiat"],
+        params: z.object({ reference: z.string() }),
+        body: z
+          .object({ proofUrl: z.string().url().optional(), note: z.string().optional() })
+          .optional(),
+      },
+    },
+    async (req, reply) => {
+      assertAdmin(req);
+      const { reference } = req.params as { reference: string };
+      const body = (req.body as { proofUrl?: string; note?: string }) || {};
+
+      await fastify.db.transaction(async (tx) => {
+        await tx
+          .update(withdrawRequests)
+          .set({ status: "completed", updatedAt: new Date() })
+          .where(eq(withdrawRequests.reference, reference));
+
+        const [txRow] = await tx
+          .select()
+          .from(transactions)
+          .where(eq(transactions.reference, reference));
+
+        if (txRow) {
+          const meta = (() => {
+            try {
+              const base = typeof txRow.metadata === "string" ? JSON.parse(txRow.metadata) : txRow.metadata || {};
+              return { ...base, proofUrl: body.proofUrl, note: body.note };
+            } catch {
+              return { proofUrl: body.proofUrl, note: body.note };
+            }
+          })();
+
+          await tx
+            .update(transactions)
+            .set({ status: "completed", updatedAt: new Date(), metadata: JSON.stringify(meta) })
+            .where(eq(transactions.id, txRow.id));
+        }
+      });
+
+      return reply.code(200).send({ success: true });
+    }
+  );
+
+  fastify.post(
+    "/admin/withdraw/:reference/reject",
+    {
+      schema: {
+        description: "Admin reject withdrawal (manual); refunds token balance",
+        tags: ["Fiat"],
+        params: z.object({ reference: z.string() }),
+        body: z
+          .object({ reason: z.string().optional() })
+          .optional(),
+      },
+    },
+    async (req, reply) => {
+      assertAdmin(req);
+      const { reference } = req.params as { reference: string };
+      const body = (req.body as { reason?: string }) || {};
+
+      await fastify.db.transaction(async (tx) => {
+        // set failed on withdraw + tx
+        await tx
+          .update(withdrawRequests)
+          .set({ status: "failed", updatedAt: new Date() })
+          .where(eq(withdrawRequests.reference, reference));
+
+        const [txRow] = await tx
+          .select()
+          .from(transactions)
+          .where(eq(transactions.reference, reference));
+
+        if (txRow) {
+          const meta = (() => {
+            try {
+              const base = typeof txRow.metadata === "string" ? JSON.parse(txRow.metadata) : txRow.metadata || {};
+              return { ...base, rejectReason: body.reason };
+            } catch {
+              return { rejectReason: body.reason };
+            }
+          })();
+
+          await tx
+            .update(transactions)
+            .set({ status: "failed", updatedAt: new Date(), metadata: JSON.stringify(meta) })
+            .where(eq(transactions.id, txRow.id));
+
+          // refund off-chain balance
+          const [wr] = await tx
+            .select()
+            .from(withdrawRequests)
+            .where(eq(withdrawRequests.reference, reference));
+          if (wr) {
+            const [bal] = await tx
+              .select()
+              .from(balances)
+              .where(and(eq(balances.userId, wr.userId), eq(balances.tokenSymbol, wr.tokenSymbol)));
+            if (bal) {
+              await tx
+                .update(balances)
+                .set({
+                  balance: (Number(bal.balance) + Number(wr.amountToken)).toString(),
+                  updatedAt: new Date(),
+                })
+                .where(eq(balances.id, bal.id));
+            }
+          }
+        }
+      });
+
+      return reply.code(200).send({ success: true });
+    }
+  );
+
+  // ------------------- DB-ONLY WITHDRAW STATUS (MANUAL MODE) -------------------
+  fastify.get(
+    "/withdraw/:reference/status",
+    {
+      preHandler: requireAuth(fastify),
+      schema: {
+        description: "Get withdraw status from DB only (manual mode)",
+        tags: ["Fiat"],
+        params: z.object({ reference: z.string() }),
+      },
+    },
+    async (req, reply) => {
+      const { reference } = req.params as { reference: string };
+      const [wr] = await fastify.db
+        .select({ reference: withdrawRequests.reference, status: withdrawRequests.status })
+        .from(withdrawRequests)
+        .where(eq(withdrawRequests.reference, reference));
+      if (!wr) return reply.code(404).send({ error: "not_found" });
+      return reply.code(200).send(wr);
     }
   );
 

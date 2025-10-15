@@ -373,7 +373,7 @@ export class MonnifyClient {
         status: "pending",
         reference,
         txHash: null,
-        metadata: JSON.stringify({}),
+        metadata: JSON.stringify({ bankCode, narration, bankName, accountNumber }),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -416,6 +416,33 @@ export class MonnifyClient {
           .where(eq(balances.id, balance.id));
       });
       throw err;
+    }
+
+    // Manual withdrawals PoC: skip Monnify if enabled
+    if (env.MANUAL_WITHDRAWALS) {
+      await fastify.db
+        .update(withdrawRequests)
+        .set({ status: "pending" })
+        .where(eq(withdrawRequests.id, withdraw!.id));
+
+      await fastify.queues.withdraw.add(
+        "initiate_withdrawal",
+        {
+          reference,
+        }
+      );
+
+      if (!withdraw) throw new Error("Withdraw row missing");
+      const wr: WithdrawRow = withdraw as WithdrawRow;
+      return {
+        id: wr.id,
+        amountFiat: String(wr.amountFiat),
+        amountToken: String(wr.amountToken),
+        status: "pending",
+        provider: "MANUAL",
+        reference,
+        monnifyResponse: { mode: "manual" },
+      };
     }
 
     // Call Monnify after DB commit

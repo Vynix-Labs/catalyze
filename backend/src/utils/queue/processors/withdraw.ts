@@ -3,6 +3,8 @@ import type { Job } from "bullmq";
 import { syncTransferStatus } from "../../../modules/fiat/fiat.service";
 import { buildApp } from "../../../app";
 import { notifyAdminOfWithdrawal } from "../../telegram/bot";
+import { eq } from "drizzle-orm";
+import { transactions, withdrawRequests, user as users } from "../../../db/schema";
 
 let fastifySingleton: Awaited<ReturnType<typeof buildApp>> | null = null;
 
@@ -18,14 +20,51 @@ export const withdrawProcessor = async (job: Job) => {
 
   switch (job.name) {
     case "initiate_withdrawal": {
-      const { reference, amount, bank } = job.data;
+      const { reference } = job.data as { reference: string };
 
       fastify.log.info({ reference }, "Initiating withdrawal");
 
-      // Notify admin via Telegram bot
-      notifyAdminOfWithdrawal(reference, amount, bank);
+      // Fetch transaction and withdrawal details
+      const [tx] = await fastify.db
+        .select()
+        .from(transactions)
+        .where(eq(transactions.reference, reference));
 
-      return { status: "otp_pending" };
+      const [wr] = await fastify.db
+        .select()
+        .from(withdrawRequests)
+        .where(eq(withdrawRequests.reference, reference));
+
+      if (!tx || !wr) {
+        fastify.log.error({ reference }, "Missing transaction or withdraw request for notification");
+        return { status: "missing" };
+      }
+
+      const meta = ((): { bankCode?: string; narration?: string } => {
+        try { return (typeof tx.metadata === 'string' ? JSON.parse(tx.metadata) : tx.metadata) || {}; } catch { return {}; }
+      })();
+
+      const [usr] = await fastify.db
+        .select({ id: users.id, name: users.name, email: users.email })
+        .from(users)
+        .where(eq(users.id, tx.userId));
+
+      // Notify admin via Telegram bot with full details
+      notifyAdminOfWithdrawal({
+        reference,
+        amountFiat: Number(wr.amountFiat),
+        tokenSymbol: tx.tokenSymbol,
+        amountToken: String(tx.amountToken),
+        bankName: wr.bankName,
+        bankCode: meta.bankCode,
+        accountNumber: wr.accountNumber,
+        narration: meta.narration,
+        userId: tx.userId,
+        userName: usr?.name ?? null,
+        userEmail: usr?.email ?? null,
+      });
+
+      return { status: "notified" };
     }
 
     case "check_withdraw_status": {
