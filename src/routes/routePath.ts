@@ -14,11 +14,22 @@ export const RoutePath = {
   ASSET: "/app/dashboard/asset/:token",
   ENTERAMOUNTPAGE: "/app/dashboard/more/staking/:crypto",
   SETTINGS: "/app/dashboard/more/settings",
+  GAMIFICATION: "/app/dashboard/more/gamification",
+  HISTORY: "/app/dashboard/more/history",
+  LEARNING_HUB: "/app/dashboard/more/learning-hub",
 
   // nested under settings
   PERSONAL_INFO: "/app/dashboard/more/settings/personal-info",
   TRANSACTION_PIN: "/app/dashboard/more/settings/transaction-pin",
   UPDATE_PASSWORD: "/app/dashboard/more/settings/update-password",
+  KYC: "/app/dashboard/more/settings/kyc",
+  RECENT_ACTIVITY: "/app/dashboard/more/settings/recent-activity",
+  PREFERENCES: "/app/dashboard/more/settings/preferences",
+  NOTIFICATIONS: "/app/dashboard/more/settings/notifications",
+  HELP_CENTER: "/app/dashboard/more/settings/help-center",
+  CONTACT_SUPPORT: "/app/dashboard/more/settings/contact-support",
+  PRIVACY_POLICY: "/app/dashboard/more/settings/privacy-policy",
+  TERMS_OF_USE: "/app/dashboard/more/settings/terms-of-use",
   CLAIMREWARDPAGE: "/app/dashboard/more/staking/claim-reward",
 
   // auth routes (standalone, can keep absolute or move under "auth")

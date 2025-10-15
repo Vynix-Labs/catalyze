@@ -41,7 +41,7 @@ function Security() {
         />
         <SettingsLink
           icon={<VideoIcon />}
-          href="/settings/recent-activity"
+          href={RoutePath.RECENT_ACTIVITY}
           name="Device Management"
           subtext="Manage active logins and devices"
         />

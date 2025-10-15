@@ -1,23 +1,24 @@
 import { MagicWandIcon, VideoIcon } from "../../../assets/svg";
 import SettingsLink from "../links/Link";
+import { RoutePath } from "../../../routes/routePath";
 
 const links = [
   {
     name: "Language",
-    href: "/settings/preferences",
+    href: RoutePath.PREFERENCES,
     description: "Choose your preferred app language",
     icon: <MagicWandIcon />,
   },
 
   {
     name: "Currency",
-    href: "/settings/preferences",
+    href: RoutePath.PREFERENCES,
     description: "Switch between NGN, USD, etc.",
     icon: <VideoIcon />,
   },
   {
     name: "Notification Settings",
-    href: "/settings/notifications",
+    href: RoutePath.NOTIFICATIONS,
     description: "Control push, email, and in-app notifications",
     icon: <VideoIcon />,
   },

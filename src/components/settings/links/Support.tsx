@@ -1,28 +1,29 @@
 import { MagicWandIcon, VideoIcon } from "../../../assets/svg";
 import SettingsLink from "../links/Link";
+import { RoutePath } from "../../../routes/routePath";
 const links = [
   {
     name: "Help Center",
-    href: "/settings/help-center",
+    href: RoutePath.HELP_CENTER,
     description: "FAQs and support articles",
     icon: <MagicWandIcon />,
   },
 
   {
     name: "Contact Support",
-    href: "/settings/contact-support",
+    href: RoutePath.CONTACT_SUPPORT,
     description: "Reach out via chat or email",
     icon: <VideoIcon />,
   },
   {
     name: "Privacy Policy",
-    href: "/settings/privacy-policy",
+    href: RoutePath.PRIVACY_POLICY,
     description: "Privacy Policy",
     icon: <VideoIcon />,
   },
   {
     name: "Terms Of Use",
-    href: "/settings/terms-of-use",
+    href: RoutePath.TERMS_OF_USE,
     description: "Read our terms of service",
     icon: <VideoIcon />,
   },

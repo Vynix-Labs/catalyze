@@ -11,6 +11,7 @@ import type { CurrencyDetailPageProps } from "../../types/types";
 import GlobalModal from "../../common/ui/modal/GlobalModal";
 import Assets, { type Asset } from "../../components/Assets";
 import { currencyIcons } from "../../utils";
+import { RoutePath } from "../../routes/routePath";
 
 // Fallback component for unknown currencies
 const FallbackIcon = ({ currencyType }: { currencyType: string }) => (
@@ -101,7 +102,7 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
       setSelectedAssetForModal(null);
 
       // Navigate to transfer page with selected asset data and transfer type
-      navigate("/dashboard/transfer", {
+      navigate(RoutePath.TRANSFER, {
         state: {
           selectedAsset: selectedAssetForModal,
           transferType: transferType,

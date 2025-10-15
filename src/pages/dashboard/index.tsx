@@ -61,7 +61,7 @@ const Home: React.FC = () => {
 
   // In your Home component
   const handleAssetClick = (asset: Asset) => {
-    navigate(`/dashboard/asset/${asset.symbol}`);
+    navigate(RoutePath.ASSET.replace(":token", asset.symbol));
   };
 
   // Handle Transfer button click from dashboard
@@ -89,7 +89,7 @@ const Home: React.FC = () => {
       setSelectedAssetForModal(null);
 
       // Navigate to transfer page with selected asset data and transfer type
-      navigate("/dashboard/transfer", {
+      navigate(RoutePath.TRANSFER, {
         state: {
           selectedAsset: selectedAssetForModal,
           transferType: transferType,
@@ -186,7 +186,7 @@ const Home: React.FC = () => {
                   <span className="text-white font-black">
                     {user?.name
                       ? user.name.charAt(0) + user.name.charAt(1)
-                      : "AO"}
+                      : "User"}
                   </span>
                 </div>
                 <div className="text-sm">

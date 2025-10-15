@@ -17,7 +17,7 @@ const links = [
   },
   {
     name: "Verify Identity (KYC)",
-    href: "/settings/kyc",
+    href: RoutePath.KYC,
     subtext: "Complete identity verification",
     icon: <VideoIcon />,
   },

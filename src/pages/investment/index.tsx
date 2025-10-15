@@ -1,7 +1,7 @@
 const InvestmentPage = () => {
   return (
     <div className="bg-neutral-50 w-full min-h-screen flex items-center justify-center">
-      <div className=" px-4 w-full">
+      <div className="max-w-md px-4 w-full">
         <h1 className="text-center text-2xl font-bold text-gray-800 mb-2">
           Investment Page
         </h1>

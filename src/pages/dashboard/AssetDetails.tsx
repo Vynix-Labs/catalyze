@@ -10,6 +10,7 @@ import {
 import { type Asset } from "../../components/Assets";
 import { useTokenBalance, useTransactions } from "../../hooks";
 import { currencyIcons } from "../../utils";
+import { RoutePath } from "../../routes/routePath";
 
 type TransferProps = {
   transferType: "transfer" | "deposit";
@@ -84,7 +85,7 @@ const AssetDetail = () => {
       // Close modal first
 
       // Navigate to transfer page with selected asset data and transfer type
-      navigate("/dashboard/transfer", {
+      navigate(RoutePath.TRANSFER, {
         state: {
           selectedAsset: selectedAssetForModal,
           transferType: transferType,
