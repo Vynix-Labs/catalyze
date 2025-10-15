@@ -10,6 +10,7 @@ import { useAuthState } from "../../hooks/useAuthState";
 import { authClient } from "../../lib/auth-client";
 import { RoutePath } from "../../routes/routePath";
 import { AuthLoader } from "../../common/ui/Loader";
+import type { User } from "../../store/jotai";
 
 interface LoginFormData {
   email: string;
@@ -28,6 +29,7 @@ function Login() {
   const location = useLocation();
   const formRef = useRef<HTMLFormElement>(null);
   const { login, isAuthenticated, initializeAuth } = useAuthState();
+  const authBase = import.meta.env.VITE_AUTH_BASE_URL as string | undefined;
 
   // Get the return URL from location state
   const from = location.state?.from || RoutePath.DASHBOARD;
@@ -40,6 +42,72 @@ function Login() {
 
     checkAuth();
   }, [initializeAuth]);
+
+  // Handle Google OAuth redirect on this screen (/auth/signin)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const hasOAuthParams = params.has("code") || params.has("state") || params.has("error");
+    if (!hasOAuthParams) return;
+
+    const cleanupUrl = () => {
+      // Remove query params but keep on the same route
+      window.history.replaceState({}, "", RoutePath.SIGNIN);
+    };
+
+    const completeOAuth = async () => {
+      const error = params.get("error");
+      if (error) {
+        toast.error(error);
+        cleanupUrl();
+        return;
+      }
+
+      try {
+        // Exchange the code/state with Better Auth backend
+        // Better Auth default callback endpoint: `${basePath}/callback/{provider}`
+        const provider = "google";
+        if (!authBase) throw new Error("Auth base URL is not configured");
+        const callbackEndpoint = `${authBase}/api/auth/callback/${provider}${location.search}`;
+        const res = await fetch(callbackEndpoint, {
+          credentials: "include",
+          mode: "cors",
+        });
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || "OAuth callback failed");
+        }
+
+        // Get session and proceed
+        const session = await authClient.getSession();
+        const userData = session?.data?.user;
+        const token = session?.data?.session?.token as string | undefined;
+        if (userData) {
+          const mappedUser: User = {
+            id: userData.id,
+            name: userData.name,
+            email: userData.email,
+            emailVerified: userData.emailVerified,
+            image: userData.image || "",
+            createdAt: userData.createdAt.toISOString(),
+            updatedAt: userData.updatedAt.toISOString(),
+            role: "user",
+          };
+          login(mappedUser, token);
+          navigate(RoutePath.DASHBOARD, { replace: true });
+        } else {
+          throw new Error("No user in session after OAuth callback");
+        }
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : "Failed to complete Google sign-in";
+        toast.error(msg);
+      } finally {
+        cleanupUrl();
+      }
+    };
+
+    void completeOAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search, navigate, login]);
 
   useEffect(() => {
     if (isAuthenticated) {

@@ -1,4 +1,4 @@
-import { emailOTPClient } from "better-auth/client/plugins";
+import { emailOTPClient, genericOAuthClient } from "better-auth/client/plugins";
 // import { nextCookies } from "better-auth/next-js";
 import { createAuthClient } from "better-auth/react";
 const authBase = import.meta.env.VITE_AUTH_BASE_URL;
@@ -10,7 +10,7 @@ export const authClient = createAuthClient({
   },
   baseURL: authBase,
   basePath: "/api/auth/",
-  plugins: [emailOTPClient()],
+  plugins: [emailOTPClient(), genericOAuthClient()],
 });
 
 export const {

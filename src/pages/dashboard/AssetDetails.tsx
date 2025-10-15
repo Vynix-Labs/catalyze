@@ -226,7 +226,7 @@ const AssetDetail = () => {
                               : ""}
                             {transaction.subtype === "fiat"
                               ? `N${transaction.amountFiat}`
-                              : `${transaction.tokenSymbol} ${transaction.amountToken}`}
+                              : `${transaction.tokenSymbol.toUpperCase()} ${Number(transaction.amountToken).toFixed(2)}`}
                           </span>
                         </div>
                       </div>

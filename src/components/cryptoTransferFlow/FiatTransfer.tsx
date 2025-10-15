@@ -4,6 +4,7 @@ import type { BaseComponentProps } from "../../types/types";
 interface FiatTransferProps extends BaseComponentProps {
   onSwap: () => void;
   isSwapped: boolean;
+  availableAmount: string;
 }
 
 export const FiatTransfer: React.FC<FiatTransferProps> = ({
@@ -17,13 +18,14 @@ export const FiatTransfer: React.FC<FiatTransferProps> = ({
   rate,
   isRateLoading,
   rateError,
+  availableAmount,
 }) => {
   return (
     <div className="p-4 w-md  space-y-4">
       <div className="w-full">
         <div className="flex items-center justify-between text-sm mb-2">
           <div className="font-bold">Enter Amount</div>
-          <span>Available Amount: 10,000</span>
+          <span>Available Amount: {availableAmount}</span>
         </div>
 
         <div className="relative">

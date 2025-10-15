@@ -150,7 +150,8 @@ const Home: React.FC = () => {
       ? assetsDatas.crypto.map((asset, index) => {
           // Find matching balance for this asset symbol
           const matchingBalance = balanceData?.items?.find(
-            (balance) => balance.tokenSymbol === asset.symbol
+            (balance) =>
+              balance.tokenSymbol?.toUpperCase() === asset.symbol?.toUpperCase()
           );
 
           const balanceAmount = matchingBalance

@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import Button from "../../common/ui/button";
 import DepositModal from "../../common/ui/modal/DepositModal";
 import GlobalModal from "../../common/ui/modal/GlobalModal";
-import { useInitiateDeposit, useTokenRate, useTradingFees } from "../../hooks";
+import { useInitiateDeposit, useTokenRate, useTradingFees, useBalances } from "../../hooks";
 import type { AmountEntryStepProps } from "../../types/types";
 import type { fiatResponse } from "../../utils/types";
 import { currencyIcons, getNetworkName } from "../../utils";
@@ -77,6 +77,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   } = useTradingFees();
   const { mutate: initiateDeposit, isPending: isInitiateDepositPending } =
     useInitiateDeposit();
+  const { data: balances } = useBalances();
 
   // Use currencyMode directly instead of deriving from transferType
   const [activeTab, setActiveTab] = useState<"fiat" | "crypto">(currencyMode);
@@ -142,6 +143,15 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
   }, [currentRate, fees, quoteType]);
 
   const baseRate = useMemo(() => rates?.base ?? 0, [rates]);
+
+  // Derive available balance for the selected token
+  const availableTokenBalance = useMemo(() => {
+    const symbol = currencyType?.toUpperCase();
+    const match = balances?.items?.find(
+      (b) => b.tokenSymbol?.toUpperCase() === symbol
+    );
+    return match ? parseFloat(match.balance || "0") : 0;
+  }, [balances, currencyType]);
 
   const handleFiatUSDCChange = (value: string) => {
     setFiatAmount(value);
@@ -295,6 +305,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
           />
         ) : (
           <FiatTransfer
+            availableAmount={availableTokenBalance.toFixed(6)}
             amount={fiatAmount}
             amountNGN={fiatAmountNGN}
             currencyType={currencyType}
@@ -326,7 +337,7 @@ const AmountEntryStep: React.FC<AmountEntryStepProps> = ({
           onCryptoAmountChange={handleCryptoAmountChange}
           onAddressChange={setAddress}
           onNetworkChange={setSelectedNetwork}
-          balance={fiatAmountNGN}
+          balance={availableTokenBalance.toFixed(6)}
         />
       )}
 
