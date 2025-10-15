@@ -139,7 +139,7 @@ const CurrencyDetailPage: React.FC<CurrencyDetailPageProps> = ({
   ];
 
   return (
-    <div className="min-h-screen w-md bg-neutral-50">
+    <div className="min-h-screen bg-neutral-50">
       <div className="  max-w-md w-full mx-auto min-h-screen">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white sticky top-0 z-10">

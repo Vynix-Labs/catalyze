@@ -46,7 +46,7 @@ export const CryptoDeposit: React.FC<CryptoComponentProps> = ({
   const qrValue = data?.address || "";
 
   return (
-    <div className="flex w-md flex-col items-center space-y-6 p-4">
+    <div className="flex flex-col items-center space-y-6 p-4">
       {/* ✅ QR Code with custom overlay */}
       <div className="relative w-48 h-48 bg-white border border-blue-500 rounded-lg flex items-center justify-center">
         <QRCodeCanvas

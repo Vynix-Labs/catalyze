@@ -22,7 +22,7 @@ const TransactionDetailsPage = () => {
   };
 
   return (
-    <div className="bg-neutral-50 w-md">
+    <div className="bg-neutral-50">
       <div className="  max-w-md w-full mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white sticky top-0 z-10">

@@ -21,8 +21,8 @@ export const FiatDeposit: React.FC<FiatDepositProps> = ({
   rateError = null,
 }) => {
   return (
-    <div className="p-4 w-md space-y-4">
-      <div className="">
+    <div className="p-4 space-y-4">
+      <div className="w-full max-w-md">
         <div className="flex items-center justify-between text-sm mb-2">
           <div className="font-bold">Enter Amount</div>
           <span>Available Amount: {availableAmount}</span>
