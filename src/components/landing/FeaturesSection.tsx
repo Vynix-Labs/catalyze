@@ -13,7 +13,7 @@ function FeaturesSection() {
   };
 
   return (
-    <section className="lg:py-30 pb-14 space-y-20 px-4 lg:px-6 bg-[#FEFEFE]">
+    <section id="features" className="lg:py-30 pb-14 space-y-20 px-4 lg:px-6 bg-[#FEFEFE]">
       <div className="lg:max-w-6xl flex flex-col lg:flex-row gap-6 md:gap-16 justify-between mx-auto items-center">
         <div className="bg-white/50 pt-15 lg:px-11 w-fit">
           <img

@@ -123,16 +123,16 @@ function Nav() {
                     >
                       <ul className="flex flex-col text-sm font-medium text-gray-700">
                         <li className="hover:bg-slate-200 p-2">
-                          <Link to="/about">About Us</Link>
+                          <Link to="#">About Us</Link>
                         </li>
                         <li className="hover:bg-slate-200 p-2">
-                          <Link to="/careers">Careers</Link>
+                          <Link to="#">Careers</Link>
                         </li>
                         <li className="hover:bg-slate-200 p-2">
-                          <Link to="/team">Our Team</Link>
+                          <Link to="#">Our Team</Link>
                         </li>
                         <li className="hover:bg-slate-200 p-2">
-                          <Link to="/contact">Contact</Link>
+                          <Link to="#">Contact</Link>
                         </li>
                       </ul>
                     </motion.div>
@@ -141,11 +141,11 @@ function Nav() {
               </li>
 
               <li>
-                <Link to="/features">features</Link>
+                <Link to="#features">features</Link>
               </li>
-              <li>
+              {/* <li>
                 <Link to="/pricing">pricing</Link>
-              </li>
+              </li> */}
             </ul>
 
             <div className="md:block hidden">
@@ -220,25 +220,25 @@ function Nav() {
                         className="mt-2 pl-4 flex flex-col gap-4 text-sm font-medium text-gray-700"
                       >
                         <Link
-                          to="/about"
+                          to="#"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           About Us
                         </Link>
                         <Link
-                          to="/careers"
+                          to="#"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           Careers
                         </Link>
                         <Link
-                          to="/team"
+                          to="#"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           Our Team
                         </Link>
                         <Link
-                          to="/contact"
+                          to="#"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           Contact
@@ -249,15 +249,15 @@ function Nav() {
                 </li>
 
                 <li>
-                  <Link to="/features" onClick={() => setMobileMenuOpen(false)}>
+                  <Link to="#features" onClick={() => setMobileMenuOpen(false)}>
                     features
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link to="/pricing" onClick={() => setMobileMenuOpen(false)}>
                     pricing
                   </Link>
-                </li>
+                </li> */}
               </ul>
 
               {/* Button pinned at bottom */}
