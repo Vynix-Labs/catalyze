@@ -39,7 +39,7 @@ export const routes = createBrowserRouter([
   },
 
   {
-    path: "/app/dashboard",
+    path: RoutePath.DASHBOARD,
     element: (
       <ProtectedRoute>
         <Layout />
@@ -90,7 +90,7 @@ export const routes = createBrowserRouter([
   },
 
   {
-    path: "/app/auth",
+    path: `${RoutePath.ONBOARDING}/auth`,
     children: [
       { path: RoutePath.CREATE_ACCOUNT, element: <SignUp /> },
       { path: RoutePath.RESET_OTP, element: <VerifyEmail /> },
