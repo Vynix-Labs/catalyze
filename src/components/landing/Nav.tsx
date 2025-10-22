@@ -97,8 +97,7 @@ function Nav() {
           {/* Desktop Links */}
           <div className="hidden sm:flex flex-1 gap-6 items-center justify-between">
             <ul className="flex gap-6 justify-between w-full items-center text-gray-700 text-base font-bold capitalize relative">
-              {/* Dropdown */}
-              <li className="relative" ref={dropDownRef}>
+              {/* <li className="relative" ref={dropDownRef}>
                 <button
                   onClick={() => setDesktopDropdownOpen((prev) => !prev)}
                   className="flex gap-1 items-center"
@@ -138,7 +137,7 @@ function Nav() {
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </li>
+              </li> */}
 
               <li>
                 <Link to="#features">features</Link>
@@ -197,7 +196,7 @@ function Nav() {
             >
               {/* Nav Links */}
               <ul className="flex flex-col gap-6 pr-4 mt-24 [&>li]:border-b [&>li]:border-gray-100/40 [&>li]:pb-4  text-gray-700 text-base font-bold capitalize flex-1">
-                <li>
+                {/* <li>
                   <button
                     onClick={() => setMobileDropdownOpen((prev) => !prev)}
                     className="flex items-center justify-between w-full"
@@ -246,7 +245,7 @@ function Nav() {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </li>
+                </li> */}
 
                 <li>
                   <Link to="#features" onClick={() => setMobileMenuOpen(false)}>
