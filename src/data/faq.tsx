@@ -2,30 +2,30 @@ export const faqData = [
   {
     title: "What is Catalyze?",
     description:
-      "Catalyze is a mobile micro-investment platform designed to make investing in cryptocurrencies and tokenized assets easy, affordable, and accessible—especially for users in emerging markets.",
+      "Catalyze is your bridge between traditional finance and DeFi. Convert crypto to cash instantly, earn yields on your fiat, learn about investing, and access tokenized real-world assets — all in one seamless platform.",
   },
   {
-    title: "How much money do I need to start investing?",
-    description: "You can start with as little as $1 (or local equivalent).",
+    title: "How does crypto-fiat conversion work?",
+    description: "Convert between crypto and local currency in under a minute with a simple 1% fee. We support USDC, USDT, STRK, and more, with direct NGN integration.",
   },
   {
-    title: "Do I need prior knowledge about crypto or investing?",
+    title: "How do I earn DeFi yields?",
     description:
-      "No. Catalyze is beginner-friendly and includes simple guides and tips.",
+      "Simply deposit your fiat, and we automatically put it to work in audited DeFi protocols. You earn yields without managing wallets, seed phrases, or gas fees.",
   },
   {
-    title: "Is Catalyze safe and secure?",
+    title: "Do I need to manage a crypto wallet?",
     description:
-      "Yes. We use bank-grade encryption, secure PIN/2FA, and trusted custodial partners.",
+      "No. We handle all the blockchain complexity through account abstraction. Just sign up with email and password — no seed phrases, no gas fees.",
   },
   {
-    title: "Can I use Catalyze on any phone?",
+    title: "Can I invest in traditional assets too?",
     description:
-      "Yes. It works on most smartphones with internet access and is lightweight.",
+      "Yes. Beyond crypto, you can invest in stocks and tokenized real-world assets, building a diversified portfolio from one platform.",
   },
   {
-    title: "Are there any hidden fees?",
+    title: "Is my money safe?",
     description:
-      "No hidden fees. All charges are shown clearly before you confirm a transaction.",
+      "Yes. We use bank-level security, transaction PIN protection, and integrate with audited DeFi protocols. Built on Starknet for transparency and security.",
   },
 ];

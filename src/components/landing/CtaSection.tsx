@@ -15,12 +15,11 @@ function CtaSection() {
       >
         <div className="space-y-4 text-center">
           <h2 className="text-lg md:text-4xl lg:text-7xl font-black text-white lg:max-w-[29ch]">
-            Ready to start your investment journey? Join the waitlist now!
+            Ready to bridge traditional finance and DeFi? Join the waitlist now!
           </h2>
 
           <p className="text-sm md:text-xl font-semibold md:leading-8 text-white text-pretty max-w-[35ch] md:max-w-[49ch] mx-auto">
-            Be among the first to unlock easy, affordable investing — no
-            experience needed.
+            Be among the first to convert crypto instantly, earn DeFi yields, and invest in the future — all from one seamless platform.
           </p>
         </div>
 

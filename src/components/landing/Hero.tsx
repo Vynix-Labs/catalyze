@@ -1,6 +1,6 @@
 import bg from "../../assets/images/landing_hero_bg.png";
 import iphone from "../../assets/images/iphone 15.png";
-import solana from "../../assets/images/solana.png";
+import starknet from "../../assets/images/starknet.png";
 import tether from "../../assets/images/tether.png";
 import bitcoin from "../../assets/images/bitcoin.png";
 import ethereum from "../../assets/images/ethereum.png";
@@ -24,10 +24,10 @@ function Hero() {
             <span className="bg-primary-100/10 border border-primary-100 pr-2 pl-4">
               Catalyze
             </span>{" "}
-            – Invest Smarter, Starting Small
+            – Traditional Finance Meets DeFi
           </h1>
           <p className="text-sm text-center md:text-base">
-            Empowering you Through Micro-Investments in Digital Assets
+            Convert crypto to cash instantly. Earn DeFi yields. Invest in tokenized assets — all in one seamless platform.
           </p>
         </div>
         {!showInput ? (
@@ -62,7 +62,7 @@ function Hero() {
 
       <div className="relative">
         <motion.img
-          src={solana}
+          src={starknet}
           alt="solana"
           className="md:max-w-[280px]  xl:max-w-[350px] absolute lg:block hidden left-1/2 -translate-x-1/2"
           initial={{

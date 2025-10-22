@@ -27,13 +27,10 @@ function FeaturesSection() {
           <div className="space-y-6">
             <div className="space-y-3">
               <h3 className="text-xl lg:text-4xl lg:leading-[44px] text-center lg:text-start font-black tracking-[-3%]">
-                Investment Opportunities for the General Population
+                Seamless Crypto-Fiat Conversion
               </h3>
               <p className="text-xs lg:text-base font-semibold text-gray-100 lg:leading-[30px]">
-                For many people — especially in emerging markets — investing
-                feels like an exclusive club. Traditional platforms require
-                large sums of money, are packed with confusing financial jargon,
-                and are built for those who already understand the game.
+                Moving money between crypto and traditional currency shouldn't take hours or cost a fortune. With Catalyze, you get instant conversions with transparent fees — no complexity, no waiting.
               </p>
             </div>
 
@@ -42,20 +39,19 @@ function FeaturesSection() {
                 <span className="lg:size-6 p-1 size-4 rounded-full flex items-center justify-center bg-primary-100">
                   <Check className="text-white" size={20} />
                 </span>
-                High entry barriers keep first-time investors out.
+                Convert crypto to local currency in under 1 minute
               </li>
               <li className="flex items-center gap-2">
                 <span className="lg:size-6 p-1 size-4 rounded-full flex items-center justify-center bg-primary-100">
                   <Check className="text-white" size={20} />
                 </span>
-                Complex platforms intimidate rather than invite.{" "}
+                Simple 1% fee structure with no hidden charges
               </li>
               <li className="flex items-center gap-2">
                 <span className="lg:size-6 p-1 size-4 rounded-full flex items-center justify-center bg-primary-100">
                   <Check className="text-white" size={20} />
                 </span>
-                Minimum deposit requirements are often higher than people can
-                afford.{" "}
+                Support for USDC, USDT, STRK, and more
               </li>
             </ul>
           </div>
@@ -86,14 +82,10 @@ function FeaturesSection() {
           <div className="space-y-6">
             <div className="space-y-3">
               <h3 className="text-xl lg:text-4xl lg:leading-[44px] text-center lg:text-start font-black tracking-[-3%]">
-                Limited Availability of Financial Tools and Educational
-                Resources{" "}
+                DeFi Yields Without the Complexity
               </h3>
               <p className="text-xs lg:text-base font-semibold text-gray-100 lg:leading-[30px]">
-                in underserved communities, access to trustworthy financial
-                knowledge is scarce or non-existent. People are eager to learn,
-                but the right tools aren’t available — and most educational
-                content is too complex, too foreign, or too inaccessible.
+                Earning DeFi yields shouldn't require a computer science degree. Deposit your fiat, and we automatically put it to work in audited DeFi protocols — you earn while we handle the technical details.
               </p>
             </div>
 
@@ -102,20 +94,19 @@ function FeaturesSection() {
                 <span className="lg:size-6 p-1 size-4 rounded-full flex items-center justify-center bg-primary-100">
                   <Check className="text-white" size={20} />
                 </span>
-                Little or no guidance on how to begin investing.
+                Earn yields on your fiat holdings automatically
               </li>
               <li className="flex items-center gap-2">
                 <span className="lg:size-6 p-1 size-4 rounded-full flex items-center justify-center bg-primary-100">
                   <Check className="text-white" size={20} />
                 </span>
-                Overly technical content that doesn’t match users’ literacy or
-                language levels.
+                No wallets, seed phrases, or gas fees to manage
               </li>
               <li className="flex items-center gap-2">
                 <span className="lg:size-6 p-1 size-4 rounded-full flex items-center justify-center bg-primary-100">
                   <Check className="text-white" size={20} />
                 </span>
-                No tools designed for low-end devices or unstable internet.
+                Powered by audited DeFi protocols you can trust
               </li>
             </ul>
           </div>

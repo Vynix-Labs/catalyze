@@ -19,24 +19,24 @@ function Slider() {
   const sliders = [
     {
       id: 1,
-      title: "Start Small. Grow Steady.",
+      title: "Your Bridge to Smarter Money",
       description:
-        "With Catalyze, you can invest in crypto and digital assets with as little as $1 — no complex steps, no experience needed.",
-      tag: "Safe. Smart. Designed for You.",
+        "Convert crypto to cash instantly. Earn DeFi yields on your savings. Invest in stocks and real-world assets — all in one place.",
+      tag: "Traditional Meets DeFi",
     },
     {
       id: 2,
-      title: "Grow and Learn Together",
+      title: "Earn While You Learn",
       description:
-        "We make sure you understand every step. Access bite-sized lessons and tips while investing — because confidence builds success.",
-      tag: "Learn as You Go",
+        "Your money grows with DeFi-native yields while you explore crypto, investing, and financial strategies — no jargon, just clarity.",
+      tag: "Grow Smarter, Not Harder",
     },
     {
       id: 3,
-      title: "Built for Everyday Life",
+      title: "The Future of Finance, Today",
       description:
-        "Catalyze works on any smartphone, protects your data, and helps you stay in control — wherever you are, whenever you’re ready.",
-      tag: "Investing Made Simple",
+        "No seed phrases. No gas fees. Just seamless access to crypto, DeFi, and tokenized assets — designed for the way you live.",
+      tag: "Simple. Powerful. Yours.",
     },
   ];
 

@@ -8,19 +8,19 @@ function Requirement() {
 
   const steps = [
     {
-      title: "Start Small, Grow Steady",
+      title: "Convert Instantly, Earn Automatically",
       description:
-        "Invest from as little as $1. Whether you're a student or just starting out, Catalyze helps you build wealth on your own terms.",
+        "Move between crypto and cash in under a minute, earn DeFi yields — all without managing wallets or understanding blockchain.",
     },
     {
-      title: "Learn as You Invest",
+      title: "Invest Beyond Crypto",
       description:
-        "Get built-in education resources that explain crypto and investing in simple language, so you grow your knowledge while growing wealth.",
+        "Access stocks and tokenized real-world assets alongside your crypto holdings. Build a diversified portfolio from one unified platform.",
     },
     {
-      title: "Tools for the Future",
+      title: "Grow Smarter with Every Step",
       description:
-        "From portfolio tracking to goal-based saving, we give you everything you need to take control of your financial journey.",
+        "Track your portfolio, complete challenges, and unlock bite-sized lessons that turn curiosity into confidence — all while your money works for you.",
     },
   ];
 
@@ -32,12 +32,10 @@ function Requirement() {
       >
         <div className="md:max-w-[35.5rem] mx-auto space-y-3 text-center">
           <h2 className="text-2xl md:text-5xl font-black text-black">
-            Everything You Need to Start Investing — Simplified.
+            Everything You Need — Nothing You Don't.
           </h2>
           <p className="text-xs md:text-base font-semibold text-gray-100">
-            From micro-investments to built-in education and portfolio tools,
-            Catalyze brings powerful financial features to your fingertips — no
-            experience required.
+            Crypto conversion, DeFi yields, learning tools, and real-world asset investing — all in one seamless platform designed for the way you live.
           </p>
         </div>
 
