@@ -3,12 +3,12 @@ import { LogoIcon } from "../../assets/svg";
 import Button from "../../common/ui/button";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 function Nav() {
   const [showHeader, setShowHeader] = useState(true);
   const [desktopDropdownOpen, setDesktopDropdownOpen] = useState(false);
-  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+  // const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const lastScrollY = useRef(window.scrollY);
   const dropDownRef = useRef<HTMLLIElement | null>(null);
@@ -50,12 +50,12 @@ function Nav() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Auto-close dropdown when mobileMenuOpen closes
-  useEffect(() => {
-    if (!mobileMenuOpen) {
-      setMobileDropdownOpen(false);
-    }
-  }, [mobileMenuOpen]);
+  // // Auto-close dropdown when mobileMenuOpen closes
+  // useEffect(() => {
+  //   if (!mobileMenuOpen) {
+  //     setMobileDropdownOpen(false);
+  //   }
+  // }, [mobileMenuOpen]);
 
   // Close desktop dropdown when clicking outside
   useEffect(() => {
