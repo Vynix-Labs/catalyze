@@ -24,7 +24,7 @@ function Hero() {
             <span className="bg-primary-100/10 border border-primary-100 pr-2 pl-4">
               Catalyze
             </span>{" "}
-            – Traditional Finance Meets DeFi
+            – Earn DeFi Native Yield on Fiat
           </h1>
           <p className="text-sm text-center md:text-base">
             Convert crypto to cash instantly. Earn DeFi yields. Invest in tokenized assets — all in one seamless platform.
