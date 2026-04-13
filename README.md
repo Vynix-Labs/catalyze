@@ -4,8 +4,7 @@
 
 Catalyst Finance is a mobile-first platform that bridges traditional finance and DeFi for users across Africa. Built on Starknet, it enables seamless crypto-to-fiat transactions and provides access to DeFi-native yields—all with complete wallet abstraction.
 
-🔗 **Live Demo:** [catalyze.vynixlabs.com](https://catalyze.vynixlabs.com)  
-🏆 **Hackathon:** [Starknet Re{Solve} Hackathon](https://resolve-starknet.devpost.com/)  
+🔗 **Live Demo:** [catalyze.finance](https://catalyze.finance/)  
 📝 **Devpost:** [Catalyst Finance Submission](https://devpost.com/software/catalyte-finance)
 
 ---
